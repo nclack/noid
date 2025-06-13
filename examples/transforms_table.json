@@ -1,0 +1,51 @@
+[
+  {
+    "id": "identity1",
+    "label": "Identity transformation"
+  },
+  {
+    "id": "translation1", 
+    "label": "Translation by [10, 20, 5]",
+    "translation": [10, 20, 5]
+  },
+  {
+    "id": "scale1",
+    "label": "Scale by [2.0, 1.5, 0.5]",
+    "scale": [2.0, 1.5, 0.5]
+  },
+  {
+    "id": "mapAxis1",
+    "label": "Swap x and y axes", 
+    "mapAxis": {"x": "y", "y": "x", "z": "z"}
+  },
+  {
+    "id": "rotation1",
+    "label": "90 degree rotation around z-axis",
+    "matrix": [[0, -1, 0], [1, 0, 0], [0, 0, 1]]
+  },
+  {
+    "id": "homogeneous1",
+    "label": "Affine transformation with scaling and translation",
+    "matrix": [[2.0, 0, 0, 10], [0, 1.5, 0, 20], [0, 0, 0.5, 5], [0, 0, 0, 1]]
+  },
+  {
+    "id": "homogeneous2",
+    "label": "Projective transformation", 
+    "matrix": [[1, 0, 0, 0], [0, 1, 0, 0], [0, 0, 1, 0], [0.001, 0.002, 0, 1]]
+  },
+  {
+    "id": "sequence1",
+    "label": "Composite transformation: scale then translate",
+    "sequence": ["scale1", "translation1"]
+  },
+  {
+    "id": "displacements1",
+    "label": "Non-linear displacement field",
+    "displacements": "path/to/displacement_field.zarr"
+  },
+  {
+    "id": "coordinates1", 
+    "label": "Explicit coordinate mapping",
+    "coordinates": {"lookup_table": "path/to/coordinate_lut.zarr", "interpolation": "linear"}
+  }
+]

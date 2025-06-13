@@ -1,62 +1,58 @@
 {
   "@context": {
-    "@version": 1.1,
-    "@base": "https://example.org/spatial-transforms/",
-    "st": "https://example.org/spatial-transforms/",
+    "@vocab": "https://github.com/nclack/noid/schemas/transforms/",
+    "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
     "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
-    
-    "TransformType": {
-      "@id": "st:TransformType",
-      "@type": "rdfs:Class"
-    },
-    
-    "identity": {
-      "@id": "st:identity",
-      "@type": "st:TransformType"
-    },
+    "id": "@id",
+    "label": "rdfs:label",
     "translation": {
-      "@id": "st:translation",
-      "@type": "st:TransformType"
+      "@id": "translation",
+      "@type": "@json",
+      "@context": {
+        "@type": "translation"
+      }
     },
     "scale": {
-      "@id": "st:scale",
-      "@type": "st:TransformType"
+      "@id": "scale", 
+      "@type": "@json",
+      "@context": {
+        "@type": "scale"
+      }
     },
-    "rotation": {
-      "@id": "st:rotation",
-      "@type": "st:TransformType"
-    },
-    "affine": {
-      "@id": "st:affine",
-      "@type": "st:TransformType"
+    "matrix": {
+      "@id": "matrix",
+      "@type": "@json",
+      "@context": {
+        "@type": "homogeneous"
+      }
     },
     "mapAxis": {
-      "@id": "st:mapAxis",
-      "@type": "st:TransformType"
+      "@id": "mapAxis",
+      "@type": "@json", 
+      "@context": {
+        "@type": "mapAxis"
+      }
     },
     "sequence": {
-      "@id": "st:sequence",
-      "@type": "st:TransformType"
+      "@id": "sequence",
+      "@type": "@json",
+      "@context": {
+        "@type": "sequence"  
+      }
     },
     "displacements": {
-      "@id": "st:displacements",
-      "@type": "st:TransformType"
+      "@id": "displacements",
+      "@type": "@json",
+      "@context": {
+        "@type": "displacements"
+      }
     },
     "coordinates": {
-      "@id": "st:coordinates",
-      "@type": "st:TransformType"
-    },
-    "inverseOf": {
-      "@id": "st:inverseOf",
-      "@type": "st:TransformType"
-    },
-    "bijection": {
-      "@id": "st:bijection",
-      "@type": "st:TransformType"
-    },
-    "byDimension": {
-      "@id": "st:byDimension",
-      "@type": "st:TransformType"
+      "@id": "coordinates", 
+      "@type": "@json",
+      "@context": {
+        "@type": "coordinates"
+      }
     }
   }
 }

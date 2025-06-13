@@ -1,224 +1,104 @@
-@prefix ct: <https://your-domain.org/coordinate-transforms/> .
-@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix owl: <http://www.w3.org/2002/07/owl#> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
-@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
 @prefix dc: <http://purl.org/dc/terms/> .
+@prefix noid: <https://github.com/nclack/noid/schemas/transforms/> .
 
-# Vocabulary metadata
-ct: a owl:Ontology ;
-    rdfs:label "Coordinate Transform Vocabulary"@en ;
-    rdfs:comment "Controlled vocabulary for coordinate transformations between named coordinate spaces"@en ;
-    dc:created "2024-12-19"^^xsd:date ;
-    dc:creator "Multidimensional Array Working Group" ;
-    dc:license <https://creativecommons.org/licenses/by/4.0/> ;
-    owl:versionInfo "1.0.0" .
+<https://github.com/nclack/noid/schemas/transforms/vocabulary.ttl> a owl:Ontology ;
+    dc:title "NOID Transform Vocabulary" ;
+    dc:description "Minimal vocabulary for coordinate transformations and their parameterizations" ;
+    dc:creator "NOID Project" ;
+    owl:versionInfo "0.1.0" .
 
-# Main class
-ct:TransformType a rdfs:Class ;
-    rdfs:label "Transform Type"@en ;
-    rdfs:comment "A type of coordinate transformation between coordinate spaces"@en ;
-    rdfs:isDefinedBy ct: .
+# Base class
 
-# Properties
-ct:hasParameter a rdf:Property ;
-    rdfs:label "has parameter"@en ;
-    rdfs:comment "Indicates a parameter required by this transform type"@en ;
-    rdfs:domain ct:TransformType ;
-    rdfs:range ct:Parameter .
+noid:Transform a owl:Class ;
+    rdfs:label "Transform" ;
+    rdfs:comment "Base class for coordinate transformations" ;
+    rdfs:subClassOf owl:Thing .
 
-ct:parameterName a rdf:Property ;
-    rdfs:label "parameter name"@en ;
-    rdfs:comment "The name of a transform parameter"@en ;
-    rdfs:domain ct:Parameter ;
-    rdfs:range xsd:string .
+# Transform types
 
-ct:parameterType a rdf:Property ;
-    rdfs:label "parameter type"@en ;
-    rdfs:comment "The data type of a transform parameter"@en ;
-    rdfs:domain ct:Parameter ;
-    rdfs:range xsd:string .
+noid:identity a owl:Class ;
+    rdfs:label "Identity Transform" ;
+    rdfs:comment "Maps coordinates without modification" ;
+    rdfs:subClassOf noid:Transform .
 
-ct:isRequired a rdf:Property ;
-    rdfs:label "is required"@en ;
-    rdfs:comment "Whether this parameter is required"@en ;
-    rdfs:domain ct:Parameter ;
-    rdfs:range xsd:boolean .
+noid:mapAxis a owl:Class ;
+    rdfs:label "Map Axis Transform" ;
+    rdfs:comment "Axis permutations as a mapping of axis names" ;
+    rdfs:subClassOf noid:Transform .
 
-# Parameter class
-ct:Parameter a rdfs:Class ;
-    rdfs:label "Parameter"@en ;
-    rdfs:comment "A parameter for a transform type"@en .
+noid:translation a owl:Class ;
+    rdfs:label "Translation Transform" ;
+    rdfs:comment "Shifts coordinates by a constant vector" ;
+    rdfs:subClassOf noid:Transform .
 
-# Transform Types
+noid:scale a owl:Class ;
+    rdfs:label "Scale Transform" ;
+    rdfs:comment "Scales coordinates along each axis" ;
+    rdfs:subClassOf noid:Transform .
 
-ct:identity a ct:TransformType ;
-    rdfs:label "Identity Transform"@en ;
-    rdfs:comment "Maps input coordinates to output coordinates without modification"@en ;
-    skos:notation "identity" ;
-    skos:definition "The identity transformation that leaves coordinates unchanged"@en .
+noid:homogeneous a owl:Class ;
+    rdfs:label "Homogeneous Transform" ;
+    rdfs:comment "Matrix-based transformation using homogeneous coordinates (supports both affine and projective)" ;
+    rdfs:subClassOf noid:Transform .
 
-ct:translation a ct:TransformType ;
-    rdfs:label "Translation Transform"@en ;
-    rdfs:comment "Translates points by a fixed vector"@en ;
-    skos:notation "translation" ;
-    skos:definition "A transformation that shifts all points by a constant vector"@en ;
-    ct:hasParameter ct:translation_vector .
+noid:rotation a owl:Class ;
+    rdfs:label "Rotation Transform" ;
+    rdfs:comment "Matrix-based rotation transformation" ;
+    rdfs:subClassOf noid:Transform .
 
-ct:translation_vector a ct:Parameter ;
-    ct:parameterName "translation" ;
-    ct:parameterType "number[]" ;
-    ct:isRequired true ;
-    rdfs:comment "Translation vector with length N"@en .
+noid:sequence a owl:Class ;
+    rdfs:label "Sequence Transform" ;
+    rdfs:comment "Composition of multiple transforms applied in sequence" ;
+    rdfs:subClassOf noid:Transform .
 
-ct:scale a ct:TransformType ;
-    rdfs:label "Scale Transform"@en ;
-    rdfs:comment "Scales coordinates by factors along each axis"@en ;
-    skos:notation "scale" ;
-    skos:definition "A transformation that scales coordinates by specified factors"@en ;
-    ct:hasParameter ct:scale_factors .
+noid:displacements a owl:Class ;
+    rdfs:label "Displacements Transform" ;
+    rdfs:comment "Vector field-based transformation using displacement maps" ;
+    rdfs:subClassOf noid:Transform .
 
-ct:scale_factors a ct:Parameter ;
-    ct:parameterName "scale" ;
-    ct:parameterType "number[]" ;
-    ct:isRequired true ;
-    rdfs:comment "Scale factors with length N (non-zero values)"@en .
+noid:coordinates a owl:Class ;
+    rdfs:label "Coordinates Transform" ;
+    rdfs:comment "Explicit coordinate mapping transformation" ;
+    rdfs:subClassOf noid:Transform .
 
-ct:rotation a ct:TransformType ;
-    rdfs:label "Rotation Transform"@en ;
-    rdfs:comment "Rotates coordinates using an orthonormal matrix"@en ;
-    skos:notation "rotation" ;
-    skos:definition "A transformation that rotates coordinates in N-dimensional space"@en ;
-    ct:hasParameter ct:rotation_matrix .
+# Parameter properties
 
-ct:rotation_matrix a ct:Parameter ;
-    ct:parameterName "matrix" ;
-    ct:parameterType "number[][]" ;
-    ct:isRequired true ;
-    rdfs:comment "NxN rotation matrix with determinant 1"@en .
+noid:translation a owl:DatatypeProperty ;
+    rdfs:label "translation" ;
+    rdfs:comment "Translation vector as array of numeric values" ;
+    rdfs:domain noid:translation .
 
-ct:affine a ct:TransformType ;
-    rdfs:label "Affine Transform"@en ;
-    rdfs:comment "General affine transformation from N to M dimensions"@en ;
-    skos:notation "affine" ;
-    skos:definition "A transformation that preserves lines and parallelism"@en ;
-    ct:hasParameter ct:affine_matrix .
+noid:scale a owl:DatatypeProperty ;
+    rdfs:label "scale" ;
+    rdfs:comment "Scale factors as array of numeric values" ;
+    rdfs:domain noid:scale .
 
-ct:affine_matrix a ct:Parameter ;
-    ct:parameterName "matrix" ;
-    ct:parameterType "number[][]" ;
-    ct:isRequired true ;
-    rdfs:comment "Mx(N+1) affine transformation matrix"@en .
+noid:matrix a owl:DatatypeProperty ;
+    rdfs:label "matrix" ;
+    rdfs:comment "Transformation matrix as array of arrays" ;
+    rdfs:domain noid:homogeneous, noid:rotation .
 
-ct:mapAxis a ct:TransformType ;
-    rdfs:label "Map Axis Transform"@en ;
-    rdfs:comment "Permutes axes by mapping axis indices"@en ;
-    skos:notation "mapAxis" ;
-    skos:definition "A transformation that reorders dimensions"@en ;
-    ct:hasParameter ct:axis_mapping .
+noid:mapAxis a owl:DatatypeProperty ;
+    rdfs:label "mapAxis" ;
+    rdfs:comment "Mapping between input and output axes" ;
+    rdfs:domain noid:mapAxis .
 
-ct:axis_mapping a ct:Parameter ;
-    ct:parameterName "mapping" ;
-    ct:parameterType "object" ;
-    ct:isRequired true ;
-    rdfs:comment "Object mapping output axis names to input axis names"@en .
+noid:sequence a owl:ObjectProperty ;
+    rdfs:label "sequence" ;
+    rdfs:comment "Ordered list of transforms in the sequence" ;
+    rdfs:domain noid:sequence ;
+    rdfs:range noid:Transform .
 
-ct:sequence a ct:TransformType ;
-    rdfs:label "Sequence Transform"@en ;
-    rdfs:comment "Composition of multiple transformations applied in order"@en ;
-    skos:notation "sequence" ;
-    skos:definition "A transformation that applies multiple transforms sequentially"@en ;
-    ct:hasParameter ct:sequence_transforms .
+noid:displacements a owl:DatatypeProperty ;
+    rdfs:label "displacements" ;
+    rdfs:comment "Reference to displacement field data" ;
+    rdfs:domain noid:displacements .
 
-ct:sequence_transforms a ct:Parameter ;
-    ct:parameterName "transformations" ;
-    ct:parameterType "transform[]" ;
-    ct:isRequired true ;
-    rdfs:comment "Ordered list of transformations to apply"@en .
-
-ct:displacements a ct:TransformType ;
-    rdfs:label "Displacement Field Transform"@en ;
-    rdfs:comment "Transform using a displacement vector field"@en ;
-    skos:notation "displacements" ;
-    skos:definition "A transformation defined by displacement vectors at each point"@en ;
-    ct:hasParameter ct:displacement_field ;
-    ct:hasParameter ct:displacement_interpolation .
-
-ct:displacement_field a ct:Parameter ;
-    ct:parameterName "field" ;
-    ct:parameterType "string" ;
-    ct:isRequired true ;
-    rdfs:comment "Reference to displacement field array"@en .
-
-ct:displacement_interpolation a ct:Parameter ;
-    ct:parameterName "interpolation" ;
-    ct:parameterType "string" ;
-    ct:isRequired false ;
-    rdfs:comment "Interpolation method: linear, nearest, or cubic"@en .
-
-ct:coordinates a ct:TransformType ;
-    rdfs:label "Coordinate Field Transform"@en ;
-    rdfs:comment "Transform using absolute coordinate mappings"@en ;
-    skos:notation "coordinates" ;
-    skos:definition "A transformation defined by absolute coordinate values"@en ;
-    ct:hasParameter ct:coordinate_field ;
-    ct:hasParameter ct:coordinate_interpolation .
-
-ct:coordinate_field a ct:Parameter ;
-    ct:parameterName "field" ;
-    ct:parameterType "string" ;
-    ct:isRequired true ;
-    rdfs:comment "Reference to coordinate field array"@en .
-
-ct:coordinate_interpolation a ct:Parameter ;
-    ct:parameterName "interpolation" ;
-    ct:parameterType "string" ;
-    ct:isRequired false ;
-    rdfs:comment "Interpolation method: linear, nearest, or cubic"@en .
-
-ct:inverseOf a ct:TransformType ;
-    rdfs:label "Inverse Transform"@en ;
-    rdfs:comment "Specifies the inverse of another transformation"@en ;
-    skos:notation "inverseOf" ;
-    skos:definition "A transformation that reverses another transformation"@en ;
-    ct:hasParameter ct:inverse_transform .
-
-ct:inverse_transform a ct:Parameter ;
-    ct:parameterName "transform" ;
-    ct:parameterType "transform" ;
-    ct:isRequired true ;
-    rdfs:comment "The transformation to invert"@en .
-
-ct:bijection a ct:TransformType ;
-    rdfs:label "Bijection Transform"@en ;
-    rdfs:comment "Explicitly defined forward and inverse transformations"@en ;
-    skos:notation "bijection" ;
-    skos:definition "A transformation with explicit forward and inverse mappings"@en ;
-    ct:hasParameter ct:forward_transform ;
-    ct:hasParameter ct:inverse_transform_bijection .
-
-ct:forward_transform a ct:Parameter ;
-    ct:parameterName "forward" ;
-    ct:parameterType "transform" ;
-    ct:isRequired true ;
-    rdfs:comment "Forward transformation"@en .
-
-ct:inverse_transform_bijection a ct:Parameter ;
-    ct:parameterName "inverse" ;
-    ct:parameterType "transform" ;
-    ct:isRequired true ;
-    rdfs:comment "Inverse transformation"@en .
-
-ct:byDimension a ct:TransformType ;
-    rdfs:label "By Dimension Transform"@en ;
-    rdfs:comment "Applies different transformations to subsets of dimensions"@en ;
-    skos:notation "byDimension" ;
-    skos:definition "A transformation that operates on dimension subsets independently"@en ;
-    ct:hasParameter ct:dimension_transforms .
-
-ct:dimension_transforms a ct:Parameter ;
-    ct:parameterName "transformations" ;
-    ct:parameterType "dimensionTransform[]" ;
-    ct:isRequired true ;
-    rdfs:comment "List of transformations with dimension specifications"@en .
+noid:coordinates a owl:DatatypeProperty ;
+    rdfs:label "coordinates" ;
+    rdfs:comment "Explicit coordinate value mappings" ;
+    rdfs:domain noid:coordinates .
