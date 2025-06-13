@@ -1,0 +1,158 @@
+{
+  "@context": [
+    "http://mlcommons.org/croissant/",
+    {
+      "sc": "https://schema.org/",
+      "st": "https://example.org/spatial-transforms/"
+    }
+  ],
+  "@type": "sc:Dataset",
+  "@id": "https://example.org/datasets/image-registration-2024",
+  "name": "Medical Image Registration Transforms",
+  "description": "Spatial transformations for multi-modal medical image registration",
+  "url": "https://example.org/datasets/image-registration-2024",
+  "license": "https://creativecommons.org/licenses/by/4.0/",
+  "creator": {
+    "@type": "sc:Organization",
+    "name": "Example Medical Imaging Lab",
+    "url": "https://example.org"
+  },
+  "datePublished": "2024-01-15",
+  "version": "1.0.0",
+  
+  "conformsTo": "http://mlcommons.org/croissant/1.0",
+  
+  "distribution": [
+    {
+      "@type": "FileObject",
+      "name": "transforms_data",
+      "contentUrl": "data/transforms.parquet",
+      "encodingFormat": "application/x-parquet",
+      "contentSize": "45MB"
+    },
+    {
+      "@type": "FileObject",
+      "name": "displacement_fields",
+      "contentUrl": "data/displacement_fields.zarr",
+      "encodingFormat": "application/x-zarr",
+      "contentSize": "2.3GB"
+    }
+  ],
+  
+  "recordSet": [
+    {
+      "@type": "RecordSet",
+      "name": "spatial_transforms",
+      "description": "Spatial transformations between image pairs",
+      
+      "field": [
+        {
+          "@type": "Field",
+          "name": "transform_id",
+          "description": "Unique identifier for the transformation",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": "transforms_data",
+            "extract": {
+              "column": "transform_id"
+            }
+          }
+        },
+        {
+          "@type": "Field",
+          "name": "source_image_id",
+          "description": "ID of the source (moving) image",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": "transforms_data",
+            "extract": {
+              "column": "source_image_id"
+            }
+          }
+        },
+        {
+          "@type": "Field",
+          "name": "target_image_id",
+          "description": "ID of the target (fixed) image",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": "transforms_data",
+            "extract": {
+              "column": "target_image_id"
+            }
+          }
+        },
+        {
+          "@type": "Field",
+          "name": "transform_type",
+          "description": "Type of spatial transformation applied",
+          "dataType": "st:TransformType",
+          "source": {
+            "fileObject": "transforms_data",
+            "extract": {
+              "column": "transform_type"
+            }
+          }
+        },
+        {
+          "@type": "Field",
+          "name": "dimensionality",
+          "description": "Number of spatial dimensions (2D or 3D)",
+          "dataType": "sc:Integer",
+          "source": {
+            "fileObject": "transforms_data",
+            "extract": {
+              "column": "dimensionality"
+            }
+          }
+        },
+        {
+          "@type": "Field",
+          "name": "parameters",
+          "description": "JSON-encoded transformation parameters",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": "transforms_data",
+            "extract": {
+              "column": "parameters"
+            }
+          }
+        },
+        {
+          "@type": "Field",
+          "name": "registration_error",
+          "description": "Root mean square error after registration (in mm)",
+          "dataType": "sc:Float",
+          "source": {
+            "fileObject": "transforms_data",
+            "extract": {
+              "column": "registration_error"
+            }
+          }
+        },
+        {
+          "@type": "Field",
+          "name": "computation_time",
+          "description": "Time taken to compute the transformation (in seconds)",
+          "dataType": "sc:Float",
+          "source": {
+            "fileObject": "transforms_data",
+            "extract": {
+              "column": "computation_time"
+            }
+          }
+        }
+      ]
+    }
+  ],
+  
+  "mentions": [
+    {
+      "@type": "sc:DefinedTermSet",
+      "@id": "https://example.org/spatial-transforms/",
+      "name": "Spatial Transform Types Vocabulary",
+      "description": "Controlled vocabulary defining the transform types used in this dataset",
+      "url": "https://example.org/spatial-transforms/vocabulary.jsonld"
+    }
+  ]
+}

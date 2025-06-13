@@ -1,0 +1,14 @@
+[
+  "identity",
+  "translation",
+  "scale",
+  "rotation",
+  "affine",
+  "mapAxis",
+  "sequence",
+  "displacements",
+  "coordinates",
+  "inverseOf",
+  "bijection",
+  "byDimension"
+]

@@ -1,0 +1,336 @@
+{
+  "@context": {
+    "@version": 1.1,
+    "@base": "https://example.org/spatial-transforms/",
+    "st": "https://example.org/spatial-transforms/",
+    "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
+    "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
+    "owl": "http://www.w3.org/2002/07/owl#",
+    "xsd": "http://www.w3.org/2001/XMLSchema#",
+    "skos": "http://www.w3.org/2004/02/skos/core#",
+    "dc": "http://purl.org/dc/terms/",
+    
+    "TransformType": {
+      "@id": "st:TransformType",
+      "@type": "rdfs:Class"
+    },
+    "Parameter": {
+      "@id": "st:Parameter",
+      "@type": "rdfs:Class"
+    },
+    
+    "label": "rdfs:label",
+    "comment": "rdfs:comment",
+    "definition": "skos:definition",
+    "notation": "skos:notation",
+    "created": {
+      "@id": "dc:created",
+      "@type": "xsd:date"
+    },
+    "creator": "dc:creator",
+    "license": {
+      "@id": "dc:license",
+      "@type": "@id"
+    },
+    "versionInfo": "owl:versionInfo",
+    
+    "hasParameter": {
+      "@id": "st:hasParameter",
+      "@type": "@id"
+    },
+    "parameterName": "st:parameterName",
+    "parameterType": "st:parameterType",
+    "isRequired": {
+      "@id": "st:isRequired",
+      "@type": "xsd:boolean"
+    },
+    
+    "identity": {
+      "@id": "st:identity",
+      "@type": "TransformType"
+    },
+    "translation": {
+      "@id": "st:translation",
+      "@type": "TransformType"
+    },
+    "scale": {
+      "@id": "st:scale",
+      "@type": "TransformType"
+    },
+    "rotation": {
+      "@id": "st:rotation",
+      "@type": "TransformType"
+    },
+    "affine": {
+      "@id": "st:affine",
+      "@type": "TransformType"
+    },
+    "mapAxis": {
+      "@id": "st:mapAxis",
+      "@type": "TransformType"
+    },
+    "sequence": {
+      "@id": "st:sequence",
+      "@type": "TransformType"
+    },
+    "displacements": {
+      "@id": "st:displacements",
+      "@type": "TransformType"
+    },
+    "coordinates": {
+      "@id": "st:coordinates",
+      "@type": "TransformType"
+    },
+    "inverseOf": {
+      "@id": "st:inverseOf",
+      "@type": "TransformType"
+    },
+    "bijection": {
+      "@id": "st:bijection",
+      "@type": "TransformType"
+    },
+    "byDimension": {
+      "@id": "st:byDimension",
+      "@type": "TransformType"
+    }
+  },
+  
+  "@graph": [
+    {
+      "@id": "https://example.org/spatial-transforms/",
+      "@type": "owl:Ontology",
+      "label": "Spatial Transform Vocabulary",
+      "comment": "Controlled vocabulary for spatial coordinate transformations",
+      "created": "2024-01-01",
+      "creator": "Example Organization",
+      "license": "https://creativecommons.org/licenses/by/4.0/",
+      "versionInfo": "1.0.0"
+    },
+    
+    {
+      "@id": "TransformType",
+      "@type": "rdfs:Class",
+      "label": "Transform Type",
+      "comment": "A type of spatial coordinate transformation"
+    },
+    
+    {
+      "@id": "Parameter",
+      "@type": "rdfs:Class",
+      "label": "Parameter",
+      "comment": "A parameter for a transform type"
+    },
+    
+    {
+      "@id": "identity",
+      "@type": "TransformType",
+      "label": "Identity Transform",
+      "comment": "Maps input coordinates to output coordinates without modification",
+      "notation": "identity",
+      "definition": "The identity transformation that leaves coordinates unchanged"
+    },
+    
+    {
+      "@id": "translation",
+      "@type": "TransformType",
+      "label": "Translation Transform",
+      "comment": "Translates points by a fixed vector",
+      "notation": "translation",
+      "definition": "A transformation that shifts all points by a constant vector",
+      "hasParameter": {
+        "@type": "Parameter",
+        "parameterName": "translation",
+        "parameterType": "number[]",
+        "isRequired": true,
+        "comment": "Translation vector with length N"
+      }
+    },
+    
+    {
+      "@id": "scale",
+      "@type": "TransformType",
+      "label": "Scale Transform",
+      "comment": "Scales coordinates by factors along each axis",
+      "notation": "scale",
+      "definition": "A transformation that scales coordinates by specified factors",
+      "hasParameter": {
+        "@type": "Parameter",
+        "parameterName": "scale",
+        "parameterType": "number[]",
+        "isRequired": true,
+        "comment": "Scale factors with length N (non-zero values)"
+      }
+    },
+    
+    {
+      "@id": "rotation",
+      "@type": "TransformType",
+      "label": "Rotation Transform",
+      "comment": "Rotates coordinates using an orthonormal matrix",
+      "notation": "rotation",
+      "definition": "A transformation that rotates coordinates in N-dimensional space",
+      "hasParameter": {
+        "@type": "Parameter",
+        "parameterName": "matrix",
+        "parameterType": "number[][]",
+        "isRequired": true,
+        "comment": "NxN rotation matrix with determinant 1"
+      }
+    },
+    
+    {
+      "@id": "affine",
+      "@type": "TransformType",
+      "label": "Affine Transform",
+      "comment": "General affine transformation from N to M dimensions",
+      "notation": "affine",
+      "definition": "A transformation that preserves lines and parallelism",
+      "hasParameter": {
+        "@type": "Parameter",
+        "parameterName": "matrix",
+        "parameterType": "number[][]",
+        "isRequired": true,
+        "comment": "Mx(N+1) affine transformation matrix"
+      }
+    },
+    
+    {
+      "@id": "mapAxis",
+      "@type": "TransformType",
+      "label": "Map Axis Transform",
+      "comment": "Permutes axes by mapping axis indices",
+      "notation": "mapAxis",
+      "definition": "A transformation that reorders dimensions",
+      "hasParameter": {
+        "@type": "Parameter",
+        "parameterName": "mapping",
+        "parameterType": "object",
+        "isRequired": true,
+        "comment": "Object mapping output axis names to input axis names"
+      }
+    },
+    
+    {
+      "@id": "sequence",
+      "@type": "TransformType",
+      "label": "Sequence Transform",
+      "comment": "Composition of multiple transformations applied in order",
+      "notation": "sequence",
+      "definition": "A transformation that applies multiple transforms sequentially",
+      "hasParameter": {
+        "@type": "Parameter",
+        "parameterName": "transformations",
+        "parameterType": "transform[]",
+        "isRequired": true,
+        "comment": "Ordered list of transformations to apply"
+      }
+    },
+    
+    {
+      "@id": "displacements",
+      "@type": "TransformType",
+      "label": "Displacement Field Transform",
+      "comment": "Transform using a displacement vector field",
+      "notation": "displacements",
+      "definition": "A transformation defined by displacement vectors at each point",
+      "hasParameter": [
+        {
+          "@type": "Parameter",
+          "parameterName": "field",
+          "parameterType": "string",
+          "isRequired": true,
+          "comment": "Reference to displacement field array"
+        },
+        {
+          "@type": "Parameter",
+          "parameterName": "interpolation",
+          "parameterType": "string",
+          "isRequired": false,
+          "comment": "Interpolation method: linear, nearest, or cubic"
+        }
+      ]
+    },
+    
+    {
+      "@id": "coordinates",
+      "@type": "TransformType",
+      "label": "Coordinate Field Transform",
+      "comment": "Transform using absolute coordinate mappings",
+      "notation": "coordinates",
+      "definition": "A transformation defined by absolute coordinate values",
+      "hasParameter": [
+        {
+          "@type": "Parameter",
+          "parameterName": "field",
+          "parameterType": "string",
+          "isRequired": true,
+          "comment": "Reference to coordinate field array"
+        },
+        {
+          "@type": "Parameter",
+          "parameterName": "interpolation",
+          "parameterType": "string",
+          "isRequired": false,
+          "comment": "Interpolation method: linear, nearest, or cubic"
+        }
+      ]
+    },
+    
+    {
+      "@id": "inverseOf",
+      "@type": "TransformType",
+      "label": "Inverse Transform",
+      "comment": "Specifies the inverse of another transformation",
+      "notation": "inverseOf",
+      "definition": "A transformation that reverses another transformation",
+      "hasParameter": {
+        "@type": "Parameter",
+        "parameterName": "transform",
+        "parameterType": "transform",
+        "isRequired": true,
+        "comment": "The transformation to invert"
+      }
+    },
+    
+    {
+      "@id": "bijection",
+      "@type": "TransformType",
+      "label": "Bijection Transform",
+      "comment": "Explicitly defined forward and inverse transformations",
+      "notation": "bijection",
+      "definition": "A transformation with explicit forward and inverse mappings",
+      "hasParameter": [
+        {
+          "@type": "Parameter",
+          "parameterName": "forward",
+          "parameterType": "transform",
+          "isRequired": true,
+          "comment": "Forward transformation"
+        },
+        {
+          "@type": "Parameter",
+          "parameterName": "inverse",
+          "parameterType": "transform",
+          "isRequired": true,
+          "comment": "Inverse transformation"
+        }
+      ]
+    },
+    
+    {
+      "@id": "byDimension",
+      "@type": "TransformType",
+      "label": "By Dimension Transform",
+      "comment": "Applies different transformations to subsets of dimensions",
+      "notation": "byDimension",
+      "definition": "A transformation that operates on dimension subsets independently",
+      "hasParameter": {
+        "@type": "Parameter",
+        "parameterName": "transformations",
+        "parameterType": "dimensionTransform[]",
+        "isRequired": true,
+        "comment": "List of transformations with dimension specifications"
+      }
+    }
+  ]
+}

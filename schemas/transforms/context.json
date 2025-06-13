@@ -1,0 +1,62 @@
+{
+  "@context": {
+    "@version": 1.1,
+    "@base": "https://example.org/spatial-transforms/",
+    "st": "https://example.org/spatial-transforms/",
+    "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
+    
+    "TransformType": {
+      "@id": "st:TransformType",
+      "@type": "rdfs:Class"
+    },
+    
+    "identity": {
+      "@id": "st:identity",
+      "@type": "st:TransformType"
+    },
+    "translation": {
+      "@id": "st:translation",
+      "@type": "st:TransformType"
+    },
+    "scale": {
+      "@id": "st:scale",
+      "@type": "st:TransformType"
+    },
+    "rotation": {
+      "@id": "st:rotation",
+      "@type": "st:TransformType"
+    },
+    "affine": {
+      "@id": "st:affine",
+      "@type": "st:TransformType"
+    },
+    "mapAxis": {
+      "@id": "st:mapAxis",
+      "@type": "st:TransformType"
+    },
+    "sequence": {
+      "@id": "st:sequence",
+      "@type": "st:TransformType"
+    },
+    "displacements": {
+      "@id": "st:displacements",
+      "@type": "st:TransformType"
+    },
+    "coordinates": {
+      "@id": "st:coordinates",
+      "@type": "st:TransformType"
+    },
+    "inverseOf": {
+      "@id": "st:inverseOf",
+      "@type": "st:TransformType"
+    },
+    "bijection": {
+      "@id": "st:bijection",
+      "@type": "st:TransformType"
+    },
+    "byDimension": {
+      "@id": "st:byDimension",
+      "@type": "st:TransformType"
+    }
+  }
+}

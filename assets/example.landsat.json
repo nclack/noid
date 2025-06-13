@@ -1,0 +1,305 @@
+{
+  "@context": [
+    {
+      "@vocab": "https://your-domain.org/mdarray#",
+      "proj": "https://proj.org/vocab#",
+      "cv": "https://opencv.org/vocab#"
+    }
+  ],
+  
+  "arrays": {
+    "landsat_scene": {
+      "@id": "landsat_scene",
+      "@type": "MultidimensionalArray",
+      "description": "Landsat 8 multispectral image over San Francisco Bay",
+      "hasDimension": [
+        {
+          "hasName": "row",
+          "hasUnit": "index", 
+          "hasDimensionType": "spatial"
+        },
+        {
+          "hasName": "col",
+          "hasUnit": "index",
+          "hasDimensionType": "spatial" 
+        },
+        {
+          "hasName": "band",
+          "hasUnit": "index",
+          "hasDimensionType": "categorical",
+          "hasCategoryScheme": "landsat8_bands"
+        },
+        {
+          "hasName": "time",
+          "hasUnit": "index", 
+          "hasDimensionType": "temporal",
+          "hasEventScheme": "acquisition_events"
+        }
+      ],
+      "hasValueTransform": {
+        "hasTransform": "dn_to_reflectance",
+        "hasStatistics": {
+          "min": 0,
+          "max": 65535,
+          "histogram": "landsat_histogram"
+        }
+      }
+    },
+    
+    "landsat_histogram": {
+      "@id": "landsat_histogram",
+      "@type": "MultidimensionalArray", 
+      "description": "Histogram of digital number values",
+      "hasDimension": [
+        {
+          "hasName": "bin",
+          "hasUnit": "index",
+          "hasDimensionType": "categorical"
+        },
+        {
+          "hasName": "band", 
+          "hasUnit": "index",
+          "hasDimensionType": "categorical",
+          "hasCategoryScheme": "landsat8_bands"
+        }
+      ]
+    },
+    
+    "land_cover_map": {
+      "@id": "land_cover_map", 
+      "@type": "MultidimensionalArray",
+      "description": "Land cover classification derived from Landsat scene",
+      "hasDimension": [
+        {
+          "hasName": "row",
+          "hasUnit": "index",
+          "hasDimensionType": "spatial"
+        },
+        {
+          "hasName": "col", 
+          "hasUnit": "index",
+          "hasDimensionType": "spatial"
+        }
+      ],
+      "hasValueTransform": {
+        "hasCategoryScheme": "land_cover_classes"
+      }
+    }
+  },
+  
+  "coordinateSpaces": {
+    "utm_zone_10n": {
+      "@id": "utm_zone_10n",
+      "@type": "CoordinateSpace",
+      "description": "UTM Zone 10N coordinate system",
+      "hasDimension": [
+        {"hasName": "easting", "hasUnit": "meters"},
+        {"hasName": "northing", "hasUnit": "meters"}
+      ]
+    },
+    
+    "wgs84_geographic": {
+      "@id": "wgs84_geographic", 
+      "@type": "CoordinateSpace",
+      "description": "WGS84 Geographic coordinates",
+      "hasDimension": [
+        {"hasName": "longitude", "hasUnit": "degrees"},
+        {"hasName": "latitude", "hasUnit": "degrees"}
+      ]
+    },
+    
+    "reflectance_space": {
+      "@id": "reflectance_space",
+      "@type": "CoordinateSpace", 
+      "description": "Surface reflectance values",
+      "hasDimension": [
+        {"hasName": "reflectance", "hasUnit": "unitless"}
+      ]
+    },
+    
+    "measurement_time": {
+      "@id": "measurement_time",
+      "@type": "CoordinateSpace",
+      "description": "Temporal coordinate system",
+      "hasDimension": [
+        {"hasName": "seconds_since_epoch", "hasUnit": "seconds"}
+      ]
+    }
+  },
+  
+  "transforms": {
+    "image_to_utm": {
+      "@context": {"@vocab": "https://proj.org/vocab#"},
+      "@type": "mdarray:Transform",
+      "description": "Transform from image coordinates to UTM",
+      "hasDomain": "landsat_scene",
+      "hasRange": "utm_zone_10n",
+      "mapsDimension": [
+        {"from": [0, 1], "to": ["easting", "northing"]}
+      ],
+      "proj:method": "Affine",
+      "proj:parameters": [
+        {"name": "A0", "value": 463312.5, "unit": "metre"},
+        {"name": "A1", "value": 30.0, "unit": "metre"},
+        {"name": "A2", "value": 0.0, "unit": "metre"},
+        {"name": "B0", "value": 4190887.5, "unit": "metre"}, 
+        {"name": "B1", "value": 0.0, "unit": "metre"},
+        {"name": "B2", "value": -30.0, "unit": "metre"}
+      ]
+    },
+    
+    "utm_to_geographic": {
+      "@context": {"@vocab": "https://proj.org/vocab#"},
+      "@type": "mdarray:Transform",
+      "description": "Transform from UTM to Geographic",
+      "hasDomain": "utm_zone_10n", 
+      "hasRange": "wgs84_geographic",
+      "mapsDimension": [
+        {"from": ["easting", "northing"], "to": ["longitude", "latitude"]}
+      ],
+      "proj:crs_from": "EPSG:32610",
+      "proj:crs_to": "EPSG:4326"
+    },
+    
+    "dn_to_reflectance": {
+      "@context": {"@vocab": "https://your-domain.org/mdarray#"},
+      "@type": "Transform",
+      "description": "Convert digital numbers to surface reflectance",
+      "hasDomain": "landsat_scene",
+      "hasRange": "reflectance_space",
+      "mapsDimension": [
+        {"from": ["intensity"], "to": ["reflectance"]}
+      ],
+      "transformType": "LinearTransform",
+      "parameters": {
+        "scale": 0.0000275,
+        "offset": -0.2
+      }
+    },
+    
+    "array_time_to_seconds": {
+      "@context": {"@vocab": "https://your-domain.org/mdarray#"},
+      "@type": "Transform", 
+      "description": "Transform array time indices to seconds since epoch",
+      "hasDomain": "landsat_scene",
+      "hasRange": "measurement_time",
+      "mapsDimension": [
+        {"from": [3], "to": ["seconds_since_epoch"]}
+      ],
+      "transformType": "LinearTransform",
+      "parameters": {
+        "offset": 1647360000,
+        "scale": 16
+      }
+    },
+    
+    "enhance_display": {
+      "@context": {"@vocab": "https://opencv.org/vocab#"},
+      "@type": "mdarray:Transform",
+      "description": "Enhance image for display",
+      "hasDomain": "landsat_scene", 
+      "hasRange": "display_space",
+      "cv:transformType": "ContrastTransform",
+      "cv:alpha": 1.5,
+      "cv:beta": 20
+    }
+  },
+  
+  "categorySchemes": {
+    "landsat8_bands": {
+      "@id": "landsat8_bands",
+      "@type": "ExternalCategoryScheme",
+      "description": "Landsat 8 spectral band definitions",
+      "referencesTable": {
+        "url": "s3://landsat-metadata/landsat8_bands.parquet",
+        "hasFormat": "parquet"
+      },
+      "hasLookupKey": "@row_index",
+      "expectedFields": [
+        "band_name", "wavelength_center_nm", "wavelength_width_nm", 
+        "description", "typical_use"
+      ]
+    },
+    
+    "land_cover_classes": {
+      "@id": "land_cover_classes",
+      "@type": "ExternalCategoryScheme", 
+      "description": "NLCD land cover classification scheme",
+      "referencesTable": {
+        "url": "s3://nlcd-data/land_cover_classes.parquet",
+        "hasFormat": "parquet"
+      },
+      "hasLookupKey": "class_value",
+      "expectedFields": [
+        "class_value", "class_name", "description", "color_rgb"
+      ]
+    }
+  },
+  
+  "eventSchemes": {
+    "acquisition_events": {
+      "@id": "acquisition_events",
+      "@type": "ExternalEventScheme",
+      "description": "Landsat acquisition events with multiple timing sources",
+      "referencesTable": {
+        "url": "s3://landsat-metadata/acquisition_log.parquet", 
+        "hasFormat": "parquet"
+      },
+      "hasLookupKey": "@row_index",
+      "expectedFields": [
+        "event_name", "utc_timestamp", "spacecraft_clock", 
+        "ground_station", "orbit_number", "scene_quality"
+      ]
+    }
+  },
+  
+  "clocks": {
+    "utc_system": {
+      "@id": "utc_system",
+      "@type": "Clock",
+      "description": "Coordinated Universal Time",
+      "hasTimeZone": "UTC",
+      "hasCalendarSystem": "Gregorian"
+    },
+    
+    "landsat8_clock": {
+      "@id": "landsat8_clock",
+      "@type": "Clock", 
+      "description": "Landsat 8 spacecraft internal clock",
+      "hasSource": "spacecraft_onboard_timer",
+      "hasClockMetadata": {
+        "mission": "Landsat 8",
+        "calibration_authority": "USGS"
+      }
+    }
+  },
+  
+  "vocabularies": {
+    "geospatial": {
+      "context_uri": "https://proj.org/vocab#",
+      "schema_uri": "https://proj.org/schemas/v0.4/projjson.schema.json",
+      "description": "PROJ geospatial coordinate transformations"
+    },
+    "image_processing": {
+      "context_uri": "https://opencv.org/vocab#", 
+      "schema_uri": "https://opencv.org/schemas/transforms.json",
+      "description": "OpenCV image processing operations"
+    },
+    "core_transforms": {
+      "context_uri": "https://your-domain.org/mdarray#",
+      "schema_uri": "https://your-domain.org/schemas/transforms.json", 
+      "description": "Core linear and lookup transformations"
+    }
+  },
+  
+  "metadata": {
+    "title": "Landsat 8 Multispectral Scene - San Francisco Bay",
+    "description": "Example multidimensional array showing spatial, spectral, and temporal dimensions with various transform types",
+    "created": "2024-03-15T14:30:00Z",
+    "institution": "Example Remote Sensing Lab",
+    "processing_level": "Level 2A Surface Reflectance",
+    "coordinate_reference_system": "EPSG:32610",
+    "spatial_resolution": "30 meters",
+    "temporal_resolution": "16 days"
+  }
+}
