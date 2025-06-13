@@ -31,7 +31,7 @@
       "@id": "CoordinateSpace", 
       "@type": "rdfs:Class",
       "rdfs:label": "Coordinate Space",
-      "rdfs:comment": "A mathematical container for coordinate systems, formed by a tuple of named dimensions",
+      "rdfs:comment": "A named mathematical space defined by ordered dimensions, each with a name and unit. Provides the mathematical framework for coordinate transformations.",
       "rdfs:subClassOf": "rdfs:Resource"
     },
     
@@ -47,7 +47,15 @@
       "@id": "Transform",
       "@type": "rdfs:Class",
       "rdfs:label": "Transform", 
-      "rdfs:comment": "A transformation between coordinate spaces, potentially using domain-specific vocabularies",
+      "rdfs:comment": "A mathematical transformation between coordinate spaces, defined as a triple of input coordinate space, output coordinate space, and transform type with parameters",
+      "rdfs:subClassOf": "rdfs:Resource"
+    },
+    
+    {
+      "@id": "CoordinateTransform",
+      "@type": "rdfs:Class",
+      "rdfs:label": "Coordinate Transform",
+      "rdfs:comment": "A complete specification of a coordinate transformation, including input space, output space, and transform definition",
       "rdfs:subClassOf": "rdfs:Resource"
     },
     
@@ -120,7 +128,7 @@
       "@id": "hasCoordinateSpace",
       "@type": "rdf:Property", 
       "rdfs:label": "has coordinate space",
-      "rdfs:comment": "Relates an array to a named coordinate space",
+      "rdfs:comment": "Relates an array to a named coordinate space. Arrays have an implicit coordinate space defined by their coordinate indexes.",
       "rdfs:domain": "MultidimensionalArray",
       "rdfs:range": "CoordinateSpace"
     },
@@ -157,8 +165,35 @@
       "@type": "rdf:Property",
       "rdfs:label": "has range",
       "rdfs:comment": "The target/output coordinate space of a transformation", 
-      "rdfs:domain": "Transform",
+      "rdfs:domain": ["Transform", "CoordinateTransform"],
       "rdfs:range": "CoordinateSpace"
+    },
+    
+    {
+      "@id": "hasInputSpace",
+      "@type": "rdf:Property",
+      "rdfs:label": "has input space",
+      "rdfs:comment": "The input coordinate space for a coordinate transformation",
+      "rdfs:domain": "CoordinateTransform",
+      "rdfs:range": "CoordinateSpace"
+    },
+    
+    {
+      "@id": "hasOutputSpace", 
+      "@type": "rdf:Property",
+      "rdfs:label": "has output space",
+      "rdfs:comment": "The output coordinate space for a coordinate transformation",
+      "rdfs:domain": "CoordinateTransform",
+      "rdfs:range": "CoordinateSpace"
+    },
+    
+    {
+      "@id": "hasTransformDefinition",
+      "@type": "rdf:Property",
+      "rdfs:label": "has transform definition",
+      "rdfs:comment": "The mathematical transform definition with type and parameters",
+      "rdfs:domain": "CoordinateTransform",
+      "rdfs:range": "Transform"
     },
     
     {
@@ -174,8 +209,8 @@
       "@id": "hasName",
       "@type": "rdf:Property",
       "rdfs:label": "has name", 
-      "rdfs:comment": "The identifier name of a dimension within its coordinate space",
-      "rdfs:domain": "Dimension",
+      "rdfs:comment": "The unique name identifier for a coordinate space or dimension",
+      "rdfs:domain": ["CoordinateSpace", "Dimension"],
       "rdfs:range": "xsd:string"
     },
     
@@ -414,6 +449,33 @@
       "rdfs:comment": "Points to the actual array data storage location and format",
       "rdfs:domain": "MultidimensionalArray",
       "rdfs:range": "ExternalTable"
+    },
+    
+    {
+      "@id": "hasImplicitCoordinateSpace",
+      "@type": "rdf:Property",
+      "rdfs:label": "has implicit coordinate space",
+      "rdfs:comment": "References the implicit coordinate space defined by an array's coordinate indexes. Each dimension has unit 'index' and name matching the array dimension.",
+      "rdfs:domain": "MultidimensionalArray",
+      "rdfs:range": "CoordinateSpace"
+    },
+    
+    {
+      "@id": "hasTransformType",
+      "@type": "rdf:Property", 
+      "rdfs:label": "has transform type",
+      "rdfs:comment": "The specific type of mathematical transformation (e.g., affine, translation, scale)",
+      "rdfs:domain": "Transform",
+      "rdfs:range": "xsd:string"
+    },
+    
+    {
+      "@id": "hasParameters",
+      "@type": "rdf:Property",
+      "rdfs:label": "has parameters", 
+      "rdfs:comment": "The specific parameters required for this transform type",
+      "rdfs:domain": "Transform",
+      "rdfs:range": "rdfs:Resource"
     }
   ]
 }
