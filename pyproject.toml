@@ -7,7 +7,7 @@ authors = [
     { name = "Nathan Clack", email = "nclack@chanzuckerberg.com" }
 ]
 requires-python = ">=3.10"
-dependencies = ["mlcroissant"]
+dependencies = ["mlcroissant", "rich"]
 
 [build-system]
 requires = ["hatchling"]

@@ -1,0 +1,79 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dc: <http://purl.org/dc/terms/> .
+@prefix noid: <https://github.com/nclack/noid/schemas/> .
+@prefix transforms: <https://github.com/nclack/noid/schemas/transforms/> .
+
+<https://github.com/nclack/noid/schemas/coordinate_spaces.ttl> a owl:Ontology ;
+    dc:title "NOID Coordinate Spaces Vocabulary" ;
+    dc:description "Vocabulary for coordinate spaces, dimensions, and their relationships to transforms" ;
+    dc:creator "NOID Project" ;
+    owl:versionInfo "0.1.0" ;
+    owl:imports <https://github.com/nclack/noid/schemas/transforms/vocabulary.ttl> .
+
+# Core classes
+
+noid:CoordinateSpace a owl:Class ;
+    rdfs:label "Coordinate Space" ;
+    rdfs:comment "A collection of dimensions that defines a coordinate system" .
+
+noid:Dimension a owl:Class ;
+    rdfs:label "Dimension" ;
+    rdfs:comment "A single axis within a coordinate space with name and optional unit" .
+
+# Properties for coordinate spaces
+
+noid:dimensions a owl:DatatypeProperty ;
+    rdfs:label "dimensions" ;
+    rdfs:comment "Ordered JSON array of dimension objects that define this coordinate space" ;
+    rdfs:domain noid:CoordinateSpace .
+
+# Properties for dimensions
+
+noid:name a owl:DatatypeProperty ;
+    rdfs:label "name" ;
+    rdfs:comment "Name of the dimension (e.g., 'x', 'y', 'z', 't')" ;
+    rdfs:domain noid:Dimension ;
+    rdfs:range xsd:string .
+
+noid:unit a owl:DatatypeProperty ;
+    rdfs:label "unit" ;
+    rdfs:comment "Unit for this dimension. For 'space' and 'time' types, should correspond to UDUNITS-2 ontology terms. For all types, 'index' and 'arbitrary' are also valid." ;
+    rdfs:domain noid:Dimension ;
+    rdfs:range xsd:string .
+
+noid:type a owl:DatatypeProperty ;
+    rdfs:label "type" ;
+    rdfs:comment "Type of dimension: 'space', 'time', or 'other'" ;
+    rdfs:domain noid:Dimension ;
+    rdfs:range xsd:string .
+
+# Transform space relationships
+
+noid:input a owl:ObjectProperty ;
+    rdfs:label "input" ;
+    rdfs:comment "The coordinate space that serves as input to this transform" ;
+    rdfs:domain transforms:Transform ;
+    rdfs:range noid:CoordinateSpace .
+
+noid:output a owl:ObjectProperty ;
+    rdfs:label "output" ;
+    rdfs:comment "The coordinate space that serves as output from this transform" ;
+    rdfs:domain transforms:Transform ;
+    rdfs:range noid:CoordinateSpace .
+
+# Convenience properties
+
+noid:name a owl:DatatypeProperty ;
+    rdfs:label "name" ;
+    rdfs:comment "Human-readable name for the coordinate space" ;
+    rdfs:domain noid:CoordinateSpace ;
+    rdfs:range xsd:string .
+
+noid:description a owl:DatatypeProperty ;
+    rdfs:label "description" ;
+    rdfs:comment "Description of what this coordinate space represents" ;
+    rdfs:domain noid:CoordinateSpace ;
+    rdfs:range xsd:string .
