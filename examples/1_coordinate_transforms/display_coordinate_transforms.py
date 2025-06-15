@@ -38,7 +38,6 @@ def get_transform_color(transform_type):
         'scale': 'blue',
         'homogeneous': 'magenta',
         'rotation': 'cyan',
-        'sequence': 'bright_magenta',
         'coordinates': 'bright_blue',
         'mapAxis': 'yellow'
     }
@@ -74,13 +73,6 @@ def format_transform(transform):
     # Add brief parameter summary
     if transform_type == 'translation' and 'translation' in transform:
         result.append(f" {transform['translation']}", style="dim")
-    elif transform_type == 'sequence' and 'sequence' in transform:
-        seq = transform['sequence']
-        if isinstance(seq[0], dict):
-            types = [t.get('type', 'unknown') for t in seq]
-            result.append(f" [{' → '.join(types)}]", style="dim")
-        else:
-            result.append(f" {seq}", style="dim")
     elif transform_type == 'homogeneous' and 'matrix' in transform:
         matrix = transform['matrix']
         if isinstance(matrix, list) and isinstance(matrix[0], list):

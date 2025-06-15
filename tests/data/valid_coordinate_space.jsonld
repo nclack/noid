@@ -1,0 +1,30 @@
+{
+  "@context": {
+    "@vocab": "https://github.com/nclack/noid/schemas/",
+    "rdfs": "http://www.w3.org/2000/01/rdf-schema#"
+  },
+  "@id": "valid_coordinate_space",
+  "@type": "CoordinateSpace",
+  "name": "3D Spatial Coordinate Space",
+  "description": "A 3D coordinate space with spatial dimensions",
+  "dimensions": [
+    {
+      "@type": "Dimension",
+      "name": "x",
+      "unit": "micrometer",
+      "type": "space"
+    },
+    {
+      "@type": "Dimension", 
+      "name": "y",
+      "unit": "micrometer",
+      "type": "space"
+    },
+    {
+      "@type": "Dimension",
+      "name": "z", 
+      "unit": "micrometer",
+      "type": "space"
+    }
+  ]
+}

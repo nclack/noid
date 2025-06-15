@@ -1,0 +1,17 @@
+{
+  "@context": {
+    "@vocab": "https://github.com/nclack/noid/schemas/",
+    "rdfs": "http://www.w3.org/2000/01/rdf-schema#"
+  },
+  "@id": "valid_time_coordinate_space",
+  "@type": "CoordinateSpace",
+  "name": "Time Series Coordinate Space",
+  "dimensions": [
+    {
+      "@type": "Dimension",
+      "name": "t",
+      "unit": "second",
+      "type": "time"
+    }
+  ]
+}

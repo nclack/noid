@@ -1,0 +1,143 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/nclack/noid/schemas/transforms/schema.json",
+  "title": "NOID Transform Schema",
+  "description": "JSON Schema for NOID coordinate transformations generated from vocabulary.ttl",
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "Unique identifier for the transform"
+    },
+    "label": {
+      "type": "string",
+      "description": "Human-readable label for the transform"
+    },
+    "type": {
+      "type": "string",
+      "enum": [
+        "coordinates",
+        "displacements",
+        "homogeneous",
+        "identity",
+        "mapAxis",
+        "rotation",
+        "scale",
+        "translation"
+      ],
+      "description": "Type of coordinate transformation"
+    },
+    "translation": {
+      "type": "array",
+      "items": {
+        "type": "number"
+      },
+      "description": "Shifts coordinates by a constant vector"
+    },
+    "scale": {
+      "type": "array",
+      "items": {
+        "type": "number"
+      },
+      "description": "Scales coordinates along each axis"
+    },
+    "matrix": {
+      "type": "array",
+      "items": {
+        "type": "array",
+        "items": {
+          "type": "number"
+        }
+      },
+      "description": "Transformation matrix as array of arrays"
+    },
+    "mapAxis": {
+      "type": "object",
+      "patternProperties": {
+        "^[a-zA-Z_][a-zA-Z0-9_]*$": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "description": "Axis permutations as a mapping of axis names"
+    },
+    "displacements": {
+      "type": "object",
+      "description": "Vector field-based transformation using displacement maps"
+    },
+    "coordinates": {
+      "type": "object",
+      "description": "Explicit coordinate mapping transformation"
+    }
+  },
+  "additionalProperties": false,
+  "anyOf": [
+    {
+      "description": "Identity transform (no additional properties required)",
+      "not": {
+        "anyOf": [
+          {
+            "required": [
+              "translation"
+            ]
+          },
+          {
+            "required": [
+              "scale"
+            ]
+          },
+          {
+            "required": [
+              "matrix"
+            ]
+          },
+          {
+            "required": [
+              "mapAxis"
+            ]
+          },
+          {
+            "required": [
+              "displacements"
+            ]
+          },
+          {
+            "required": [
+              "coordinates"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "required": [
+        "translation"
+      ]
+    },
+    {
+      "required": [
+        "scale"
+      ]
+    },
+    {
+      "required": [
+        "matrix"
+      ]
+    },
+    {
+      "required": [
+        "mapAxis"
+      ]
+    },
+    {
+      "required": [
+        "displacements"
+      ]
+    },
+    {
+      "required": [
+        "coordinates"
+      ]
+    }
+  ]
+}

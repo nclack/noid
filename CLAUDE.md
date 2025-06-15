@@ -98,6 +98,11 @@ category schemes.
 Croissant framework for dataset description while adding multidimensional array
 capabilities.
 
+## Tools
+
+- To validate a croissont file run
+  `uv run mlcroissant validate --jsonld <testfile.json>`
+
 ## References
 
 - [croissant schema

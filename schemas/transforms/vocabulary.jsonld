@@ -1,0 +1,147 @@
+{
+  "@context": {
+    "@vocab": "https://github.com/nclack/noid/schemas/transforms/",
+    "schema": "https://schema.org/",
+    "name": "schema:name",
+    "description": "schema:description",
+    "subClassOf": "schema:subClassOf",
+    "domainIncludes": "schema:domainIncludes",
+    "rangeIncludes": "schema:rangeIncludes"
+  },
+  "@graph": [
+    {
+      "@type": "schema:DefinedTermSet",
+      "@id": "https://github.com/nclack/noid/schemas/transforms/vocabulary.jsonld",
+      "name": "NOID Transform Vocabulary",
+      "description": "Minimal vocabulary for coordinate transformations and their parameterizations",
+      "schema:creator": "NOID Project",
+      "schema:version": "0.1.0"
+    },
+    {
+      "@type": "schema:Class",
+      "@id": "Transform",
+      "name": "Transform",
+      "description": "Base class for coordinate transformations",
+      "subClassOf": "schema:Thing"
+    },
+    {
+      "@type": "schema:Class",
+      "@id": "identity",
+      "name": "Identity Transform",
+      "description": "Maps coordinates without modification",
+      "subClassOf": "Transform"
+    },
+    {
+      "@type": "schema:Class",
+      "@id": "mapAxis",
+      "name": "Map Axis Transform",
+      "description": "Axis permutations as a mapping of axis names",
+      "subClassOf": "Transform"
+    },
+    {
+      "@type": "schema:Class",
+      "@id": "translation",
+      "name": "Translation Transform",
+      "description": "Shifts coordinates by a constant vector",
+      "subClassOf": "Transform"
+    },
+    {
+      "@type": "schema:Class",
+      "@id": "scale",
+      "name": "Scale Transform",
+      "description": "Scales coordinates along each axis",
+      "subClassOf": "Transform"
+    },
+    {
+      "@type": "schema:Class",
+      "@id": "homogeneous",
+      "name": "Homogeneous Transform",
+      "description": "Matrix-based transformation using homogeneous coordinates (supports both affine and projective)",
+      "subClassOf": "Transform"
+    },
+    {
+      "@type": "schema:Class",
+      "@id": "rotation",
+      "name": "Rotation Transform",
+      "description": "Matrix-based rotation transformation",
+      "subClassOf": "Transform"
+    },
+    {
+      "@type": "schema:Class",
+      "@id": "sequence",
+      "name": "Sequence Transform",
+      "description": "Composition of multiple transforms applied in sequence",
+      "subClassOf": "Transform"
+    },
+    {
+      "@type": "schema:Class",
+      "@id": "displacements",
+      "name": "Displacements Transform",
+      "description": "Vector field-based transformation using displacement maps",
+      "subClassOf": "Transform"
+    },
+    {
+      "@type": "schema:Class",
+      "@id": "coordinates",
+      "name": "Coordinates Transform",
+      "description": "Explicit coordinate mapping transformation",
+      "subClassOf": "Transform"
+    },
+    {
+      "@type": "schema:Property",
+      "@id": "translation",
+      "name": "translation",
+      "description": "Translation vector as array of numeric values",
+      "domainIncludes": "translation",
+      "rangeIncludes": "schema:Number"
+    },
+    {
+      "@type": "schema:Property",
+      "@id": "scale",
+      "name": "scale",
+      "description": "Scale factors as array of numeric values",
+      "domainIncludes": "scale",
+      "rangeIncludes": "schema:Number"
+    },
+    {
+      "@type": "schema:Property",
+      "@id": "matrix",
+      "name": "matrix",
+      "description": "Transformation matrix as array of arrays",
+      "domainIncludes": ["homogeneous", "rotation"],
+      "rangeIncludes": "schema:Number"
+    },
+    {
+      "@type": "schema:Property",
+      "@id": "mapAxis",
+      "name": "mapAxis",
+      "description": "Mapping between input and output axes",
+      "domainIncludes": "mapAxis",
+      "rangeIncludes": "schema:Text"
+    },
+    {
+      "@type": "schema:Property",
+      "@id": "transforms",
+      "name": "transforms",
+      "description": "Array of transforms to apply in sequence",
+      "domainIncludes": "sequence",
+      "rangeIncludes": "Transform"
+    },
+    {
+      "@type": "schema:Property",
+      "@id": "displacements",
+      "name": "displacements",
+      "description": "Reference to displacement field data",
+      "domainIncludes": "displacements",
+      "rangeIncludes": "schema:Thing"
+    },
+    {
+      "@type": "schema:Property",
+      "@id": "coordinates",
+      "name": "coordinates",
+      "description": "Explicit coordinate value mappings",
+      "domainIncludes": "coordinates",
+      "rangeIncludes": "schema:Number"
+    }
+  ]
+}

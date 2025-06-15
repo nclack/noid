@@ -13,7 +13,7 @@
       }
     },
     "scale": {
-      "@id": "scale", 
+      "@id": "scale",
       "@type": "@json",
       "@context": {
         "@type": "scale"
@@ -28,16 +28,9 @@
     },
     "mapAxis": {
       "@id": "mapAxis",
-      "@type": "@json", 
-      "@context": {
-        "@type": "mapAxis"
-      }
-    },
-    "sequence": {
-      "@id": "sequence",
       "@type": "@json",
       "@context": {
-        "@type": "sequence"  
+        "@type": "mapAxis"
       }
     },
     "displacements": {
@@ -48,7 +41,7 @@
       }
     },
     "coordinates": {
-      "@id": "coordinates", 
+      "@id": "coordinates",
       "@type": "@json",
       "@context": {
         "@type": "coordinates"

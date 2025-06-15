@@ -1,0 +1,119 @@
+{
+  "@context": 
+  {
+    "@language": "en",
+    "@vocab": "https://schema.org/",
+    "sc": "https://schema.org/",
+    "noid": "../../schemas/transforms/vocabulary.jsonld",
+    "citeAs": "cr:citeAs",
+    "column": "cr:column", 
+    "conformsTo": "dct:conformsTo",
+    "cr": "http://mlcommons.org/croissant/",
+    "rai": "http://mlcommons.org/croissant/RAI/",
+    "data": {
+      "@id": "cr:data",
+      "@type": "@json"
+    },
+    "dataBiases": "cr:dataBiases",
+    "dataCollection": "cr:dataCollection",
+    "dataType": {
+      "@id": "cr:dataType",
+      "@type": "@vocab"
+    },
+    "dct": "http://purl.org/dc/terms/",
+    "examples": "cr:examples",
+    "extract": "cr:extract",
+    "field": "cr:field",
+    "fileProperty": "cr:fileProperty",
+    "fileObject": "cr:fileObject",
+    "fileSet": "cr:fileSet",
+    "format": "cr:format",
+    "includes": "cr:includes",
+    "isLiveDataset": "cr:isLiveDataset",
+    "jsonPath": "cr:jsonPath",
+    "key": "cr:key",
+    "md5": "cr:md5",
+    "parentField": "cr:parentField",
+    "path": "cr:path",
+    "recordSet": "cr:recordSet",
+    "references": "cr:references",
+    "regex": "cr:regex",
+    "repeated": "cr:repeated",
+    "replace": "cr:replace",
+    "separator": "cr:separator",
+    "source": "cr:source",
+    "subField": "cr:subField",
+    "transform": "cr:transform"
+  },
+  "@type": "sc:Dataset",
+  "name": "noid-transform-examples",
+  "description": "Example coordinate transformations for multidimensional arrays",
+  "conformsTo": "http://mlcommons.org/croissant/1.0",
+  "citeAs": "@misc{noid-transforms, title={NOID Transform Examples}, author={Nathan Clack}, year={2025}}",
+  "license": "https://creativecommons.org/licenses/by/4.0/",
+  "url": "https://github.com/nclack/noid/examples/transforms.json",
+  "version": "1.0.0",
+  "datePublished": "2025-01-13",
+  "distribution": [
+    {
+      "@type": "cr:FileObject",
+      "@id": "table",
+      "name": "transforms_table.json",
+      "description": "Table containing transform examples with parameters",
+      "contentUrl": "transforms_table.json",
+      "encodingFormat": "application/json",
+      "sha256": "placeholder"
+    }
+  ],
+  "recordSet": [
+    {
+      "@type": "cr:RecordSet",
+      "name": "transforms",
+      "description": "Transform examples with their parameters",
+      "field": [
+        {
+          "@type": "cr:Field",
+          "name": "id",
+          "description": "Unique identifier for the transform",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "table"
+            },
+            "extract": {
+              "column": "id"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field", 
+          "name": "type",
+          "description": "Transform type from the NOID vocabulary",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "table"
+            },
+            "extract": {
+              "column": "type"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "name": "label", 
+          "description": "Human readable description of the transform",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "table"
+            },
+            "extract": {
+              "column": "label"
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

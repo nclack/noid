@@ -138,3 +138,139 @@ Based on the recently completed transform vocabulary, we established:
 - JSON array representation for dimensions
 - Flexible unit system with UDUNITS-2 integration
 - Transform space relationships
+
+## Build Process and Schema Generation
+
+### Architecture Overview
+
+The NOID project follows a **source-of-truth** approach where TTL vocabularies serve as the authoritative schema definitions. All other formats are generated from these TTL files to ensure consistency and avoid duplication.
+
+### Schema Build Pipeline
+
+```
+TTL Vocabularies (Source of Truth)
+    ↓
+JSON-LD Vocabularies (Generated) → Used by Croissant integration
+    ↓
+SHACL Shapes (Hand-written) → Used for semantic validation
+```
+
+#### Build Command
+```bash
+uv run noid-build-schemas
+```
+
+This command:
+1. **Converts TTL to JSON-LD**: Uses `rdflib.Graph.serialize()` to convert TTL vocabularies to JSON-LD format for Croissant compatibility
+2. **Copies SHACL shapes**: Copies hand-written SHACL validation files to the generated schemas directory
+
+#### Key Files
+- **Source TTL**: `/schemas/coordinate_spaces.ttl`, `/schemas/transforms/vocabulary.ttl`
+- **Generated JSON-LD**: `/schemas/coordinate_spaces.jsonld`, `/schemas/transforms/vocabulary.jsonld`
+- **Hand-written SHACL**: `/schemas/coordinate_spaces_shapes.ttl`, `/schemas/transforms/shapes.ttl`
+
+### SHACL Semantic Validation
+
+#### Validation Strategy
+
+We use **SHACL (Shapes Constraint Language)** for semantic validation rather than JSON Schema because:
+
+1. **Native RDF/JSON-LD support**: SHACL operates directly on RDF graphs, making it ideal for semantic validation
+2. **Rich constraint language**: Supports complex validation rules beyond basic type checking
+3. **Integration with ontologies**: Can validate against OWL class hierarchies and relationships
+4. **Semantic reasoning**: Supports RDFS inference during validation
+
+#### Hand-written vs Generated SHACL
+
+**Decision**: Use hand-written SHACL shapes as source of truth for validation constraints.
+
+**Rationale**:
+- Validation requirements are often more specific than what can be automatically derived from TTL
+- Hand-written shapes allow for custom validation messages and complex business rules
+- Easier to maintain and understand than generated shapes
+- Provides explicit documentation of validation requirements
+
+#### SHACL Shape Examples
+
+**Transform Validation** (`/schemas/transforms/shapes.ttl`):
+```turtle
+# Translation Transform Shape
+noid:TranslationShape
+    a sh:NodeShape ;
+    sh:targetClass noid:translation ;
+    rdfs:label "Translation Transform Shape" ;
+    sh:property [
+        sh:path noid:translation ;
+        sh:name "translation vector" ;
+        sh:minCount 1 ;
+        sh:nodeKind sh:Literal ;
+    ] .
+```
+
+**Coordinate Space Validation** (`/schemas/coordinate_spaces_shapes.ttl`):
+```turtle
+# Coordinate Space Shape
+noid:CoordinateSpaceShape
+    a sh:NodeShape ;
+    sh:targetClass noid:CoordinateSpace ;
+    sh:property [
+        sh:path noid:dimensions ;
+        sh:name "dimensions" ;
+        sh:minCount 1 ;
+        sh:nodeKind sh:BlankNode ;
+        sh:node noid:DimensionShape ;
+    ] .
+
+# Dimension Shape with unit constraints
+noid:DimensionShape
+    a sh:NodeShape ;
+    sh:property [
+        sh:path noid:unit ;
+        sh:in ( "micrometer" "millimeter" "meter" "index" "arbitrary" "second" "minute" "hour" "radian" "degree" ) ;
+    ] .
+```
+
+#### Validation API
+
+The Python validation module (`src/noid/validation.py`) provides:
+
+```python
+# Validate transforms
+from noid.validation import validate_transforms
+errors = validate_transforms("path/to/transform_data.jsonld")
+
+# Validate coordinate spaces  
+from noid.validation import validate_coordinate_spaces
+errors = validate_coordinate_spaces("path/to/coordinate_space_data.jsonld")
+
+# Generic SHACL validation
+from noid.validation import validate_with_shacl
+errors = validate_with_shacl(data_file, shapes_file, data_format="json-ld")
+```
+
+#### Test Coverage
+
+Comprehensive test suite (`tests/test_validation.py`) covers:
+- ✅ Valid transform examples (translation, scale, homogeneous, identity, mapAxis)
+- ✅ Invalid transform examples (missing required properties)
+- ✅ Valid coordinate space examples (spatial and temporal dimensions)
+- ✅ Invalid coordinate space examples (missing dimensions, bad dimension types)
+- ✅ Infrastructure testing (file handling, error reporting)
+
+### Croissant Integration
+
+The generated JSON-LD vocabularies enable semantic integration with MLCommons Croissant datasets:
+
+1. **Vocabulary import**: Croissant datasets can reference NOID vocabularies via JSON-LD `@context`
+2. **Semantic validation**: Both Croissant validation and SHACL validation can be applied
+3. **Rich metadata**: Coordinate spaces and transforms become first-class entities in dataset descriptions
+
+### Development Workflow
+
+1. **Modify TTL vocabularies** when adding new classes or properties
+2. **Update SHACL shapes** when adding new validation constraints  
+3. **Run build process** to regenerate JSON-LD vocabularies
+4. **Run tests** to ensure validation works correctly
+5. **Update examples** to demonstrate new functionality
+
+This architecture ensures that the TTL vocabularies remain the authoritative source while enabling flexible validation and integration with the broader semantic web ecosystem.

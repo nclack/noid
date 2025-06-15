@@ -3,7 +3,7 @@
     "id": "pixel_to_world_2d",
     "name": "Pixel to World 2D Transform",
     "description": "Transform from pixel coordinates to physical world coordinates",
-    "input_space": {
+    "input": {
       "id": "pixel_space", 
       "name": "Pixel Space",
       "dimensions": [
@@ -11,7 +11,7 @@
         {"name": "y", "unit": "index", "type": "space"}
       ]
     },
-    "output_space": {
+    "output": {
       "id": "world_space_2d",
       "name": "World Space 2D", 
       "dimensions": [
@@ -47,11 +47,8 @@
       ]
     },
     "transform": {
-      "type": "sequence",
-      "sequence": [
-        {"type": "translation", "translation": [10, 20, 5]},
-        {"type": "rotation", "matrix": [[0.866, -0.5, 0], [0.5, 0.866, 0], [0, 0, 1]]}
-      ]
+      "type": "translation",
+      "translation": [10, 20, 5]
     }
   },
   {

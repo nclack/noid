@@ -50,10 +50,6 @@ noid:rotation a owl:Class ;
     rdfs:comment "Matrix-based rotation transformation" ;
     rdfs:subClassOf noid:Transform .
 
-noid:sequence a owl:Class ;
-    rdfs:label "Sequence Transform" ;
-    rdfs:comment "Composition of multiple transforms applied in sequence" ;
-    rdfs:subClassOf noid:Transform .
 
 noid:displacements a owl:Class ;
     rdfs:label "Displacements Transform" ;
@@ -87,11 +83,6 @@ noid:mapAxis a owl:DatatypeProperty ;
     rdfs:comment "Mapping between input and output axes" ;
     rdfs:domain noid:mapAxis .
 
-noid:sequence a owl:ObjectProperty ;
-    rdfs:label "sequence" ;
-    rdfs:comment "Ordered list of transforms in the sequence" ;
-    rdfs:domain noid:sequence ;
-    rdfs:range noid:Transform .
 
 noid:displacements a owl:DatatypeProperty ;
     rdfs:label "displacements" ;

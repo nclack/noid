@@ -1,0 +1,8 @@
+{
+  "@context": {
+    "@vocab": "https://github.com/nclack/noid/schemas/transforms/",
+    "rdfs": "http://www.w3.org/2000/01/rdf-schema#"
+  },
+  "@id": "invalid_translation",
+  "@type": "translation"
+}

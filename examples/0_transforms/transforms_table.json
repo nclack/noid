@@ -34,11 +34,6 @@
     "matrix": [[1, 0, 0, 0], [0, 1, 0, 0], [0, 0, 1, 0], [0.001, 0.002, 0, 1]]
   },
   {
-    "id": "sequence1",
-    "label": "Composite transformation: scale then translate",
-    "sequence": ["scale1", "translation1"]
-  },
-  {
     "id": "displacements1",
     "label": "Non-linear displacement field",
     "displacements": "path/to/displacement_field.zarr"
