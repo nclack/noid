@@ -66,16 +66,13 @@
       "title": "MapAxis",
       "properties": {
         "mapAxis": {
-          "type": "object",
-          "patternProperties": {
-            "^[a-zA-Z_][a-zA-Z0-9_]*$": {
-              "type": "string",
-              "pattern": "^[a-zA-Z_][a-zA-Z0-9_]*$"
-            }
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "minimum": 0
           },
-          "additionalProperties": false,
-          "minProperties": 1,
-          "description": "Axis mapping as object with string key-value pairs"
+          "minItems": 1,
+          "description": "Permutation vector of 0-based input dimension indices. Array length equals number of output dimensions. Each value specifies which input dimension maps to the corresponding output dimension."
         }
       },
       "required": ["mapAxis"],
@@ -129,19 +126,27 @@
       "type": "object",
       "title": "CoordinateLookupTable",
       "properties": {
-        "coordinates": {
-          "type": "object",
-          "properties": {
-            "lookup_table": {"type": "string"},
-            "interpolation": {"type": "string", "enum": ["linear", "nearest", "cubic"]},
-            "extrapolation": {"type": "string", "enum": ["nearest", "zero", "constant"]}
-          },
-          "required": ["lookup_table"],
-          "additionalProperties": false,
-          "description": "Coordinate lookup configuration"
+        "lookup_table": {
+          "oneOf": [
+            {
+              "type": "string",
+              "description": "Path to coordinate lookup table"
+            },
+            {
+              "type": "object",
+              "properties": {
+                "path": {"type": "string"},
+                "interpolation": {"type": "string", "enum": ["linear", "nearest", "cubic"]},
+                "extrapolation": {"type": "string", "enum": ["nearest", "zero", "constant"]}
+              },
+              "required": ["path"],
+              "additionalProperties": false,
+              "description": "Coordinate lookup table configuration"
+            }
+          ]
         }
       },
-      "required": ["coordinates"],
+      "required": ["lookup_table"],
       "additionalProperties": false
     }
   },
@@ -149,9 +154,9 @@
     {"identity": []},
     {"translation": [10, 20, 5]},
     {"scale": [2.0, 1.5, 0.5]},
-    {"mapAxis": {"x": "y", "y": "x", "z": "z"}},
+    {"mapAxis": [1, 0, 2]},
     {"homogeneous": [[2.0, 0, 0, 10], [0, 1.5, 0, 20], [0, 0, 0.5, 5], [0, 0, 0, 1]]},
     {"displacements": "path/to/displacement_field.zarr"},
-    {"coordinates": {"lookup_table": "path/to/coordinate_lut.zarr", "interpolation": "linear"}}
+    {"lookup_table": {"path": "path/to/coordinate_lut.zarr", "interpolation": "linear"}}
   ]
 }

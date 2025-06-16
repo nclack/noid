@@ -63,19 +63,20 @@ class TestTransformValidation:
 
     def test_mapaxis_valid(self):
         """Test valid mapAxis transform."""
-        data = {"mapAxis": {"x": "y", "y": "x", "z": "z"}}
+        data = {"mapAxis": [1, 0, 2]}
         transform = Transform(data)
-        assert transform.root.mapAxis == {"x": "y", "y": "x", "z": "z"}
+        # Check the values by accessing the root attribute of each MapAxi object
+        assert [x.root for x in transform.root.mapAxis] == [1, 0, 2]
 
-    def test_mapaxis_invalid_bad_key(self):
-        """Test mapAxis transform with invalid key fails."""
-        data = {"mapAxis": {"123invalid": "y"}}
+    def test_mapaxis_invalid_negative_index(self):
+        """Test mapAxis transform with negative index fails."""
+        data = {"mapAxis": [1, -1, 2]}
         with pytest.raises(ValidationError):
             Transform(data)
 
-    def test_mapaxis_invalid_bad_value(self):
-        """Test mapAxis transform with invalid value fails."""
-        data = {"mapAxis": {"x": "123invalid"}}
+    def test_mapaxis_invalid_non_integer(self):
+        """Test mapAxis transform with non-integer values fails."""
+        data = {"mapAxis": [1.5, 0, 2]}
         with pytest.raises(ValidationError):
             Transform(data)
 
@@ -116,20 +117,20 @@ class TestTransformValidation:
             Transform(data)
 
     def test_coordinates_valid(self):
-        """Test valid coordinates transform."""
+        """Test valid coordinate lookup table transform."""
         data = {
-            "coordinates": {
-                "lookup_table": "path/to/lut.zarr",
+            "lookup_table": {
+                "path": "path/to/lut.zarr",
                 "interpolation": "linear",
             }
         }
         transform = Transform(data)
-        assert transform.root.coordinates.lookup_table == "path/to/lut.zarr"
-        assert transform.root.coordinates.interpolation.value == "linear"
+        assert transform.root.lookup_table.path == "path/to/lut.zarr"
+        assert transform.root.lookup_table.interpolation.value == "linear"
 
-    def test_coordinates_invalid_missing_lookup_table(self):
-        """Test coordinates transform without required lookup_table fails."""
-        data = {"coordinates": {"interpolation": "linear"}}
+    def test_coordinates_invalid_missing_path(self):
+        """Test coordinate lookup table transform without required path fails."""
+        data = {"lookup_table": {"interpolation": "linear"}}
         with pytest.raises(ValidationError):
             Transform(data)
 
@@ -174,10 +175,10 @@ class TestTransformSerialization:
 
     def test_mapaxis_serialization(self):
         """Test mapAxis transform serialization."""
-        data = {"mapAxis": {"x": "y", "y": "x", "z": "z"}}
+        data = {"mapAxis": [1, 0, 2]}
         transform = Transform(data)
         serialized = transform.model_dump()
-        assert serialized == {"mapAxis": {"x": "y", "y": "x", "z": "z"}}
+        assert serialized == {"mapAxis": [1, 0, 2]}
 
 
     def test_displacements_object_serialization(self):
@@ -193,19 +194,19 @@ class TestTransformSerialization:
         assert serialized["displacements"]["extrapolation"] is None
 
     def test_coordinates_serialization(self):
-        """Test coordinates transform serialization."""
+        """Test coordinate lookup table transform serialization."""
         data = {
-            "coordinates": {
-                "lookup_table": "path/to/lut.zarr",
+            "lookup_table": {
+                "path": "path/to/lut.zarr",
                 "interpolation": "linear",
             }
         }
         transform = Transform(data)
         serialized = transform.model_dump()
-        assert "coordinates" in serialized
-        assert serialized["coordinates"]["lookup_table"] == "path/to/lut.zarr"
-        assert serialized["coordinates"]["interpolation"] == Interpolation.linear
-        assert serialized["coordinates"]["extrapolation"] is None
+        assert "lookup_table" in serialized
+        assert serialized["lookup_table"]["path"] == "path/to/lut.zarr"
+        assert serialized["lookup_table"]["interpolation"] == Interpolation.linear
+        assert serialized["lookup_table"]["extrapolation"] is None
 
 
 class TestTransformDeserialization:
@@ -229,11 +230,12 @@ class TestTransformDeserialization:
 
     def test_mapaxis_json_roundtrip(self):
         """Test mapAxis transform JSON roundtrip."""
-        original_data = {"mapAxis": {"x": "y", "y": "x", "z": "z"}}
+        original_data = {"mapAxis": [1, 0, 2]}
         transform = Transform(original_data)
         json_str = transform.model_dump_json()
         reconstructed = Transform.model_validate_json(json_str)
-        assert reconstructed.root.mapAxis == {"x": "y", "y": "x", "z": "z"}
+        # Check the values by accessing the root attribute of each MapAxi object
+        assert [x.root for x in reconstructed.root.mapAxis] == [1, 0, 2]
 
     def test_displacements_string_json_roundtrip(self):
         """Test displacements transform string JSON roundtrip."""
@@ -244,18 +246,18 @@ class TestTransformDeserialization:
         assert reconstructed.root.displacements == "path/to/displacement_field.zarr"
 
     def test_coordinates_json_roundtrip(self):
-        """Test coordinates transform JSON roundtrip."""
+        """Test coordinate lookup table transform JSON roundtrip."""
         original_data = {
-            "coordinates": {
-                "lookup_table": "path/to/lut.zarr",
+            "lookup_table": {
+                "path": "path/to/lut.zarr",
                 "interpolation": "linear",
             }
         }
         transform = Transform(original_data)
         json_str = transform.model_dump_json()
         reconstructed = Transform.model_validate_json(json_str)
-        assert reconstructed.root.coordinates.lookup_table == "path/to/lut.zarr"
-        assert reconstructed.root.coordinates.interpolation == Interpolation.linear
+        assert reconstructed.root.lookup_table.path == "path/to/lut.zarr"
+        assert reconstructed.root.lookup_table.interpolation == Interpolation.linear
 
     def test_parse_from_dict(self):
         """Test parsing from dictionary."""

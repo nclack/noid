@@ -1,0 +1,60 @@
+{
+  "@context": {
+    "@vocab": "https://github.com/nclack/noid/schemas/spaces/",
+    "schema": "https://schema.org/",
+    "name": "schema:name",
+    "description": "schema:description",
+    "subClassOf": "schema:subClassOf",
+    "domainIncludes": "schema:domainIncludes",
+    "rangeIncludes": "schema:rangeIncludes"
+  },
+  "@graph": [
+    {
+      "@type": "schema:DefinedTermSet",
+      "@id": "https://github.com/nclack/noid/schemas/spaces/vocabulary.jsonld",
+      "name": "NOID Coordinate Spaces Vocabulary", 
+      "description": "Vocabulary for coordinate spaces, dimensions, and coordinate transformations",
+      "schema:creator": "NOID Project",
+      "schema:version": "0.1.0"
+    },
+    {
+      "@type": "schema:Class",
+      "@id": "JsonValue",
+      "name": "JSON Value",
+      "description": "A JSON value that can be validated against a specified JSON Schema",
+      "subClassOf": "schema:Thing"
+    },
+    {
+      "@type": "schema:Property",
+      "@id": "schema",
+      "name": "schema", 
+      "description": "URL of the JSON Schema used to validate this JSON value",
+      "domainIncludes": "JsonValue",
+      "rangeIncludes": "schema:URL"
+    },
+    {
+      "@type": "schema:Class",
+      "@id": "Dimension",
+      "name": "Dimension",
+      "description": "A single dimension within a coordinate space, validated against the spaces JSON Schema",
+      "subClassOf": "JsonValue",
+      "schema": "https://github.com/nclack/noid/schemas/spaces/spaces.v0.schema.json#/definitions/Dimension"
+    },
+    {
+      "@type": "schema:Class",
+      "@id": "CoordinateSystem",
+      "name": "Coordinate System",
+      "description": "A coordinate system consisting of multiple dimensions, validated against the spaces JSON Schema",
+      "subClassOf": "JsonValue",
+      "schema": "https://github.com/nclack/noid/schemas/spaces/spaces.v0.schema.json#/definitions/CoordinateSystem"
+    },
+    {
+      "@type": "schema:Class",
+      "@id": "CoordinateTransform",
+      "name": "Coordinate Transform",
+      "description": "A coordinate transformation between input and output coordinate spaces, validated against the spaces JSON Schema",
+      "subClassOf": "JsonValue",
+      "schema": "https://github.com/nclack/noid/schemas/spaces/spaces.v0.schema.json#/definitions/CoordinateTransform"
+    }
+  ]
+}

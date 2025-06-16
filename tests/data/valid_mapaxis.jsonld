@@ -5,9 +5,5 @@
   },
   "@id": "valid_mapaxis",
   "@type": "mapAxis",
-  "mapAxis": {
-    "x": "y",
-    "y": "z", 
-    "z": "x"
-  }
+  "mapAxis": [1, 2, 0]
 }

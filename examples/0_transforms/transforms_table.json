@@ -16,8 +16,8 @@
   },
   {
     "id": "mapAxis1",
-    "label": "Swap x and y axes", 
-    "transform": "{\"mapAxis\": {\"x\": \"y\", \"y\": \"x\", \"z\": \"z\"}}"
+    "label": "Swap first two dimensions", 
+    "transform": "{\"mapAxis\": [1, 0, 2]}"
   },
   {
     "id": "homogeneous1",
@@ -42,6 +42,6 @@
   {
     "id": "coordinates1",
     "label": "Explicit coordinate mapping",
-    "transform": "{\"coordinates\": {\"lookup_table\": \"path/to/coordinate_lut.zarr\", \"interpolation\": \"linear\"}}"
+    "transform": "{\"lookup_table\": {\"path\": \"path/to/coordinate_lut.zarr\", \"interpolation\": \"linear\"}}"
   }
 ]

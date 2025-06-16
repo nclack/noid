@@ -1,0 +1,144 @@
+[
+  {
+    "id": "pixel_to_world_2d",
+    "name": "Pixel to World 2D Transform",
+    "description": "Transform from pixel coordinates to physical world coordinates using affine transformation",
+    "input": [
+      {"id": "dim_0", "unit": "index", "type": "space"},
+      {"id": "dim_1", "unit": "index", "type": "space"}
+    ],
+    "output": [
+      {"id": "y_world", "unit": "micrometer", "type": "space"},
+      {"id": "x_world", "unit": "micrometer", "type": "space"}
+    ],
+    "transform": {
+      "homogeneous": [[0.5, 0, 100], [0, 0.5, 200], [0, 0, 1]]
+    }
+  },
+  {
+    "id": "registration_3d",
+    "name": "3D Registration Transform",
+    "description": "Align 3D world coordinates between different samples using affine transformation",
+    "input": {
+      "id": "sample1_array/dims",
+      "dimensions": [
+        {"id": "sample1_array/dims/z", "unit": "index", "type": "space"},
+        {"id": "sample1_array/dims/y", "unit": "index", "type": "space"},
+        {"id": "sample1_array/dims/x", "unit": "index", "type": "space"}
+      ]
+    },
+    "output": {
+      "id": "reference_array/dims",
+      "dimensions": [
+        {"id": "reference_array/dims/z", "unit": "micrometer", "type": "space"},
+        {"id": "reference_array/dims/y", "unit": "micrometer", "type": "space"},
+        {"id": "reference_array/dims/x", "unit": "micrometer", "type": "space"}
+      ]
+    },
+    "transform": {
+      "homogeneous": [[1.1, 0.02, 0.01, 3.8], [0.01, 1.05, 0.03, -5.2], [0.005, 0.01, 0.98, 10.5], [0, 0, 0, 1]]
+    }
+  },
+  {
+    "id": "thin_plate_spline_warp",
+    "name": "Thin Plate Spline Warp",
+    "description": "Non-linear warping using thin plate spline deformation field",
+    "input": [
+      {"id": "z_original", "unit": "micrometer", "type": "space"},
+      {"id": "y_original", "unit": "micrometer", "type": "space"},
+      {"id": "x_original", "unit": "micrometer", "type": "space"}
+    ],
+    "output": [
+      {"id": "z_warped", "unit": "micrometer", "type": "space"},
+      {"id": "y_warped", "unit": "micrometer", "type": "space"},
+      {"id": "x_warped", "unit": "micrometer", "type": "space"}
+    ],
+    "transform": {
+      "displacements": {
+        "path": "thin_plate_spline_field.zarr",
+        "interpolation": "linear"
+      }
+    }
+  },
+  {
+    "id": "time_alignment",
+    "name": "Time Series Alignment",
+    "description": "Temporal alignment of time series data using translation",
+    "input": [
+      {"id": "t_raw", "unit": "index", "type": "time"}
+    ],
+    "output": [
+      {"id": "t_aligned", "unit": "index", "type": "time"}
+    ],
+    "transform": {
+      "translation": [-5]
+    }
+  },
+  {
+    "id": "channel_mapping",
+    "name": "Channel Mapping Transform", 
+    "description": "Map fluorescence channels to RGB display channels using lookup table",
+    "input": [
+      {"id": "fluorescence_array/dims/c", "unit": "index", "type": "other"}
+    ],
+    "output": [
+      {"id": "rgb_array/dims/c", "unit": "index", "type": "other"}
+    ],
+    "transform": {
+      "lookup_table": {
+        "path": "channel_mapping_lut.zarr",
+        "interpolation": "nearest"
+      }
+    }
+  },
+  {
+    "id": "contrast_scaling",
+    "name": "Display Contrast Scaling",
+    "description": "Scale and offset array values for display contrast enhancement using affine transform",
+    "input": [
+      {"id": "raw_image_array/values", "unit": "arbitrary", "type": "other"}
+    ],
+    "output": [
+      {"id": "display_image_array/values", "unit": "arbitrary", "type": "other"}
+    ],
+    "transform": {
+      "homogeneous": [[255.0, 10.0], [0, 1]]
+    }
+  },
+  {
+    "id": "spatiotemporal_scaling",
+    "name": "Spatiotemporal Scaling Transform",
+    "description": "Scale spatial and temporal dimensions independently",
+    "input": [
+      {"id": "t_raw", "unit": "second", "type": "time"},
+      {"id": "y_raw", "unit": "micrometer", "type": "space"},
+      {"id": "x_raw", "unit": "micrometer", "type": "space"}
+    ],
+    "output": [
+      {"id": "t_scaled", "unit": "second", "type": "time"},
+      {"id": "y_scaled", "unit": "micrometer", "type": "space"},
+      {"id": "x_scaled", "unit": "micrometer", "type": "space"}
+    ],
+    "transform": {
+      "scale": [0.1, 2.0, 2.0]
+    }
+  },
+  {
+    "id": "array_reordering",
+    "name": "Array Dimension Reordering",
+    "description": "Reorder array dimensions from (height, width, channels) to (channels, height, width)",
+    "input": [
+      {"id": "dim_0", "unit": "index", "type": "index"},
+      {"id": "dim_1", "unit": "index", "type": "index"},
+      {"id": "dim_2", "unit": "index", "type": "index"}
+    ],
+    "output": [
+      {"id": "dim_0", "unit": "index", "type": "index"},
+      {"id": "dim_1", "unit": "index", "type": "index"},
+      {"id": "dim_2", "unit": "index", "type": "index"}
+    ],
+    "transform": {
+      "mapAxis": [1, 2, 0]
+    }
+  }
+]

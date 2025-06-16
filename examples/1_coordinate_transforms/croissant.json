@@ -1,0 +1,123 @@
+{
+  "@context": {
+    "@language": "en",
+    "@vocab": "https://schema.org/",
+    "sc": "https://schema.org/",
+    "noid": "../../schemas/spaces/vocabulary.jsonld",
+    "citeAs": "cr:citeAs",
+    "column": "cr:column",
+    "conformsTo": "dct:conformsTo",
+    "cr": "http://mlcommons.org/croissant/",
+    "rai": "http://mlcommons.org/croissant/RAI/",
+    "data": {
+      "@id": "cr:data",
+      "@type": "@json"
+    },
+    "dataBiases": "cr:dataBiases",
+    "dataCollection": "cr:dataCollection",
+    "dataType": {
+      "@id": "cr:dataType",
+      "@type": "@vocab"
+    },
+    "dct": "http://purl.org/dc/terms/",
+    "examples": "cr:examples",
+    "extract": "cr:extract",
+    "field": "cr:field",
+    "fileProperty": "cr:fileProperty",
+    "fileObject": "cr:fileObject",
+    "fileSet": "cr:fileSet",
+    "format": "cr:format",
+    "includes": "cr:includes",
+    "isLiveDataset": "cr:isLiveDataset",
+    "jsonPath": "cr:jsonPath",
+    "key": "cr:key",
+    "md5": "cr:md5",
+    "parentField": "cr:parentField",
+    "path": "cr:path",
+    "recordSet": "cr:recordSet",
+    "references": "cr:references",
+    "regex": "cr:regex",
+    "repeated": "cr:repeated",
+    "replace": "cr:replace",
+    "separator": "cr:separator",
+    "source": "cr:source",
+    "subField": "cr:subField",
+    "transform": "cr:transform"
+  },
+  "@type": "sc:Dataset",
+  "name": "noid-coordinate-transforms-table",
+  "description": "Table of coordinate transforms demonstrating relationships between coordinate spaces using the noid spaces vocabulary",
+  "conformsTo": "http://mlcommons.org/croissant/1.0",
+  "citeAs": "@misc{noid-coordinate-transforms, title={NOID Coordinate Transforms Table}, author={Nathan Clack}, year={2025}}",
+  "datePublished": "2025-06-16",
+  "license": "https://creativecommons.org/licenses/by/4.0/",
+  "url": "https://github.com/nclack/noid",
+  "version": "0.1.0",
+  "distribution": [
+    {
+      "@type": "cr:FileObject",
+      "@id": "data0",
+      "name": "data0",
+      "description": "JSON array containing coordinate transform examples",
+      "contentUrl": "data.json",
+      "encodingFormat": "application/json",
+      "sha256": "1df95b0382ce37335af2d6845476bc387b589b23187dab814e3370c0a9304a6a"
+    }
+  ],
+  "recordSet": [
+    {
+      "@type": "cr:RecordSet",
+      "@id": "table0",
+      "name": "table0",
+      "description": "Coordinate transforms with input/output spaces and transform definitions",
+      "field": [
+        {
+          "@type": "cr:Field",
+          "@id": "table0/id",
+          "name": "id",
+          "description": "Unique identifier for the coordinate transform",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "data0"
+            },
+            "extract": {
+              "jsonPath": "$[*].id"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "table0/name",
+          "name": "name",
+          "description": "Human-readable name for the coordinate transform",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "data0"
+            },
+            "extract": {
+              "jsonPath": "$[*].name"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "table0/inputlen",
+          "name": "table0/inputlen",
+          "description": "# input dims",
+          "repeated": true,
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "data0"
+            },
+            "extract": {
+              "jsonPath": "$[*].input..id"
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
