@@ -43,5 +43,5 @@
     "id": "coordinates1",
     "label": "Explicit coordinate mapping",
     "transform": "{\"coordinates\": {\"lookup_table\": \"path/to/coordinate_lut.zarr\", \"interpolation\": \"linear\"}}"
-  },
+  }
 ]
