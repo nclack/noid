@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Coordinate Systems and Transformations</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: #f5f5f5;
+            color: #333;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .example {
+            background: white;
+            border-radius: 8px;
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .example h2 {
+            margin-top: 0;
+            color: #2c3e50;
+            font-size: 20px;
+        }
+        .viz-container {
+            display: flex;
+            gap: 24px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .coordinate-grid {
+            position: relative;
+            background: #fafafa;
+            border: 2px solid #ddd;
+            border-radius: 4px;
+        }
+        .arrow {
+            font-size: 32px;
+            color: #3498db;
+            margin: 0 20px;
+        }
+        .pixel-grid {
+            display: grid;
+            gap: 1px;
+            background: #ddd;
+            padding: 1px;
+        }
+        .pixel {
+            background: #e0e0e0;
+            aspect-ratio: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            color: #666;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .pixel:hover {
+            background: #3498db;
+            color: white;
+            transform: scale(1.1);
+            z-index: 10;
+            position: relative;
+        }
+        .pixel.highlighted {
+            background: #e74c3c;
+            color: white;
+        }
+        .coord-label {
+            position: absolute;
+            background: rgba(255,255,255,0.9);
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .info-box {
+            background: #f8f9fa;
+            border-left: 4px solid #3498db;
+            padding: 16px;
+            margin: 16px 0;
+            border-radius: 4px;
+        }
+        .channel-viz {
+            display: flex;
+            gap: 16px;
+            align-items: center;
+        }
+        .channel {
+            width: 80px;
+            height: 80px;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        .channel:hover {
+            transform: scale(1.1);
+        }
+        .timeline {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin: 20px 0;
+        }
+        .timepoint {
+            width: 60px;
+            height: 60px;
+            background: #ecf0f1;
+            border: 2px solid #bdc3c7;
+            border-radius: 4px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .timepoint:hover {
+            background: #3498db;
+            color: white;
+            border-color: #2980b9;
+        }
+        .timepoint .frame {
+            font-weight: bold;
+        }
+        .timepoint .time {
+            font-size: 10px;
+            opacity: 0.8;
+        }
+        .transform-equation {
+            background: #f8f9fa;
+            padding: 12px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            margin: 12px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 style="text-align: center; color: #2c3e50; margin-bottom: 32px;">Coordinate Systems and Transformations</h1>
+        
+        <!-- Example 1: Pixel to Physical Coordinates -->
+        <div class="example">
+            <h2>Example 1: Pixel Coordinates → Physical Coordinates</h2>
+            <div class="viz-container">
+                <div>
+                    <h3 style="font-size: 16px; text-align: center;">Pixel Coordinates</h3>
+                    <div class="coordinate-grid" style="width: 240px; height: 240px;">
+                        <div class="pixel-grid" id="pixelGrid" style="grid-template-columns: repeat(8, 1fr);">
+                            <!-- Pixels will be generated by JavaScript -->
+                        </div>
+                        <div class="coord-label" style="bottom: -30px; left: 50%; transform: translateX(-50%);">
+                            columns (0-7)
+                        </div>
+                        <div class="coord-label" style="left: -60px; top: 50%; transform: translateY(-50%) rotate(-90deg);">
+                            rows (0-7)
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="arrow">→</div>
+                
+                <div>
+                    <h3 style="font-size: 16px; text-align: center;">Physical Coordinates</h3>
+                    <div class="coordinate-grid" style="width: 240px; height: 240px; display: flex; align-items: center; justify-content: center;">
+                        <div id="physicalDisplay" style="text-align: center;">
+                            <div style="font-size: 18px; font-weight: bold;">5.2 × 5.2 μm</div>
+                            <div style="font-size: 14px; color: #666; margin-top: 8px;">
+                                Each pixel = 0.65 μm
+                            </div>
+                        </div>
+                        <div class="coord-label" style="bottom: -30px; left: 50%; transform: translateX(-50%);">
+                            X (micrometers)
+                        </div>
+                        <div class="coord-label" style="left: -80px; top: 50%; transform: translateY(-50%) rotate(-90deg);">
+                            Y (micrometers)
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="transform-equation">
+                Transform: physical_x = pixel_col × 0.65, physical_y = pixel_row × 0.65
+            </div>
+        </div>
+
+        <!-- Example 2: Multi-dimensional -->
+        <div class="example">
+            <h2>Example 2: Multi-dimensional Data</h2>
+            
+            <!-- Channels -->
+            <div>
+                <h3 style="font-size: 16px;">Categorical Dimension: Fluorescence Channels</h3>
+                <div class="channel-viz">
+                    <div class="channel" style="background: #e74c3c;" onclick="showChannelInfo(0)">
+                        Ch 0<br>Red
+                    </div>
+                    <div class="channel" style="background: #27ae60;" onclick="showChannelInfo(1)">
+                        Ch 1<br>Green
+                    </div>
+                    <div class="channel" style="background: #3498db;" onclick="showChannelInfo(2)">
+                        Ch 2<br>Blue
+                    </div>
+                    <div id="channelInfo" class="info-box" style="flex: 1; min-width: 200px;">
+                        Click a channel to see metadata lookup
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Time -->
+            <div style="margin-top: 24px;">
+                <h3 style="font-size: 16px;">Temporal Dimension: Time-lapse</h3>
+                <div class="timeline">
+                    <div class="timepoint" onclick="showTimeInfo(0)">
+                        <div class="frame">Frame 0</div>
+                        <div class="time">0 sec</div>
+                    </div>
+                    <div class="timepoint" onclick="showTimeInfo(1)">
+                        <div class="frame">Frame 1</div>
+                        <div class="time">30 sec</div>
+                    </div>
+                    <div class="timepoint" onclick="showTimeInfo(2)">
+                        <div class="frame">Frame 2</div>
+                        <div class="time">60 sec</div>
+                    </div>
+                    <div class="timepoint" onclick="showTimeInfo(3)">
+                        <div class="frame">Frame 3</div>
+                        <div class="time">90 sec</div>
+                    </div>
+                    <div style="font-size: 24px; margin: 0 8px;">...</div>
+                </div>
+                <div class="transform-equation">
+                    Transform: time_seconds = frame_number × 30
+                </div>
+            </div>
+        </div>
+
+    <script>
+        // Generate pixel grid
+        const pixelGrid = document.getElementById('pixelGrid');
+        for (let row = 0; row < 8; row++) {
+            for (let col = 0; col < 8; col++) {
+                const pixel = document.createElement('div');
+                pixel.className = 'pixel';
+                pixel.textContent = `${row},${col}`;
+                pixel.onclick = () => showPixelCoords(row, col);
+                pixelGrid.appendChild(pixel);
+            }
+        }
+
+        function showPixelCoords(row, col) {
+            const physicalX = (col * 0.65).toFixed(2);
+            const physicalY = (row * 0.65).toFixed(2);
+            const display = document.getElementById('physicalDisplay');
+            display.innerHTML = `
+                <div style="font-size: 14px; color: #666;">Pixel (${row}, ${col}) →</div>
+                <div style="font-size: 24px; font-weight: bold; color: #e74c3c; margin: 8px 0;">
+                    (${physicalX}, ${physicalY}) μm
+                </div>
+                <div style="font-size: 12px; color: #666;">
+                    Transform: ${col} × 0.65 = ${physicalX}<br>
+                    ${row} × 0.65 = ${physicalY}
+                </div>
+            `;
+            
+            // Highlight the selected pixel
+            document.querySelectorAll('.pixel').forEach(p => p.classList.remove('highlighted'));
+            pixelGrid.children[row * 8 + col].classList.add('highlighted');
+        }
+
+        function showChannelInfo(channel) {
+            const channelData = {
+                0: { name: 'Red', wavelength: '561 nm', protein: 'mCherry', target: 'Mitochondria' },
+                1: { name: 'Green', wavelength: '488 nm', protein: 'GFP', target: 'Nucleus' },
+                2: { name: 'Blue', wavelength: '405 nm', protein: 'DAPI', target: 'DNA' }
+            };
+            const data = channelData[channel];
+            document.getElementById('channelInfo').innerHTML = `
+                <strong>Channel ${channel} → Metadata Lookup:</strong><br>
+                Name: ${data.name}<br>
+                Excitation: ${data.wavelength}<br>
+                Fluorophore: ${data.protein}<br>
+                Target: ${data.target}
+            `;
+        }
+
+        function showTimeInfo(frame) {
+            const seconds = frame * 30;
+            const timestamp = new Date(2024, 2, 15, 10, 30, seconds);
+            alert(`Frame ${frame} → ${seconds} seconds\nAbsolute time: ${timestamp.toLocaleTimeString()}`);
+        }
+    </script>
+</body>
+</html>

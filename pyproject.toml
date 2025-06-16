@@ -9,12 +9,13 @@ authors = [
 requires-python = ">=3.10"
 dependencies = [
     "mlcroissant",
- "rich",
- "pytest",
- "rdflib",
- "setuptools",
- "pyshacl",
- "pyld>=2.0.4",
+    "rich",
+    "pytest",
+    "rdflib",
+    "setuptools",
+    "pyshacl",
+    "pyld>=2.0.4",
+    "datamodel-code-generator>=0.31.0",
 ]
 
 [build-system]

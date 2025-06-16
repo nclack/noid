@@ -1,0 +1,179 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/nclack/noid/schemas/transforms/transforms.schema.json",
+  "title": "Transform Parameters Schema",
+  "description": "Schema for validating transform parameters using self-describing format",
+  "oneOf": [
+    {
+      "type": "object",
+      "title": "Identity",
+      "properties": {
+        "identity": {
+          "type": "array",
+          "maxItems": 0,
+          "description": "Identity transform requires empty array"
+        }
+      },
+      "required": ["identity"],
+      "additionalProperties": false
+    },
+    {
+      "type": "object",
+      "title": "Translation",
+      "properties": {
+        "translation": {
+          "type": "array",
+          "items": {"type": "number"},
+          "minItems": 1,
+          "description": "Translation vector as array of numbers"
+        }
+      },
+      "required": ["translation"],
+      "additionalProperties": false
+    },
+    {
+      "type": "object",
+      "title": "Scale",
+      "properties": {
+        "scale": {
+          "type": "array",
+          "items": {
+            "type": "number",
+            "exclusiveMinimum": 0
+          },
+          "minItems": 1,
+          "description": "Scale factors as array of positive numbers"
+        }
+      },
+      "required": ["scale"],
+      "additionalProperties": false
+    },
+    {
+      "type": "object",
+      "title": "MapAxis",
+      "properties": {
+        "mapAxis": {
+          "type": "object",
+          "patternProperties": {
+            "^[a-zA-Z_][a-zA-Z0-9_]*$": {
+              "type": "string",
+              "pattern": "^[a-zA-Z_][a-zA-Z0-9_]*$"
+            }
+          },
+          "additionalProperties": false,
+          "minProperties": 1,
+          "description": "Axis mapping as object with string key-value pairs"
+        }
+      },
+      "required": ["mapAxis"],
+      "additionalProperties": false
+    },
+    {
+      "type": "object",
+      "title": "Rotation",
+      "properties": {
+        "rotation": {
+          "type": "array",
+          "items": {
+            "type": "array",
+            "items": {"type": "number"}
+          },
+          "minItems": 2,
+          "description": "Rotation matrix as 2D array of numbers"
+        }
+      },
+      "required": ["rotation"],
+      "additionalProperties": false
+    },
+    {
+      "type": "object",
+      "title": "Homogeneous",
+      "properties": {
+        "homogeneous": {
+          "type": "array",
+          "items": {
+            "type": "array",
+            "items": {"type": "number"}
+          },
+          "minItems": 2,
+          "description": "Homogeneous transformation matrix as 2D array"
+        }
+      },
+      "required": ["homogeneous"],
+      "additionalProperties": false
+    },
+    {
+      "type": "object",
+      "title": "Sequence",
+      "properties": {
+        "sequence": {
+          "type": "array",
+          "items": {
+            "$ref": "#"
+          },
+          "minItems": 1,
+          "description": "Array of transform objects to apply in sequence"
+        }
+      },
+      "required": ["sequence"],
+      "additionalProperties": false
+    },
+    {
+      "type": "object",
+      "title": "Displacements",
+      "properties": {
+        "displacements": {
+          "oneOf": [
+            {
+              "type": "string",
+              "description": "Path to displacement field"
+            },
+            {
+              "type": "object",
+              "properties": {
+                "path": {"type": "string"},
+                "interpolation": {"type": "string", "enum": ["linear", "nearest", "cubic"]},
+                "extrapolation": {"type": "string", "enum": ["nearest", "zero", "constant"]}
+              },
+              "required": ["path"],
+              "additionalProperties": false,
+              "description": "Displacement field configuration"
+            }
+          ]
+        }
+      },
+      "required": ["displacements"],
+      "additionalProperties": false
+    },
+    {
+      "type": "object",
+      "title": "Coordinates",
+      "properties": {
+        "coordinates": {
+          "type": "object",
+          "properties": {
+            "lookup_table": {"type": "string"},
+            "interpolation": {"type": "string", "enum": ["linear", "nearest", "cubic"]},
+            "extrapolation": {"type": "string", "enum": ["nearest", "zero", "constant"]}
+          },
+          "required": ["lookup_table"],
+          "additionalProperties": false,
+          "description": "Coordinate lookup configuration"
+        }
+      },
+      "required": ["coordinates"],
+      "additionalProperties": false
+    }
+  ],
+  "examples": [
+    {"identity": []},
+    {"translation": [10, 20, 5]},
+    {"scale": [2.0, 1.5, 0.5]},
+    {"mapAxis": {"x": "y", "y": "x", "z": "z"}},
+    {"rotation": [[0, -1, 0], [1, 0, 0], [0, 0, 1]]},
+    {"homogeneous": [[2.0, 0, 0, 10], [0, 1.5, 0, 20], [0, 0, 0.5, 5], [0, 0, 0, 1]]},
+    {"sequence": [{"scale": [2.0, 2.0]}, {"translation": [10, 20]}]},
+    {"displacements": "path/to/displacement_field.zarr"},
+    {"coordinates": {"lookup_table": "path/to/coordinate_lut.zarr", "interpolation": "linear"}}
+  ]
+}
