@@ -1,25 +1,17 @@
 # noid - Nathan's opinionated imaging data library
 
-Hi, I'm Nathan. I have opinions about organizing data, particularly when it
-comes to datasets that involve large n-dimensional arrays.
+This is an exploratory project to validate ideas and develop some design recommendations around imaging data.
+This project explores ideas around standardizing how we describe and relate scientific imaging data.
 
-This is mostly an experiment to explore/validate some ideas I have around
-recommendations I'd like to make.
+## Features
 
-The key idea is:
+- json-schema vocabularies for coordinate spaces and transformations with a 
+  little json-ld thrown in for good measure
+- Support for common transform types (identity, translation, scale, etc.)
+- Exploration of integration with Croissant datasets
+- Pydantic models for schema validation
 
-1. A dataset is some collection of files - basically a database. The files are
-   well-known file types that act as the "tables".
-2. A top-level json file acts as a self-describing human-readable index into
-   these files. Importantly it (a) points to which files make up the dataset,
-   thereby making the data discoverable, and (b) defines important relations
-   between aspects of the files.
-3. Zarr is the well-known type for images.
-4. Microformats are awesome.
-5. There are only so many relations we care about with respect to image data.
+## Documentation
 
-## Relations
-
-- [RDF triple](https://www.w3.org/TR/rdf11-concepts/#section-triples)
-
-## Image data
+See the `/docs` directory for documentation on the approach and standards.
+See the `/schemas` directory for the json-schema vocabularies and specifications.
