@@ -3,8 +3,22 @@
   "$id": "https://github.com/nclack/noid/schemas/transforms/transforms.schema.json",
   "title": "Transform Parameters Schema",
   "description": "Schema for validating transform parameters using self-describing format",
-  "oneOf": [
-    {
+  "$ref": "#/definitions/Transform",
+  "definitions": {
+    "Transform": {
+      "title": "Transform", 
+      "description": "A coordinate transformation with self-describing parameters",
+      "oneOf": [
+        { "$ref": "#/definitions/Identity" },
+        { "$ref": "#/definitions/Translation" },
+        { "$ref": "#/definitions/Scale" },
+        { "$ref": "#/definitions/MapAxis" },
+        { "$ref": "#/definitions/Homogeneous" },
+        { "$ref": "#/definitions/DisplacementLookupTable" },
+        { "$ref": "#/definitions/CoordinateLookupTable" }
+      ]
+    },
+    "Identity": {
       "type": "object",
       "title": "Identity",
       "properties": {
@@ -17,7 +31,7 @@
       "required": ["identity"],
       "additionalProperties": false
     },
-    {
+    "Translation": {
       "type": "object",
       "title": "Translation",
       "properties": {
@@ -31,24 +45,23 @@
       "required": ["translation"],
       "additionalProperties": false
     },
-    {
+    "Scale": {
       "type": "object",
       "title": "Scale",
       "properties": {
         "scale": {
           "type": "array",
           "items": {
-            "type": "number",
-            "exclusiveMinimum": 0
+            "type": "number"
           },
           "minItems": 1,
-          "description": "Scale factors as array of positive numbers"
+          "description": "Scale factors as array of numbers"
         }
       },
       "required": ["scale"],
       "additionalProperties": false
     },
-    {
+    "MapAxis": {
       "type": "object",
       "title": "MapAxis",
       "properties": {
@@ -68,24 +81,7 @@
       "required": ["mapAxis"],
       "additionalProperties": false
     },
-    {
-      "type": "object",
-      "title": "Rotation",
-      "properties": {
-        "rotation": {
-          "type": "array",
-          "items": {
-            "type": "array",
-            "items": {"type": "number"}
-          },
-          "minItems": 2,
-          "description": "Rotation matrix as 2D array of numbers"
-        }
-      },
-      "required": ["rotation"],
-      "additionalProperties": false
-    },
-    {
+    "Homogeneous": {
       "type": "object",
       "title": "Homogeneous",
       "properties": {
@@ -96,31 +92,15 @@
             "items": {"type": "number"}
           },
           "minItems": 2,
-          "description": "Homogeneous transformation matrix as 2D array"
+          "description": "Homogeneous transformation matrix as 2D array (affine/projective)"
         }
       },
       "required": ["homogeneous"],
       "additionalProperties": false
     },
-    {
+    "DisplacementLookupTable": {
       "type": "object",
-      "title": "Sequence",
-      "properties": {
-        "sequence": {
-          "type": "array",
-          "items": {
-            "$ref": "#"
-          },
-          "minItems": 1,
-          "description": "Array of transform objects to apply in sequence"
-        }
-      },
-      "required": ["sequence"],
-      "additionalProperties": false
-    },
-    {
-      "type": "object",
-      "title": "Displacements",
+      "title": "DisplacementLookupTable",
       "properties": {
         "displacements": {
           "oneOf": [
@@ -145,9 +125,9 @@
       "required": ["displacements"],
       "additionalProperties": false
     },
-    {
+    "CoordinateLookupTable": {
       "type": "object",
-      "title": "Coordinates",
+      "title": "CoordinateLookupTable",
       "properties": {
         "coordinates": {
           "type": "object",
@@ -164,15 +144,13 @@
       "required": ["coordinates"],
       "additionalProperties": false
     }
-  ],
+  },
   "examples": [
     {"identity": []},
     {"translation": [10, 20, 5]},
     {"scale": [2.0, 1.5, 0.5]},
     {"mapAxis": {"x": "y", "y": "x", "z": "z"}},
-    {"rotation": [[0, -1, 0], [1, 0, 0], [0, 0, 1]]},
     {"homogeneous": [[2.0, 0, 0, 10], [0, 1.5, 0, 20], [0, 0, 0.5, 5], [0, 0, 0, 1]]},
-    {"sequence": [{"scale": [2.0, 2.0]}, {"translation": [10, 20]}]},
     {"displacements": "path/to/displacement_field.zarr"},
     {"coordinates": {"lookup_table": "path/to/coordinate_lut.zarr", "interpolation": "linear"}}
   ]

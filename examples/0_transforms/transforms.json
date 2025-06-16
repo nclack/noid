@@ -61,7 +61,7 @@
       "description": "Table containing transform examples using self-describing format",
       "contentUrl": "transforms_table.json",
       "encodingFormat": "application/json",
-      "sha256": "0c85a791bc4d55f2d3083242895a58449f8bd14b1bfe50a2d73a173efbf2c0d2"
+      "sha256": "12eef9460728b4a210121b66bcfeefe30e6cdfae2c1b441f999fc4b6acd8551b"
     }
   ],
   "recordSet": [

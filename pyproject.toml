@@ -16,6 +16,8 @@ dependencies = [
     "pyshacl",
     "pyld>=2.0.4",
     "datamodel-code-generator>=0.31.0",
+    "httpx>=0.28.1",
+    "ruff>=0.11.13",
 ]
 
 [build-system]

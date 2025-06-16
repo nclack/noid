@@ -1,0 +1,5 @@
+rule mk_pydantic2
+  command = uv run datamodel-codegen --input-file-type jsonschema --input $in --output $out --output-model-type pydantic_v2.BaseModel --use-title-as-name --reuse-model
+  description = Generate Pydantic models with external refs from $in
+
+build src/noid/_schema.py: mk_pydantic2 schemas/spaces/spaces.v0.schema.json

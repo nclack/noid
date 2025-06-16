@@ -1,0 +1,148 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/nclack/noid/schemas/spaces/spaces.v0.schema.json",
+  "title": "Coordinate Spaces Schema",
+  "description": "Schema for coordinate spaces and dimensions",
+  "type": "object",
+  "definitions": {
+    "Dimension": {
+      "type": "object",
+      "description": "A single dimension within a coordinate space",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the dimension across all dimensions in a dataset"
+        },
+        "unit": {
+          "type": "string",
+          "description": "Unit of measurement. Use UDUNITS-2 terms for space/time dimensions, 'index' or 'arbitrary' for all types"
+        },
+        "type": {
+          "type": "string",
+          "enum": ["space", "time", "other", "index"],
+          "description": "Type of dimension: 'space' for spatial, 'time' for temporal, 'other' for channels/indices/etc, 'index' for array indices",
+          "title": "DimensionType"
+        }
+      },
+      "required": ["id", "unit", "type"],
+      "additionalProperties": false,
+      "if": {
+        "properties": {
+          "type": {
+            "const": "index"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "unit": {
+            "const": "index"
+          }
+        }
+      }
+    },
+    "CoordinateSystem": {
+      "type": "object",
+      "description": "A coordinate system consisting of multiple dimensions",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the coordinate system"
+        },
+        "dimensions": {
+          "type": "array",
+          "description": "List of dimensions, specified either by ID reference or as full Dimension objects",
+          "items": {
+            "oneOf": [
+              {
+                "type": "string",
+                "description": "Reference to a dimension by its ID"
+              },
+              {
+                "$ref": "#/definitions/Dimension"
+              }
+            ]
+          }
+        },
+        "description": {
+          "type": "string",
+          "description": "Optional description of the coordinate system"
+        }
+      },
+      "required": ["id", "dimensions"],
+      "additionalProperties": false
+    },
+    "CoordinateTransform": {
+      "type": "object",
+      "description": "A coordinate transformation between input and output coordinate spaces. The number of input and output dimensions must match the dimensionality of the transform.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the coordinate transform"
+        },
+        "input": {
+          "oneOf": [
+            {
+              "type": "array",
+              "description": "List of dimensions, specified either by ID reference or as full Dimension objects",
+              "items": {
+                "oneOf": [
+                  {
+                    "type": "string",
+                    "description": "Reference to a dimension by its ID"
+                  },
+                  {
+                    "$ref": "#/definitions/Dimension"
+                  }
+                ]
+              }
+            },
+            {
+              "$ref": "#/definitions/CoordinateSystem"
+            },
+            {
+              "type": "string",
+              "description": "Reference to a coordinate system by its ID"
+            }
+          ]
+        },
+        "output": {
+          "oneOf": [
+            {
+              "type": "array",
+              "description": "List of dimensions, specified either by ID reference or as full Dimension objects",
+              "items": {
+                "oneOf": [
+                  {
+                    "type": "string",
+                    "description": "Reference to a dimension by its ID"
+                  },
+                  {
+                    "$ref": "#/definitions/Dimension"
+                  }
+                ]
+              }
+            },
+            {
+              "$ref": "#/definitions/CoordinateSystem"
+            },
+            {
+              "type": "string",
+              "description": "Reference to a coordinate system by its ID"
+            }
+          ]
+        },
+        "transform": {
+          "$ref": "../transforms/transforms.v0.schema.json#/definitions/Transform",
+          "description": "Transform definition from the transforms vocabulary"
+        },
+        "description": {
+          "type": "string",
+          "description": "Optional description of the coordinate transform"
+        }
+      },
+      "required": ["id", "input", "output", "transform"],
+      "additionalProperties": false
+    }
+  }
+}

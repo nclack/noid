@@ -5,7 +5,7 @@ import os
 from rich.console import Console
 from rich.table import Table
 import mlcroissant as mlc
-from noid.transforms import Transform
+from noid import Transform
 
 
 def display_transforms():

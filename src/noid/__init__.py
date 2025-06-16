@@ -1,3 +1,33 @@
-"""A Python library."""
+"""Nathan's opinionated imaging data library (noid)."""
 
-__version__ = "0.1.0"
+# Import coordinate space and transform models
+from .schema import (
+    Dimension,
+    CoordinateSystem,
+    CoordinateTransform,
+    DimensionType,
+    Identity,
+    Translation,
+    Scale,
+    MapAxis,
+    Homogeneous,
+    DisplacementLookupTable,
+    CoordinateLookupTable,
+    Transform,
+)
+
+# Public API
+__all__ = [
+    "Dimension",
+    "CoordinateSystem",
+    "CoordinateTransform",
+    "DimensionType",
+    "Identity",
+    "Translation",
+    "Scale",
+    "MapAxis",
+    "Homogeneous",
+    "DisplacementLookupTable",
+    "CoordinateLookupTable",
+    "Transform",
+]
