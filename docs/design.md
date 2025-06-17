@@ -239,7 +239,7 @@ Instead, this design focuses on a JSON Schema based approach. `DataSet` is desig
 
 ## Specification
 
-The sections below outline the specific types, their fields, and their constraints. These are based on the schemas found in the [noid repository](https://github.com/nclack/noid/tree/main/schemas).
+The sections below outline the specific types, their fields, and their constraints. These are based on the schemas found in the [noid repository](https://github.com/nclack/noid/tree/main/schemas). The code in that repository was used for exploratory work.
 
 ### Transform specification
 
