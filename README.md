@@ -15,3 +15,8 @@ This project explores ideas around standardizing how we describe and relate scie
 
 See the `/docs` directory for documentation on the approach and standards.
 See the `/schemas` directory for the json-schema vocabularies and specifications.
+
+## Open questions
+
+* How to treat the implicit index of an array vs identified dimensions in the ome-zarr data set, especially when there's a base physical transform?
+* How to specify all the stuff I haven't specified yet? channel metadata, time series, bounding boxes, etc.

@@ -4,9 +4,9 @@
   "title": "Transform Parameters Schema",
   "description": "Schema for validating transform parameters using self-describing format",
   "$ref": "#/definitions/Transform",
-  "definitions": {
+  "$defs": {
     "Transform": {
-      "title": "Transform", 
+      "title": "Transform",
       "description": "A coordinate transformation with self-describing parameters",
       "oneOf": [
         { "$ref": "#/definitions/Identity" },
@@ -37,7 +37,7 @@
       "properties": {
         "translation": {
           "type": "array",
-          "items": {"type": "number"},
+          "items": { "type": "number" },
           "minItems": 1,
           "description": "Translation vector as array of numbers"
         }
@@ -86,7 +86,7 @@
           "type": "array",
           "items": {
             "type": "array",
-            "items": {"type": "number"}
+            "items": { "type": "number" }
           },
           "minItems": 2,
           "description": "Homogeneous transformation matrix as 2D array (affine/projective)"
@@ -108,9 +108,15 @@
             {
               "type": "object",
               "properties": {
-                "path": {"type": "string"},
-                "interpolation": {"type": "string", "enum": ["linear", "nearest", "cubic"]},
-                "extrapolation": {"type": "string", "enum": ["nearest", "zero", "constant"]}
+                "path": { "type": "string" },
+                "interpolation": {
+                  "type": "string",
+                  "enum": ["linear", "nearest", "cubic"]
+                },
+                "extrapolation": {
+                  "type": "string",
+                  "enum": ["nearest", "zero", "constant"]
+                }
               },
               "required": ["path"],
               "additionalProperties": false,
@@ -135,9 +141,15 @@
             {
               "type": "object",
               "properties": {
-                "path": {"type": "string"},
-                "interpolation": {"type": "string", "enum": ["linear", "nearest", "cubic"]},
-                "extrapolation": {"type": "string", "enum": ["nearest", "zero", "constant"]}
+                "path": { "type": "string" },
+                "interpolation": {
+                  "type": "string",
+                  "enum": ["linear", "nearest", "cubic"]
+                },
+                "extrapolation": {
+                  "type": "string",
+                  "enum": ["nearest", "zero", "constant"]
+                }
               },
               "required": ["path"],
               "additionalProperties": false,
@@ -151,12 +163,24 @@
     }
   },
   "examples": [
-    {"identity": []},
-    {"translation": [10, 20, 5]},
-    {"scale": [2.0, 1.5, 0.5]},
-    {"mapAxis": [1, 0, 2]},
-    {"homogeneous": [[2.0, 0, 0, 10], [0, 1.5, 0, 20], [0, 0, 0.5, 5], [0, 0, 0, 1]]},
-    {"displacements": "path/to/displacement_field.zarr"},
-    {"lookup_table": {"path": "path/to/coordinate_lut.zarr", "interpolation": "linear"}}
+    { "identity": [] },
+    { "translation": [10, 20, 5] },
+    { "scale": [2.0, 1.5, 0.5] },
+    { "mapAxis": [1, 0, 2] },
+    {
+      "homogeneous": [
+        [2.0, 0, 0, 10],
+        [0, 1.5, 0, 20],
+        [0, 0, 0.5, 5],
+        [0, 0, 0, 1]
+      ]
+    },
+    { "displacements": "path/to/displacement_field.zarr" },
+    {
+      "lookup_table": {
+        "path": "path/to/coordinate_lut.zarr",
+        "interpolation": "linear"
+      }
+    }
   ]
 }

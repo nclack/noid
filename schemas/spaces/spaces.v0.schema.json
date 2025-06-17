@@ -4,7 +4,7 @@
   "title": "Coordinate Spaces Schema",
   "description": "Schema for coordinate spaces and dimensions",
   "type": "object",
-  "definitions": {
+  "$defs": {
     "Dimension": {
       "type": "object",
       "description": "A single dimension within a coordinate space",
