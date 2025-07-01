@@ -12,12 +12,12 @@ class TestTransformValidation:
 
     def test_identity_valid(self):
         """Test valid identity transform."""
-        data = {"identity": []}
+        data = "identity"
         transform = Transform(data)
-        assert transform.root.identity == []
+        assert transform.root == "identity"
 
-    def test_identity_invalid_non_empty(self):
-        """Test identity transform with non-empty array fails."""
+    def test_identity_invalid_wrong_type(self):
+        """Test identity transform with wrong type fails."""
         data = {"identity": [1, 2]}
         with pytest.raises(ValidationError):
             Transform(data)
@@ -152,10 +152,10 @@ class TestTransformSerialization:
 
     def test_identity_serialization(self):
         """Test identity transform serialization."""
-        data = {"identity": []}
+        data = "identity"
         transform = Transform(data)
         serialized = transform.model_dump()
-        assert serialized == {"identity": []}
+        assert serialized == "identity"
 
     def test_translation_serialization(self):
         """Test translation transform serialization."""

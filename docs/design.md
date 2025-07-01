@@ -239,7 +239,7 @@ Instead, this design focuses on a JSON Schema based approach. `DataSet` is desig
 
 ## Specification
 
-The sections below outline the specific types, their fields, and their constraints. These are based on the schemas found in the [noid repository](https://github.com/nclack/noid/tree/main/schemas). The code in that repository was used for exploratory work.
+The sections below outline the specific types, their fields, and their constraints. These are based on the schemas found in the [noid repository](https://github.com/nclack/noid/tree/main/schemas). The code in that repository was used for exploratory work to define this specification.
 
 ### Transform specification
 
@@ -1007,7 +1007,15 @@ Coordinate transforms enable spatial alignment between data sources:
 "transforms": [{
   "id": "image_to_physical",
   "input": "microscopy_image",
-  "output": "physical_space",
+  "output": {
+    "id": "physical_space",
+    "dimensions": [
+      {"id": "x", "unit": "micrometers", "type": "space"},
+      {"id": "y", "unit": "micrometers", "type": "space"},
+      {"id": "z", "unit": "micrometers", "type": "space"}
+    ],
+    "description": "3D physical coordinate system in micrometers"
+  },
   "transform": {"scale": [0.1, 0.1, 0.2]}
 }]
 ```
@@ -1136,12 +1144,36 @@ Complete datasets integrate multiple data sources through transforms and relatio
       "contentUrl": "meshes/cells"
     }
   ],
-  "transforms": [{
-    "id": "image_to_physical",
-    "input": "microscopy",
-    "output": "physical_space",
-    "transform": {"scale": [0.1, 0.1, 0.2]}
-  }],
+  "transforms": [
+    {
+      "id": "image_to_physical",
+      "input": "microscopy",
+      "output": {
+        "id": "physical_space",
+        "dimensions": [
+          {"id": "x", "unit": "micrometers", "type": "space"},
+          {"id": "y", "unit": "micrometers", "type": "space"},
+          {"id": "z", "unit": "micrometers", "type": "space"}
+        ],
+        "description": "3D physical coordinate system in micrometers"
+      },
+      "transform": {"scale": [0.1, 0.1, 0.2]}
+    },
+    {
+      "id": "centroids_to_physical",
+      "input": "centroids",
+      "output": "physical_space",
+      "transform": {"identity": []},
+      "description": "Cell centroids are already in physical coordinates"
+    },
+    {
+      "id": "surfaces_to_physical", 
+      "input": "surfaces",
+      "output": "physical_space",
+      "transform": {"identity": []},
+      "description": "Cell surfaces are already in physical coordinates"
+    }
+  ],
   "relations": [
     {
       "equivalent": ["measurements/cell_id", "centroids/cell_id", "surfaces/cell_id"],

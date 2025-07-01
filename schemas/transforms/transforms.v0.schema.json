@@ -9,7 +9,7 @@
       "title": "Transform",
       "description": "A coordinate transformation with self-describing parameters",
       "oneOf": [
-        { "$ref": "#/definitions/Identity" },
+        { "const": "identity", "description": "Identity transform" },
         { "$ref": "#/definitions/Translation" },
         { "$ref": "#/definitions/Scale" },
         { "$ref": "#/definitions/MapAxis" },
@@ -18,19 +18,7 @@
         { "$ref": "#/definitions/CoordinateLookupTable" }
       ]
     },
-    "Identity": {
-      "type": "object",
-      "title": "Identity",
-      "properties": {
-        "identity": {
-          "type": "array",
-          "maxItems": 0,
-          "description": "Identity transform requires empty array"
-        }
-      },
-      "required": ["identity"],
-      "additionalProperties": false
-    },
+
     "Translation": {
       "type": "object",
       "title": "Translation",
@@ -163,7 +151,7 @@
     }
   },
   "examples": [
-    { "identity": [] },
+    "identity",
     { "translation": [10, 20, 5] },
     { "scale": [2.0, 1.5, 0.5] },
     { "mapAxis": [1, 0, 2] },

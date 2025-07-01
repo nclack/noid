@@ -75,7 +75,7 @@ class TestCoordinateTransform:
 
     def test_coordinate_transform_with_references(self):
         """Test coordinate transform with coordinate system references."""
-        transform_data = {"identity": []}
+        transform_data = "identity"
         transform = Transform(transform_data)
 
         ct = CoordinateTransform(
