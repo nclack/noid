@@ -1,0 +1,23 @@
+transforms:
+  - "identity"
+  - translation: [10, 20, 5]
+  - scale: [2.0, 1.5, 0.5]
+  - mapAxis: [1, 0, 2]
+  - homogeneous:
+    - [2.0, 0, 0, 10]
+    - [0, 1.5, 0, 20]
+    - [0, 0, 0.5, 5]
+    - [0, 0, 0, 1]
+  - homogeneous:
+    - [1, 0, 0, 0]
+    - [0, 1, 0, 0]
+    - [0, 0, 1, 0]
+    - [0.001, 0.002, 0, 1]
+  - displacements: "path/to/displacement_field.zarr"
+  - displacements:
+      path: "path/to/field.zarr"
+      interpolation: "linear"
+  - lookup_table:
+      path: "path/to/coordinate_lut.zarr"
+      interpolation: "linear"
+      extrapolation: "nearest"

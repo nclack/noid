@@ -9,7 +9,7 @@ This is Nathan's opinionated imaging data library (noid) - an experimental
 project for developing standards and recommendations for organizing scientific
 datasets involving multidimensional arrays. The project focuses on creating
 JSON-LD vocabularies and schemas for describing relationships between zarr-based
-arrays and croissant datasets.
+arrays, spatial annotations, and other data entities.
 
 The focus is on modeling bioimaging data sets with spatial annotations for
 machine learning applications.
@@ -19,11 +19,6 @@ flexible and extensible. A key way of testing this is to understand how
 geospatial data can be integrated into the schema, though geospatial data is not
 the primary focus of this project.
 
-The aim is to build on croissant. In particular a croissant `distribution`
-should be used to point to collections of arrays in `ome-zarr` files.
-`RecordSets` should be used to define relationships between arrays, annotations,
-and other data entities.
-
 ## Core Architecture
 
 The project is organized around several key components:
@@ -31,10 +26,10 @@ The project is organized around several key components:
 **Schema Development**: JSON-LD vocabularies and schemas in `/schemas/`
 define the core data model for multidimensional arrays with rich relational
 metadata. Two core vocabularies have been implemented:
-- `/schemas/transforms/vocabulary.ttl` - Transform types and parameters
+- `/transforms/vocabulary.ttl` - Transform types and parameters
 - `/schemas/coordinate_spaces.ttl` - Coordinate spaces and dimensions
 
-**Transform Vocabularies**: Located in `/schemas/transforms/`, these define
+**Transform Vocabularies**: Located in `/transforms/`, these define
 controlled vocabularies for coordinate transformations. The vocabulary includes
 8 transform types: identity, translation, scale, mapAxis, homogeneous (for both
 affine and projective), sequence, displacements, and coordinates.

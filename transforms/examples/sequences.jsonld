@@ -1,0 +1,116 @@
+{
+  "@context": {
+    "xsd": "http://www.w3.org/2001/XMLSchema#",
+    "linkml": "https://w3id.org/linkml/",
+    "samplers": "https://github.com/nclack/noid/schemas/transforms/samplers/",
+    "tr": "https://github.com/nclack/noid/schemas/transforms/",
+    "@vocab": "https://github.com/nclack/noid/schemas/transforms/"
+  },
+  "description": "Examples of transform sequences in JSON-LD format",
+  "examples": [
+    {
+      "name": "simple_sequence",
+      "description": "A simple sequence of basic transforms",
+      "tr:transforms": [
+        "tr:identity",
+        {
+          "tr:translation": [10.0, 20.0, 5.0]
+        },
+        {
+          "tr:scale": [2.0, 1.5, 0.5]
+        }
+      ]
+    },
+    {
+      "name": "axis_permutation_sequence",
+      "description": "Sequence with axis permutation",
+      "tr:transforms": [
+        {
+          "tr:mapAxis": [1, 0, 2]
+        },
+        {
+          "tr:translation": [10.0, 20.0, 5.0]
+        },
+        {
+          "tr:scale": [2.0, 1.5, 0.5]
+        }
+      ]
+    },
+    {
+      "name": "homogeneous_sequence",
+      "description": "Sequence with homogeneous transformations",
+      "tr:transforms": [
+        {
+          "tr:homogeneous": [
+            [2.0, 0, 0, 10],
+            [0, 1.5, 0, 20],
+            [0, 0, 0.5, 5],
+            [0, 0, 0, 1]
+          ]
+        },
+        {
+          "tr:homogeneous": [
+            [1, 0, 0, 0],
+            [0, 1, 0, 0],
+            [0, 0, 1, 0],
+            [0.001, 0.002, 0, 1]
+          ]
+        }
+      ]
+    },
+    {
+      "name": "lookup_table_sequence",
+      "description": "Sequence with lookup table transforms",
+      "tr:transforms": [
+        {
+          "tr:displacements": {
+            "samplers:path": "path/to/displacement_field.zarr",
+            "samplers:interpolation": "linear",
+            "samplers:extrapolation": "zero"
+          }
+        },
+        {
+          "tr:lookup_table": {
+            "samplers:path": "path/to/coordinate_lut.zarr",
+            "samplers:interpolation": "cubic",
+            "samplers:extrapolation": "reflect"
+          }
+        }
+      ]
+    },
+    {
+      "name": "mixed_sequence",
+      "description": "Mixed sequence with all transform types",
+      "tr:transforms": [
+        "tr:identity",
+        {
+          "tr:translation": [10.0, 20.0, 5.0]
+        },
+        {
+          "tr:scale": [2.0, 1.5, 0.5]
+        },
+        {
+          "tr:mapAxis": [1, 0, 2]
+        },
+        {
+          "tr:homogeneous": [
+            [2.0, 0, 0, 10],
+            [0, 1.5, 0, 20],
+            [0, 0, 0.5, 5],
+            [0, 0, 0, 1]
+          ]
+        },
+        {
+          "tr:displacements": "path/to/displacement_field.zarr"
+        },
+        {
+          "tr:lookup_table": {
+            "samplers:path": "path/to/coordinate_lut.zarr",
+            "samplers:interpolation": "linear",
+            "samplers:extrapolation": "nearest"
+          }
+        }
+      ]
+    }
+  ]
+}

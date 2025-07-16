@@ -5,18 +5,24 @@ This project explores ideas around standardizing how we describe and relate scie
 
 ## Features
 
-- json-schema vocabularies for coordinate spaces and transformations with a 
-  little json-ld thrown in for good measure
+- linkml vocabularies for coordinate spaces, transformations, and other data entities
 - Support for common transform types (identity, translation, scale, etc.)
-- Exploration of integration with Croissant datasets
 - Pydantic models for schema validation
+- Support for json-ld
 
-## Documentation
+# Organization
 
-See the `/docs` directory for documentation on the approach and standards.
-See the `/schemas` directory for the json-schema vocabularies and specifications.
+A dataset is described using a combination of linkml-based schemas. They are:
 
-## Open questions
+* transforms - a vocabulary of transformations described by their parameters.
+* coordinate spaces - a schema for describing coordinate spaces and coordinate transforms. This depends on the transforms vocabulary.
+* data sources - a schema for specifying where data is stored for different spatial data (arrays, tables, points, meshes, etc.)
+* data set - a schema for combining the different peices and describing the relationships between them.
 
-* How to treat the implicit index of an array vs identified dimensions in the ome-zarr data set, especially when there's a base physical transform?
-* How to specify all the stuff I haven't specified yet? channel metadata, time series, bounding boxes, etc.
+Each of these component pieces is developed as a (a) linkml schema that acts as a source-of-truth specifying the data types and their representation in json-ld and (b) a python package that provides an api for working with data and validating it against the schema.
+
+The python code is partially generated from the linkml schemas using `datamodel-codegen`.
+
+## Examples
+
+* channel metadata, time series, bounding boxes, etc.
