@@ -8,23 +8,20 @@
   },
   "examples": [
     {
+      // What approach to take for the identity transform?
       "@type": "tr:Identity",
       "@value": "identity"
     },
     {
-      "@type": "tr:Translation",
       "tr:translation": [10.0, 20.0, 5.0]
     },
     {
-      "@type": "tr:Scale",
       "tr:scale": [2.0, 1.5, 0.5]
     },
     {
-      "@type": "tr:MapAxis",
       "tr:mapAxis": [1, 0, 2]
     },
     {
-      "@type": "tr:Homogeneous",
       "tr:homogeneous": [
         [2.0, 0, 0, 10],
         [0, 1.5, 0, 20],
@@ -33,7 +30,6 @@
       ]
     },
     {
-      "@type": "tr:Homogeneous",
       "tr:homogeneous": [
         [1, 0, 0, 0],
         [0, 1, 0, 0],
@@ -42,11 +38,9 @@
       ]
     },
     {
-      "@type": "tr:DisplacementLookupTable",
       "tr:displacements": "path/to/displacement_field.zarr"
     },
     {
-      "@type": "tr:DisplacementLookupTable",
       "tr:displacements": {
         "samplers:path": "path/to/field.zarr",
         "samplers:interpolation": "linear",
@@ -54,7 +48,6 @@
       }
     },
     {
-      "@type": "tr:CoordinateLookupTable",
       "tr:lookup_table": {
         "samplers:path": "path/to/coordinate_lut.zarr",
         "samplers:interpolation": "cubic",

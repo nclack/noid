@@ -54,6 +54,8 @@ See individual modules for detailed documentation:
 - `validation`: Validation utilities
 """
 
+from typing import Optional
+
 from .models import (
     Transform,
     Identity,
@@ -74,7 +76,7 @@ from .factory import (
     scale,
     mapaxis,
     homogeneous,
-    displacement_lookup,
+    displacements,
     coordinate_lookup,
     from_dict,
     from_json,
@@ -83,10 +85,14 @@ from .factory import (
 from .serialization import (
     to_dict,
     to_json,
-    to_jsonld,
-    from_jsonld,
-    export_schema_context,
 )
+
+# Import factory functions to ensure they get registered
+try:
+    from . import factory
+except ImportError:
+    # Registry not available - skip registration
+    pass
 
 from .validation import (
     validate,
@@ -117,7 +123,7 @@ __all__ = [
     "scale",
     "mapaxis",
     "homogeneous",
-    "displacement_lookup",
+    "displacements",
     "coordinate_lookup",
     "from_dict",
     "from_json",
@@ -127,7 +133,6 @@ __all__ = [
     "to_json",
     "to_jsonld",
     "from_jsonld",
-    "export_schema_context",
     
     # Validation
     "validate",
@@ -135,3 +140,22 @@ __all__ = [
     "check_transform_compatibility",
     "ValidationError",
 ]
+
+# Import enhanced JSON-LD processing as main API (requires PyLD)
+from .jsonld_processing import from_jsonld as _enhanced_from_jsonld, to_jsonld as _enhanced_to_jsonld
+
+# Override the legacy versions with enhanced ones (with backward compatibility wrappers)
+from_jsonld = _enhanced_from_jsonld
+
+def to_jsonld(transform, include_context: bool = True, indent: Optional[int] = None) -> str:
+    """Backward compatible wrapper for enhanced to_jsonld that always returns a string."""
+    result = _enhanced_to_jsonld(transform, include_context, indent)
+    if isinstance(result, str):
+        return result
+    else:
+        # Enhanced version returned a dict, convert to string for backward compatibility
+        import json
+        return json.dumps(result, indent=indent)
+
+# Internal registry components are imported but not exported
+# Users should use the high-level from_jsonld/to_jsonld API

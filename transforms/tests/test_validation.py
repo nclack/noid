@@ -17,7 +17,7 @@ from noid_transforms.validation import (
 )
 from noid_transforms.factory import (
     identity, translation, scale, mapaxis,
-    homogeneous, displacement_lookup, coordinate_lookup
+    homogeneous, displacements, coordinate_lookup
 )
 # Aliases for backward compatibility in tests
 create_identity = identity
@@ -25,7 +25,7 @@ create_translation = translation
 create_scale = scale
 create_mapaxis = mapaxis
 create_homogeneous = homogeneous
-create_displacement_lookup = displacement_lookup
+create_displacement_lookup = displacements
 create_coordinate_lookup = coordinate_lookup
 from noid_transforms.models import SamplerConfig
 

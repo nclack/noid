@@ -38,7 +38,7 @@ def basic_usage():
     homogeneous = transforms.homogeneous(matrix)
     
     # Create lookup table transforms
-    displacement = transforms.displacement_lookup(
+    displacement = transforms.displacements(
         "path/to/displacement_field.zarr", 
         interpolation="linear",
         extrapolation="zero"

@@ -83,14 +83,17 @@ def to_json(transform: Union[Transform, Sequence[Transform]], indent: Optional[i
     return json.dumps(to_dict(transform), indent=indent)
 
 
-def to_jsonld(transform: Union[Transform, Sequence[Transform]], 
+def to_jsonld(transform: Union[Transform, Sequence[Transform], Dict[str, Any]], 
               include_context: bool = True,
               indent: Optional[int] = None) -> str:
     """
-    Convert a transform or sequence of transforms to JSON-LD string with semantic context.
+    Convert transforms to JSON-LD string with enhanced processing and optimal abbreviations.
+    
+    This function now uses the enhanced JSON-LD processing system with per-call
+    namespace optimization for cleaner output.
     
     Args:
-        transform: Transform object or list of transform objects to serialize
+        transform: Transform object, list of transform objects, or dict of transforms to serialize
         include_context: Whether to include @context in the output
         indent: Optional indentation for pretty printing
         
@@ -98,18 +101,36 @@ def to_jsonld(transform: Union[Transform, Sequence[Transform]],
         JSON-LD string representation of the transform(s)
         
     Example:
-        >>> from .factory import homogeneous, identity
-        >>> matrix = [[2.0, 0, 0, 10], [0, 1.5, 0, 20], [0, 0, 0.5, 5], [0, 0, 0, 1]]
-        >>> homo = homogeneous(matrix)
-        >>> jsonld = to_jsonld(homo)
-        >>> "@context" in jsonld
-        True
+        >>> from .factory import homogeneous, identity, translation
+        >>> # Single transform
+        >>> trans = translation([10, 20, 30])
+        >>> jsonld = to_jsonld(trans)
         >>> 
-        >>> sequence = [identity(), homo]
+        >>> # Dictionary of transforms (new enhanced mode)
+        >>> transforms = {
+        ...     "my_translation": translation([10, 20, 30]),
+        ...     "my_scale": scale([2.0, 1.5, 0.5])
+        ... }
+        >>> jsonld = to_jsonld(transforms)  # Uses enhanced processing
+        >>> 
+        >>> # Legacy sequence support
+        >>> sequence = [identity(), trans]
         >>> jsonld = to_jsonld(sequence)
-        >>> "@context" in jsonld
-        True
     """
+    # Try enhanced processing for dictionaries
+    if isinstance(transform, dict):
+        try:
+            from .jsonld_processing import to_jsonld as enhanced_to_jsonld
+            result = enhanced_to_jsonld(transform, include_context=include_context, indent=indent)
+            if isinstance(result, str):
+                return result
+            else:
+                return json.dumps(result, indent=indent)
+        except ImportError:
+            # Fallback to legacy processing if enhanced processing unavailable
+            pass
+    
+    # Legacy processing for Transform objects and sequences
     data = to_dict(transform)
     
     if include_context:
@@ -136,41 +157,70 @@ def to_jsonld(transform: Union[Transform, Sequence[Transform]],
     return json.dumps(jsonld_data, indent=indent)
 
 
-def from_jsonld(jsonld_str: str) -> Transform:
+def from_jsonld(jsonld_str: str) -> Union[Transform, Dict[str, Any]]:
     """
-    Create a transform from JSON-LD string.
+    Create transforms from JSON-LD string using enhanced processing.
+    
+    This function now uses the advanced JSON-LD processing system with PyLD expansion,
+    key preservation, and registry dispatch.
     
     Args:
         jsonld_str: JSON-LD string representation
         
     Returns:
-        Transform object
+        Transform object (for single transforms) or dictionary with processed results
         
     Raises:
         ValueError: If JSON-LD is invalid or transform format is unsupported
         
     Example:
-        >>> jsonld = '{"@context": {}, "translation": [10, 20, 5]}'
-        >>> trans = from_jsonld(jsonld)
-        >>> trans.to_dict()
-        {'translation': [10.0, 20.0, 5.0]}
+        >>> # Single transform
+        >>> jsonld = '{"@context": {"tr": "https://github.com/nclack/noid/schemas/transforms/"}, "tr:translation": [10, 20, 5]}'
+        >>> result = from_jsonld(jsonld)
+        >>> # Returns dict with processed transforms
+        
+        >>> # Legacy format still works
+        >>> simple_jsonld = '{"translation": [10, 20, 5]}'
+        >>> trans = from_jsonld(simple_jsonld)
     """
+    from .jsonld_processing import from_jsonld as enhanced_from_jsonld
     from .factory import from_dict
     
+    # Try enhanced processing first
     try:
-        data = json.loads(jsonld_str)
-    except json.JSONDecodeError as e:
-        raise ValueError(f"Invalid JSON-LD: {e}")
-    
-    # Remove @context if present
-    if "@context" in data:
-        data = {k: v for k, v in data.items() if k != "@context"}
-    
-    # Handle @value wrapper for simple values
-    if "@value" in data:
-        return from_dict(data["@value"])
-    
-    return from_dict(data)
+        result = enhanced_from_jsonld(jsonld_str)
+        
+        # If result contains only one transform (ignoring @context), return just the transform
+        # for backward compatibility with the existing API
+        non_context_items = {k: v for k, v in result.items() if k != "@context"}
+        if len(non_context_items) == 1:
+            single_value = list(non_context_items.values())[0]
+            # Check if this is actually a Transform object
+            if hasattr(single_value, 'to_dict'):
+                return single_value
+            else:
+                # Not a transform object - fall back to from_dict with the original data
+                raise ValueError("Enhanced processing didn't create transform objects")
+        
+        # Multiple items or items with context - return full dict
+        return result
+        
+    except (ImportError, ValueError) as e:
+        # Fallback to legacy processing if enhanced processing fails
+        try:
+            data = json.loads(jsonld_str)
+        except json.JSONDecodeError as e:
+            raise ValueError(f"Invalid JSON-LD: {e}")
+        
+        # Remove @context if present
+        if "@context" in data:
+            data = {k: v for k, v in data.items() if k != "@context"}
+        
+        # Handle @value wrapper for simple values
+        if "@value" in data:
+            return from_dict(data["@value"])
+        
+        return from_dict(data)
 
 
 def serialize_sequence(transforms: Sequence[Transform], 

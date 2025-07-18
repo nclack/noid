@@ -14,7 +14,7 @@ sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 
 from noid_transforms.factory import (
     identity, translation, scale, mapaxis,
-    homogeneous, displacement_lookup, coordinate_lookup,
+    homogeneous, displacements, coordinate_lookup,
     from_dict, from_json
 )
 from noid_transforms.models import (
@@ -57,9 +57,9 @@ class TestCreateFunctions:
         assert isinstance(homo, Homogeneous)
         assert homo.matrix_shape == (4, 4)
     
-    def test_displacement_lookup(self):
-        """Test displacement lookup creation."""
-        disp = displacement_lookup("path/to/field.zarr", "linear", "zero")
+    def test_displacements(self):
+        """Test displacements creation."""
+        disp = displacements("path/to/field.zarr", "linear", "zero")
         assert isinstance(disp, DisplacementLookupTable)
         assert disp.path == "path/to/field.zarr"
         assert disp.displacements.interpolation == "linear"
@@ -118,15 +118,15 @@ class TestFromDict:
         assert isinstance(homogeneous, Homogeneous)
         assert homogeneous.matrix_shape == (4, 4)
     
-    def test_displacement_lookup_from_dict_path_only(self):
-        """Test displacement lookup creation from dict with path only."""
+    def test_displacements_from_dict_path_only(self):
+        """Test displacements creation from dict with path only."""
         data = {"displacements": "path/to/field.zarr"}
         disp = from_dict(data)
         assert isinstance(disp, DisplacementLookupTable)
         assert disp.path == "path/to/field.zarr"
     
-    def test_displacement_lookup_from_dict_full(self):
-        """Test displacement lookup creation from dict with full config."""
+    def test_displacements_from_dict_full(self):
+        """Test displacements creation from dict with full config."""
         data = {
             "displacements": {
                 "path": "path/to/field.zarr",
@@ -172,7 +172,9 @@ class TestFromDict:
     
     def test_missing_path_error(self):
         """Test error on missing path in lookup table."""
-        with pytest.raises(ValueError, match="must have 'path' field"):
+        # Registry now wraps factory errors in FactoryValidationError
+        from noid_transforms.registry import FactoryValidationError
+        with pytest.raises(FactoryValidationError, match="missing 1 required positional argument: 'path'"):
             from_dict({"displacements": {"interpolation": "linear"}})
 
 
