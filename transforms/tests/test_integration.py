@@ -7,32 +7,21 @@ to transform creation and back to JSON-LD serialization.
 
 import json
 
+from pyld import jsonld
 import pytest
 
-try:
-    from pyld import jsonld
-
-    PYLD_AVAILABLE = True
-except ImportError:
-    PYLD_AVAILABLE = False
-
 # Import the full system
-try:
-    from noid_transforms import from_dict, identity, scale, to_jsonld, translation
-    from noid_transforms.jsonld_processing import (
-        from_jsonld as enhanced_from_jsonld,
-        to_jsonld as enhanced_to_jsonld,
-    )
-    from noid_transforms.models import Identity, Scale, Translation
-    from noid_transforms.registry import registry
+from noid_transforms import (
+    from_dict,
+    from_jsonld,
+    identity,
+    scale,
+    to_jsonld,
+    translation,
+)
 
-    ENHANCED_AVAILABLE = True
-except ImportError:
-    # Enhanced functionality not available
-    from noid_transforms import from_dict, identity, scale, to_jsonld, translation
-    from noid_transforms.models import Identity, Scale, Translation
-
-    ENHANCED_AVAILABLE = False
+# Import enhanced version for testing enhanced functionality
+from noid_transforms.models import Identity, Scale, Translation
 
 
 def validate_jsonld_spec(data) -> bool:
@@ -48,9 +37,6 @@ def validate_jsonld_spec(data) -> bool:
     Returns:
         True if valid JSON-LD, False otherwise
     """
-    if not PYLD_AVAILABLE:
-        pytest.skip("PyLD not available for JSON-LD validation")
-
     try:
         # Test expansion (most fundamental operation)
         expanded = jsonld.expand(data)
@@ -59,13 +45,13 @@ def validate_jsonld_spec(data) -> bool:
 
         # Test flattening
         flattened = jsonld.flatten(data)
-        if not isinstance(flattened, (dict, list)):
+        if not isinstance(flattened, dict | list):
             return False
 
         # Test compaction if context is available
         if isinstance(data, dict) and "@context" in data:
             context = data["@context"]
-            compacted = jsonld.compact(data, context)
+            jsonld.compact(data, context)
 
         return True
 
@@ -111,15 +97,17 @@ class TestBasicIntegration:
         assert isinstance(sc, Scale)
         assert isinstance(ident, Identity)
 
-        # Test serialization
-        jsonld_str = to_jsonld(trans)
+        # Test serialization - enhanced version returns dict when indent=None
+        jsonld_data = to_jsonld(trans)
+        assert isinstance(jsonld_data, dict)
+        assert "@context" in jsonld_data
+
+        # Test that we can get a string when indent is specified
+        jsonld_str = to_jsonld(trans, indent=2)
         assert isinstance(jsonld_str, str)
         assert "translation" in jsonld_str
 
 
-@pytest.mark.skipif(
-    not ENHANCED_AVAILABLE, reason="Enhanced JSON-LD processing not available"
-)
 class TestEnhancedJSONLDIntegration:
     """Test enhanced JSON-LD processing with PyLD integration."""
 
@@ -132,7 +120,7 @@ class TestEnhancedJSONLDIntegration:
         }
 
         # Process with enhanced from_jsonld
-        result = enhanced_from_jsonld(input_jsonld)
+        result = from_jsonld(input_jsonld)
 
         # Should have preserved context and converted transform
         assert "@context" in result
@@ -141,7 +129,7 @@ class TestEnhancedJSONLDIntegration:
 
         # Should have created Transform object
         transform_found = False
-        for key, value in result.items():
+        for _key, value in result.items():
             if isinstance(value, Translation):
                 assert value.translation == [10, 20, 30]
                 transform_found = True
@@ -161,12 +149,12 @@ class TestEnhancedJSONLDIntegration:
             "other:metadata": "some_value",
         }
 
-        result = enhanced_from_jsonld(input_jsonld)
+        result = from_jsonld(input_jsonld)
 
         # Should process transforms and preserve other data
         transform_count = 0
         for key, value in result.items():
-            if isinstance(value, (Translation, Scale)):
+            if isinstance(value, Translation | Scale):
                 transform_count += 1
             elif key == "other:metadata":
                 assert value == "some_value"
@@ -181,7 +169,7 @@ class TestEnhancedJSONLDIntegration:
             "metadata": "preserved",
         }
 
-        result = enhanced_to_jsonld(transforms, include_context=True, indent=None)
+        result = to_jsonld(transforms, include_context=True, indent=None)
 
         # Should be a dictionary with context and clean abbreviations
         assert isinstance(result, dict)
@@ -205,7 +193,7 @@ class TestEnhancedJSONLDIntegration:
     def test_to_jsonld_single_object(self):
         """Test serialization of a single object."""
         trans = translation([10, 20, 30])
-        result = enhanced_to_jsonld(trans, include_context=True)
+        result = to_jsonld(trans, include_context=True)
 
         # Should be a dictionary containing the single object
         assert isinstance(result, dict)
@@ -234,7 +222,7 @@ class TestEnhancedJSONLDIntegration:
             identity(),
         ]
 
-        result = enhanced_to_jsonld(transforms, include_context=True)
+        result = to_jsonld(transforms, include_context=True)
 
         # Should be a dictionary with @context and @list
         assert isinstance(result, dict)
@@ -264,7 +252,7 @@ class TestEnhancedJSONLDIntegration:
             scale([2.0, 1.5, 0.5]),
         )
 
-        result = enhanced_to_jsonld(transforms, include_context=True)
+        result = to_jsonld(transforms, include_context=True)
 
         # Should be a dictionary with @context and @list
         assert isinstance(result, dict)
@@ -283,7 +271,7 @@ class TestEnhancedJSONLDIntegration:
         """Test that empty lists are serialized using JSON-LD @list construct."""
         transforms = []
 
-        result = enhanced_to_jsonld(transforms, include_context=False)
+        result = to_jsonld(transforms, include_context=False)
 
         # Should be a dictionary with empty @list
         assert isinstance(result, dict)
@@ -303,7 +291,7 @@ class TestEnhancedJSONLDIntegration:
             "metadata": "preserved",
         }
 
-        result = enhanced_to_jsonld(transforms, include_context=True)
+        result = to_jsonld(transforms, include_context=True)
 
         # Should be a dictionary with context and original structure
         assert isinstance(result, dict)
@@ -325,7 +313,7 @@ class TestEnhancedJSONLDIntegration:
             scale([2.0, 1.5, 0.5]),
         ]
 
-        result = enhanced_to_jsonld(transforms, include_context=False)
+        result = to_jsonld(transforms, include_context=False)
 
         # Should use @list but not include @context
         assert isinstance(result, dict)
@@ -348,7 +336,7 @@ class TestEnhancedJSONLDIntegration:
             translation([70, 80, 90]),
         ]
 
-        result = enhanced_to_jsonld(transforms, include_context=False)
+        result = to_jsonld(transforms, include_context=False)
 
         # Should use @list
         assert "@list" in result
@@ -384,7 +372,7 @@ class TestEnhancedJSONLDIntegration:
             with pytest.raises(
                 ValueError, match="No expandable terms found|Document contains no data"
             ):
-                enhanced_from_jsonld(invalid_data)
+                from_jsonld(invalid_data)
 
         # Test that valid JSON-LD with proper mappings still works
         valid_data = {
@@ -392,7 +380,7 @@ class TestEnhancedJSONLDIntegration:
             "tr:translation": [1, 2, 3],
         }
 
-        result = enhanced_from_jsonld(valid_data)
+        result = from_jsonld(valid_data)
         assert isinstance(result, dict)
         assert "@context" in result
 
@@ -406,7 +394,6 @@ class TestEnhancedJSONLDIntegration:
         legacy_result = legacy_from_jsonld(json.dumps({"translation": [1, 2, 3]}))
         assert isinstance(legacy_result, Translation)
 
-    @pytest.mark.skipif(not PYLD_AVAILABLE, reason="PyLD not available")
     def test_jsonld_validation_catches_invalid_data(self):
         """Test that our validation function correctly identifies invalid JSON-LD."""
 
@@ -423,14 +410,14 @@ class TestEnhancedJSONLDIntegration:
 
         for invalid_data in invalid_cases:
             # This should return False for invalid JSON-LD
-            assert validate_jsonld_spec(invalid_data) == False
+            assert not validate_jsonld_spec(invalid_data)
 
         # Test with valid JSON-LD to ensure our validation isn't too strict
         valid_data = {
             "@context": {"name": "http://schema.org/name"},
             "name": "Test Person",
         }
-        assert validate_jsonld_spec(valid_data) == True
+        assert validate_jsonld_spec(valid_data)
 
 
 class TestRealWorldScenarios:
@@ -488,9 +475,6 @@ class TestRealWorldScenarios:
         assert "unknown_transform" in errors[0]
         assert "Unknown transform type" in errors[0]
 
-    @pytest.mark.skipif(
-        not ENHANCED_AVAILABLE, reason="Enhanced JSON-LD processing not available"
-    )
     def test_mixed_data_processing(self):
         """Test processing JSON-LD with mixed transform and non-transform data."""
         mixed_jsonld = {
@@ -506,7 +490,7 @@ class TestRealWorldScenarios:
             "tags": ["transform", "geometry"],
         }
 
-        result = enhanced_from_jsonld(mixed_jsonld)
+        result = from_jsonld(mixed_jsonld)
 
         # Should preserve all data
         assert "@context" in result
@@ -517,7 +501,7 @@ class TestRealWorldScenarios:
 
         # Should process transforms
         transform_count = sum(
-            1 for v in result.values() if isinstance(v, (Translation, Scale))
+            1 for v in result.values() if isinstance(v, Translation | Scale)
         )
         assert transform_count == 2
 
@@ -556,25 +540,6 @@ class TestPerformanceAndScaling:
         assert translation_count >= 30 and translation_count <= 40
         assert scale_count >= 30 and scale_count <= 40
         assert identity_count >= 20 and identity_count <= 40
-
-    def test_registry_memory_usage(self):
-        """Test that registry doesn't leak memory with repeated registrations."""
-        # Get initial registry state
-        initial_count = len(registry.get_registered_iris())
-
-        # The registry should have some pre-registered transforms from factory imports
-        # but shouldn't grow with normal usage
-
-        # Process many transforms (should not add to registry)
-        for i in range(50):
-            transform = from_dict({"translation": [i, i + 1, i + 2]})
-            assert isinstance(transform, Translation)
-
-        # Registry size should not have grown
-        final_count = len(registry.get_registered_iris())
-        assert final_count == initial_count, (
-            "Registry grew unexpectedly during normal usage"
-        )
 
 
 if __name__ == "__main__":

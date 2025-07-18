@@ -38,7 +38,7 @@ The library supports all transform types defined in the LinkML schema:
 
 - **Identity**: No transformation
 - **Translation**: Translation vector
-- **Scale**: Scale factors  
+- **Scale**: Scale factors
 - **MapAxis**: Axis permutation
 - **Homogeneous**: Matrix transformation
 - **DisplacementLookupTable**: Displacement field lookup
@@ -54,51 +54,43 @@ See individual modules for detailed documentation:
 - `validation`: Validation utilities
 """
 
-from typing import Optional
-
-from .models import (
-    Transform,
-    Identity,
-    Translation,
-    Scale,
-    MapAxis,
-    Homogeneous,
-    DisplacementLookupTable,
-    CoordinateLookupTable,
-    SamplerConfig,
-    InterpolationMethod,
-    ExtrapolationMethod,
-)
-
 from .factory import (
-    identity,
-    translation,
-    scale,
-    mapaxis,
-    homogeneous,
-    displacements,
     coordinate_lookup,
+    displacements,
     from_dict,
     from_json,
+    homogeneous,
+    identity,
+    mapaxis,
+    scale,
+    translation,
 )
-
-from .serialization import (
-    to_dict,
-    to_json,
+from .models import (
+    CoordinateLookupTable,
+    DisplacementLookupTable,
+    ExtrapolationMethod,
+    Homogeneous,
+    Identity,
+    InterpolationMethod,
+    MapAxis,
+    SamplerConfig,
+    Scale,
+    Transform,
+    Translation,
 )
+from .serialization import to_dict, to_json
 
-# Import factory functions to ensure they get registered
-try:
-    from . import factory
-except ImportError:
-    # Registry not available - skip registration
-    pass
-
+# # Import factory functions to ensure they get registered
+# try:
+#     from . import factory
+# except ImportError:
+#     # Registry not available - skip registration
+#     pass
 from .validation import (
+    ValidationError,
+    check_transform_compatibility,
     validate,
     validate_dimension_consistency,
-    check_transform_compatibility,
-    ValidationError,
 )
 
 __version__ = "0.1.0"
@@ -106,7 +98,7 @@ __version__ = "0.1.0"
 __all__ = [
     # Models
     "Transform",
-    "Identity", 
+    "Identity",
     "Translation",
     "Scale",
     "MapAxis",
@@ -116,10 +108,9 @@ __all__ = [
     "SamplerConfig",
     "InterpolationMethod",
     "ExtrapolationMethod",
-    
     # Factory functions
     "identity",
-    "translation", 
+    "translation",
     "scale",
     "mapaxis",
     "homogeneous",
@@ -127,13 +118,11 @@ __all__ = [
     "coordinate_lookup",
     "from_dict",
     "from_json",
-    
     # Serialization
     "to_dict",
     "to_json",
     "to_jsonld",
     "from_jsonld",
-    
     # Validation
     "validate",
     "validate_dimension_consistency",
@@ -142,20 +131,7 @@ __all__ = [
 ]
 
 # Import enhanced JSON-LD processing as main API (requires PyLD)
-from .jsonld_processing import from_jsonld as _enhanced_from_jsonld, to_jsonld as _enhanced_to_jsonld
-
-# Override the legacy versions with enhanced ones (with backward compatibility wrappers)
-from_jsonld = _enhanced_from_jsonld
-
-def to_jsonld(transform, include_context: bool = True, indent: Optional[int] = None) -> str:
-    """Backward compatible wrapper for enhanced to_jsonld that always returns a string."""
-    result = _enhanced_to_jsonld(transform, include_context, indent)
-    if isinstance(result, str):
-        return result
-    else:
-        # Enhanced version returned a dict, convert to string for backward compatibility
-        import json
-        return json.dumps(result, indent=indent)
+from .jsonld_processing import from_jsonld, to_jsonld
 
 # Internal registry components are imported but not exported
 # Users should use the high-level from_jsonld/to_jsonld API

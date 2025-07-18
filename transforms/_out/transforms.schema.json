@@ -102,7 +102,7 @@
             "additionalProperties": false,
             "description": "Axis permutation transform",
             "properties": {
-                "mapAxis": {
+                "map_axis": {
                     "description": "Permutation vector of 0-based input dimension indices. Array length equals number of output dimensions. Each value specifies which input dimension maps to the corresponding output dimension.",
                     "items": {
                         "minimum": 0,
@@ -112,7 +112,7 @@
                 }
             },
             "required": [
-                "mapAxis"
+                "map_axis"
             ],
             "title": "MapAxis",
             "type": "object"

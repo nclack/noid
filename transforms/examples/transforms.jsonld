@@ -8,7 +8,6 @@
   },
   "examples": [
     {
-      // What approach to take for the identity transform?
       "@type": "tr:Identity",
       "@value": "identity"
     },
@@ -19,7 +18,7 @@
       "tr:scale": [2.0, 1.5, 0.5]
     },
     {
-      "tr:mapAxis": [1, 0, 2]
+      "tr:map-axis": [1, 0, 2]
     },
     {
       "tr:homogeneous": [
@@ -48,7 +47,7 @@
       }
     },
     {
-      "tr:lookup_table": {
+      "tr:lookup-table": {
         "samplers:path": "path/to/coordinate_lut.zarr",
         "samplers:interpolation": "cubic",
         "samplers:extrapolation": "reflect"

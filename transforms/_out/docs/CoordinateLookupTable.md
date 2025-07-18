@@ -115,8 +115,8 @@ attributes:
     - CoordinateLookupTable
     range: string
     required: true
-  lookup_table:
-    name: lookup_table
+  lookup-table:
+    name: lookup-table
     description: Coordinate lookup table configuration
     from_schema: https://github.com/nclack/noid/transforms/transforms.linkml
     rank: 1000
@@ -147,8 +147,8 @@ attributes:
     - CoordinateLookupTable
     range: string
     required: true
-  lookup_table:
-    name: lookup_table
+  lookup-table:
+    name: lookup-table
     description: Coordinate lookup table configuration
     from_schema: https://github.com/nclack/noid/transforms/transforms.linkml
     rank: 1000

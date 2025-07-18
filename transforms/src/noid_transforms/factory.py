@@ -8,7 +8,7 @@ The factory functions are registered with the registry system for extensibility.
 
 from collections.abc import Sequence
 import json
-from typing import Any, Union
+from typing import Any
 
 from .models import (
     CoordinateLookupTable,
@@ -21,12 +21,10 @@ from .models import (
     Transform,
     Translation,
 )
+from .registry import UnknownIRIError, register, registry, set_namespace
 
 # Type aliases
-HomogeneousMatrix = Union[Sequence[Sequence[float | int]], Sequence[float | int]]
-
-# Import registry system
-from .registry import UnknownTransformError, register, registry, set_namespace
+HomogeneousMatrix = Sequence[Sequence[float | int]] | Sequence[float | int]
 
 # Set namespace for transforms
 set_namespace("https://github.com/nclack/noid/schemas/transforms/")
@@ -88,7 +86,7 @@ def scale(scale: Sequence[float | int]) -> Scale:
     return Scale(scale=scale)
 
 
-@register("mapAxis")  # Schema uses camelCase, Python uses snake_case
+@register("map-axis")  # Schema uses kebab-case, Python uses snake_case
 def mapaxis(map_axis: Sequence[int]) -> MapAxis:
     """Create an axis mapping transform.
 
@@ -106,7 +104,7 @@ def mapaxis(map_axis: Sequence[int]) -> MapAxis:
     Note:
         Generalized parameter type to Sequence allows numpy arrays and other sequence-like objects.
     """
-    return MapAxis(mapAxis=map_axis)
+    return MapAxis(map_axis=map_axis)
 
 
 @register
@@ -161,7 +159,7 @@ def displacements(
     return DisplacementLookupTable(path=path, displacements=config)
 
 
-@register("lookup_table")  # Schema name for coordinate lookup tables
+@register("lookup-table")  # Schema name for coordinate lookup tables
 def coordinate_lookup(
     path: str, interpolation: str = "nearest", extrapolation: str = "nearest"
 ) -> "CoordinateLookupTable":
@@ -244,8 +242,8 @@ def from_dict(data: dict[str, Any] | str) -> Transform:
 
     try:
         return registry.create(full_iri, value)
-    except UnknownTransformError:
-        raise ValueError(f"Unknown transform type: '{key}'")
+    except UnknownIRIError as e:
+        raise ValueError(f"Unknown transform type: '{key}'") from e
 
 
 def from_json(json_str: str) -> Transform:
@@ -266,9 +264,5 @@ def from_json(json_str: str) -> Transform:
         >>> trans.to_dict()
         {'translation': [10.0, 20.0, 5.0]}
     """
-    try:
-        data = json.loads(json_str)
-    except json.JSONDecodeError as e:
-        raise ValueError(f"Invalid JSON: {e}")
-
+    data = json.loads(json_str)
     return from_dict(data)

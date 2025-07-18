@@ -1,5 +1,5 @@
 # Auto generated from transforms.linkml.yaml by pythongen.py version: 0.0.1
-# Generation date: 2025-07-16T13:18:20
+# Generation date: 2025-07-18T15:13:34
 # Schema: transforms
 #
 # id: https://github.com/nclack/noid/transforms/transforms.linkml
@@ -158,14 +158,14 @@ class MapAxis(Transform):
     class_name: ClassVar[str] = "MapAxis"
     class_model_uri: ClassVar[URIRef] = NOID_TRANSFORMS.MapAxis
 
-    mapAxis: Union[int, list[int]] = None
+    map_axis: Union[int, list[int]] = None
 
     def __post_init__(self, *_: str, **kwargs: Any):
-        if self._is_empty(self.mapAxis):
-            self.MissingRequiredField("mapAxis")
-        if not isinstance(self.mapAxis, list):
-            self.mapAxis = [self.mapAxis] if self.mapAxis is not None else []
-        self.mapAxis = [v if isinstance(v, int) else int(v) for v in self.mapAxis]
+        if self._is_empty(self.map_axis):
+            self.MissingRequiredField("map_axis")
+        if not isinstance(self.map_axis, list):
+            self.map_axis = [self.map_axis] if self.map_axis is not None else []
+        self.map_axis = [v if isinstance(v, int) else int(v) for v in self.map_axis]
 
         super().__post_init__(**kwargs)
 
@@ -322,8 +322,8 @@ slots.translation__translation = Slot(uri=NOID_TRANSFORMS.translation, name="tra
 slots.scale__scale = Slot(uri=NOID_TRANSFORMS.scale, name="scale__scale", curie=NOID_TRANSFORMS.curie('scale'),
                    model_uri=NOID_TRANSFORMS.scale__scale, domain=None, range=Union[float, list[float]])
 
-slots.mapAxis__mapAxis = Slot(uri=NOID_TRANSFORMS.mapAxis, name="mapAxis__mapAxis", curie=NOID_TRANSFORMS.curie('mapAxis'),
-                   model_uri=NOID_TRANSFORMS.mapAxis__mapAxis, domain=None, range=Union[int, list[int]])
+slots.mapAxis__map_axis = Slot(uri=NOID_TRANSFORMS.map_axis, name="mapAxis__map_axis", curie=NOID_TRANSFORMS.curie('map_axis'),
+                   model_uri=NOID_TRANSFORMS.mapAxis__map_axis, domain=None, range=Union[int, list[int]])
 
 slots.homogeneous__homogeneous = Slot(uri=NOID_TRANSFORMS.homogeneous, name="homogeneous__homogeneous", curie=NOID_TRANSFORMS.curie('homogeneous'),
                    model_uri=NOID_TRANSFORMS.homogeneous__homogeneous, domain=None, range=Union[float, list[float]])

@@ -1,44 +1,52 @@
 
 
-# Slot: mapAxis 
+# Class: MapAxis 
 
 
-_Permutation vector of 0-based input dimension indices. Array length equals number of output dimensions. Each value specifies which input dimension maps to the corresponding output dimension._
-
-
-
-
-
-URI: [noid_transforms:mapAxis](https://github.com/nclack/noid/transforms/mapAxis)
-Alias: mapAxis
-
-<!-- no inheritance hierarchy -->
+_Axis permutation transform_
 
 
 
 
 
-## Applicable Classes
-
-| Name | Description | Modifies Slot |
-| --- | --- | --- |
-| [MapAxis](MapAxis.md) | Axis permutation transform |  no  |
+URI: [noid_transforms:MapAxis](https://github.com/nclack/noid/transforms/MapAxis)
 
 
 
 
 
 
+```mermaid
+ classDiagram
+    class MapAxis
+    click MapAxis href "../MapAxis"
+      Transform <|-- MapAxis
+        click Transform href "../Transform"
+      
+      MapAxis : map_axis
+        
+      
+```
 
-## Properties
 
-* Range: [Integer](Integer.md)
 
-* Multivalued: True
 
-* Required: True
 
-* Minimum Value: 0
+## Inheritance
+* [Transform](Transform.md)
+    * **MapAxis**
+
+
+
+## Slots
+
+| Name | Cardinality and Range | Description | Inheritance |
+| ---  | --- | --- | --- |
+| [map_axis](map_axis.md) | 1..* <br/> [Integer](Integer.md) | Permutation vector of 0-based input dimension indices | direct |
+
+
+
+
 
 
 
@@ -64,30 +72,69 @@ Alias: mapAxis
 
 | Mapping Type | Mapped Value |
 | ---  | ---  |
-| self | noid_transforms:mapAxis |
-| native | noid_transforms:mapAxis |
+| self | noid_transforms:MapAxis |
+| native | noid_transforms:MapAxis |
+
+
+
 
 
 
 
 ## LinkML Source
 
+<!-- TODO: investigate https://stackoverflow.com/questions/37606292/how-to-create-tabbed-code-blocks-in-mkdocs-or-sphinx -->
+
+### Direct
+
 <details>
 ```yaml
-name: mapAxis
-description: Permutation vector of 0-based input dimension indices. Array length equals
-  number of output dimensions. Each value specifies which input dimension maps to
-  the corresponding output dimension.
+name: MapAxis
+description: Axis permutation transform
 from_schema: https://github.com/nclack/noid/transforms/transforms.linkml
-rank: 1000
-alias: mapAxis
-owner: MapAxis
-domain_of:
-- MapAxis
-range: integer
-required: true
-multivalued: true
-minimum_value: 0
+is_a: Transform
+attributes:
+  map-axis:
+    name: map-axis
+    description: Permutation vector of 0-based input dimension indices. Array length
+      equals number of output dimensions. Each value specifies which input dimension
+      maps to the corresponding output dimension.
+    from_schema: https://github.com/nclack/noid/transforms/transforms.linkml
+    rank: 1000
+    domain_of:
+    - MapAxis
+    range: integer
+    required: true
+    multivalued: true
+    minimum_value: 0
+
+```
+</details>
+
+### Induced
+
+<details>
+```yaml
+name: MapAxis
+description: Axis permutation transform
+from_schema: https://github.com/nclack/noid/transforms/transforms.linkml
+is_a: Transform
+attributes:
+  map-axis:
+    name: map-axis
+    description: Permutation vector of 0-based input dimension indices. Array length
+      equals number of output dimensions. Each value specifies which input dimension
+      maps to the corresponding output dimension.
+    from_schema: https://github.com/nclack/noid/transforms/transforms.linkml
+    rank: 1000
+    alias: map_axis
+    owner: MapAxis
+    domain_of:
+    - MapAxis
+    range: integer
+    required: true
+    multivalued: true
+    minimum_value: 0
 
 ```
 </details>

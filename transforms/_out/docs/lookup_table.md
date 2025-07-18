@@ -68,7 +68,7 @@ Alias: lookup_table
 
 <details>
 ```yaml
-name: lookup_table
+name: lookup-table
 description: Coordinate lookup table configuration
 from_schema: https://github.com/nclack/noid/transforms/transforms.linkml
 rank: 1000

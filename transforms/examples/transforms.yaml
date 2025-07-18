@@ -2,7 +2,7 @@ transforms:
   - "identity"
   - translation: [10, 20, 5]
   - scale: [2.0, 1.5, 0.5]
-  - mapAxis: [1, 0, 2]
+  - map-axis: [1, 0, 2]
   - homogeneous:
     - [2.0, 0, 0, 10]
     - [0, 1.5, 0, 20]
@@ -17,7 +17,7 @@ transforms:
   - displacements:
       path: "path/to/field.zarr"
       interpolation: "linear"
-  - lookup_table:
+  - lookup-table:
       path: "path/to/coordinate_lut.zarr"
       interpolation: "linear"
       extrapolation: "nearest"

@@ -1,5 +1,5 @@
 """
-Generic JSON-LD transform registry system.
+Generic JSON-LD registry system.
 
 This module provides a generic registry pattern for mapping JSON-LD IRIs to factory functions,
 with support for namespace abbreviations and thread-local context. It's designed to be
@@ -12,6 +12,7 @@ from typing import Any
 
 # Global namespace context - simpler than thread-local
 _current_namespace_iri: str | None = None
+
 
 def set_namespace(namespace_iri: str) -> None:
     """Set namespace for subsequent registrations in a module. Call this at the
@@ -34,13 +35,13 @@ class RegistryError(Exception):
     pass
 
 
-class UnknownTransformError(RegistryError):
-    """Raised when attempting to create transform with unknown IRI."""
+class UnknownIRIError(RegistryError):
+    """Raised when attempting to create object with unknown IRI."""
 
     def __init__(self, iri: str, available: list = None):
         self.iri = iri
         self.available = available or []
-        super().__init__(f"Unknown transform IRI: '{iri}'")
+        super().__init__(f"Unknown IRI: '{iri}'")
 
 
 class FactoryValidationError(RegistryError):
@@ -54,7 +55,7 @@ class FactoryValidationError(RegistryError):
         super().__init__(msg)
 
 
-class TransformRegistry:
+class Registry:
     """Registry supporting IRI→factory mapping and bidirectional type→short_name mapping."""
 
     def __init__(self):
@@ -129,19 +130,19 @@ class TransformRegistry:
         """Create object from IRI and data.
 
         Args:
-            iri: Full IRI of the transform type
+            iri: Full IRI of the object type
             data: Input data (will be passed to factory function)
 
         Returns:
             Created object from registered factory
 
         Raises:
-            UnknownTransformError: If IRI not registered
+            UnknownIRIError: If IRI not registered
             FactoryValidationError: If factory function fails
         """
         if iri not in self._factories:
             available = list(self._factories.keys())
-            raise UnknownTransformError(iri, available)
+            raise UnknownIRIError(iri, available)
 
         try:
             factory = self._factories[iri]
@@ -188,7 +189,7 @@ class TransformRegistry:
 
 
 # Global registry instance
-registry = TransformRegistry()
+registry = Registry()
 
 # Export the register decorator bound to global registry
 register = registry.register

@@ -33,7 +33,7 @@ Name: transforms
 | [homogeneous](homogeneous.md) | Homogeneous transformation matrix as 2D array |
 | [interpolation](interpolation.md) | Interpolation method |
 | [lookup_table](lookup_table.md) | Coordinate lookup table configuration |
-| [mapAxis](mapAxis.md) | Permutation vector of 0-based input dimension indices |
+| [map_axis](map_axis.md) | Permutation vector of 0-based input dimension indices |
 | [path](path.md) | Path to displacement field data file |
 | [scale](scale.md) | Scale factors as array of numbers |
 | [translation](translation.md) | Translation vector as array of numbers |

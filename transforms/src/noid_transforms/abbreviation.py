@@ -6,6 +6,7 @@ Each serialization operation gets the cleanest possible abbreviations for its sp
 set of namespaces, enabling reuse of clean abbreviations across different calls.
 """
 
+from collections.abc import Callable
 import hashlib
 from urllib.parse import urlparse
 
@@ -67,7 +68,7 @@ class NamespaceAbbreviator:
         # Strategy 1: Use last path component
         if path_parts:
             last_part = path_parts[-1]
-            # Try different lengths: "transforms" → "tran", "tr"
+            # Try different lengths: "schemas" → "sche", "sc"
             for length in [4, 2, 3, 1]:
                 if len(last_part) >= length:
                     candidates.append(last_part[:length])
@@ -84,7 +85,7 @@ class NamespaceAbbreviator:
         if path_parts and domain_parts:
             domain = domain_parts[0]
             path = path_parts[-1]
-            # "github" + "transforms" → "gi-tr", "gh-tr"
+            # "github" + "schemas" → "gi-sc", "gh-sc"
             for d_len, p_len in [(2, 2), (2, 4), (4, 2)]:
                 if len(domain) >= d_len and len(path) >= p_len:
                     candidates.append(f"{domain[:d_len]}-{path[:p_len]}")
@@ -119,7 +120,7 @@ class NamespaceAbbreviator:
 
         # Get meaningful prefix
         if path_parts:
-            meaningful_part = path_parts[-1][:3]  # "transforms" → "tra"
+            meaningful_part = path_parts[-1][:3]  # "schemas" → "sch"
         else:
             domain = parsed.netloc.split(".")[0]
             meaningful_part = domain[:3]  # "github" → "git"
@@ -155,20 +156,20 @@ def create_abbreviator_for_namespaces(namespaces: set[str]) -> NamespaceAbbrevia
     Examples:
         >>> # Clean case - no collisions
         >>> namespaces = {
-        ...     "https://github.com/nclack/noid/schemas/transforms/",
-        ...     "https://github.com/nclack/noid/schemas/transforms/samplers/"
+        ...     "https://github.com/nclack/noid/schemas/",
+        ...     "https://github.com/nclack/noid/schemas/subschema/"
         ... }
         >>> abbrev = create_abbreviator_for_namespaces(namespaces)
-        >>> abbrev.get_abbreviation(namespaces[0])  # → "tran"
-        >>> abbrev.get_abbreviation(namespaces[1])  # → "samp"
+        >>> abbrev.get_abbreviation(namespaces[0])  # → "sche"
+        >>> abbrev.get_abbreviation(namespaces[1])  # → "sub"
 
         >>> # Different call with different namespaces - can reuse same abbreviations
         >>> other_namespaces = {
-        ...     "https://neuraltransforms.org/",
-        ...     "https://geospatial.org/transforms/"
+        ...     "https://example.org/",
+        ...     "https://geospatial.org/schemas/"
         ... }
         >>> other_abbrev = create_abbreviator_for_namespaces(other_namespaces)
-        >>> # Can use "tran" and "samp" again since it's a fresh abbreviator
+        >>> # Can use "sche" and "sub" again since it's a fresh abbreviator
     """
     abbreviator = NamespaceAbbreviator()
 
@@ -179,25 +180,40 @@ def create_abbreviator_for_namespaces(namespaces: set[str]) -> NamespaceAbbrevia
     return abbreviator
 
 
-def extract_namespaces_from_objects(objects_dict: dict[str, any]) -> set[str]:
+def extract_namespaces_from_objects(
+    objects_dict: dict[str, any],
+    iri_extractor: Callable[[any], str | None] | None = None,
+) -> set[str]:
     """Extract all unique namespaces from a dictionary of objects.
 
     Args:
         objects_dict: Dictionary with registered objects (may include @context)
+        iri_extractor: Optional function to extract IRI from object. If None,
+                      will try to import and use the registry module.
 
     Returns:
         Set of namespace IRIs found in the objects
     """
-    from .registry import registry
-
     namespaces = set()
 
     for key, obj in objects_dict.items():
         if key == "@context":
             continue
 
-        # Get IRI from registry if object is a registered object
-        iri = registry.get_iri_for_object(obj)
+        # Get IRI from provided extractor or registry
+        iri = None
+        if iri_extractor:
+            iri = iri_extractor(obj)
+        else:
+            # Try to use registry if available
+            try:
+                from .registry import registry
+
+                iri = registry.get_iri_for_object(obj)
+            except ImportError:
+                # Registry not available, skip this object
+                continue
+
         if iri:
             namespace = _extract_namespace_from_iri(iri)
             if namespace:

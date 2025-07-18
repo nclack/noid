@@ -26,7 +26,7 @@
       "description": "Sequence with axis permutation",
       "tr:transforms": [
         {
-          "tr:mapAxis": [1, 0, 2]
+          "tr:map-axis": [1, 0, 2]
         },
         {
           "tr:translation": [10.0, 20.0, 5.0]
@@ -59,7 +59,7 @@
       ]
     },
     {
-      "name": "lookup_table_sequence",
+      "name": "lookup-table_sequence",
       "description": "Sequence with lookup table transforms",
       "tr:transforms": [
         {
@@ -70,7 +70,7 @@
           }
         },
         {
-          "tr:lookup_table": {
+          "tr:lookup-table": {
             "samplers:path": "path/to/coordinate_lut.zarr",
             "samplers:interpolation": "cubic",
             "samplers:extrapolation": "reflect"
@@ -90,7 +90,7 @@
           "tr:scale": [2.0, 1.5, 0.5]
         },
         {
-          "tr:mapAxis": [1, 0, 2]
+          "tr:map-axis": [1, 0, 2]
         },
         {
           "tr:homogeneous": [
@@ -104,7 +104,7 @@
           "tr:displacements": "path/to/displacement_field.zarr"
         },
         {
-          "tr:lookup_table": {
+          "tr:lookup-table": {
             "samplers:path": "path/to/coordinate_lut.zarr",
             "samplers:interpolation": "linear",
             "samplers:extrapolation": "nearest"

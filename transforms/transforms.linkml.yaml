@@ -51,7 +51,7 @@ classes:
     is_a: Transform
     description: Axis permutation transform
     attributes:
-      mapAxis:
+      map-axis:
         description: Permutation vector of 0-based input dimension indices. Array length equals number of output dimensions. Each value specifies which input dimension maps to the corresponding output dimension.
         multivalued: true
         required: true
@@ -88,7 +88,7 @@ classes:
         description: Path to coordinate lookup table data file
         required: true
         range: string
-      lookup_table:
+      lookup-table:
         description: Coordinate lookup table configuration
         range: SamplerConfig
 
