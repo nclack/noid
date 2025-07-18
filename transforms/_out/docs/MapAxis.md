@@ -9,7 +9,7 @@ _Axis permutation transform_
 
 
 
-URI: [noid_transforms:MapAxis](https://github.com/nclack/noid/transforms/MapAxis)
+URI: [noid_transform:MapAxis](https://github.com/nclack/noid/transforms/transform/MapAxis)
 
 
 
@@ -63,7 +63,7 @@ URI: [noid_transforms:MapAxis](https://github.com/nclack/noid/transforms/MapAxis
 ### Schema Source
 
 
-* from schema: https://github.com/nclack/noid/transforms/transforms.linkml
+* from schema: https://github.com/nclack/noid/transforms/transform.linkml
 
 
 
@@ -72,8 +72,8 @@ URI: [noid_transforms:MapAxis](https://github.com/nclack/noid/transforms/MapAxis
 
 | Mapping Type | Mapped Value |
 | ---  | ---  |
-| self | noid_transforms:MapAxis |
-| native | noid_transforms:MapAxis |
+| self | noid_transform:MapAxis |
+| native | noid_transform:MapAxis |
 
 
 
@@ -91,7 +91,7 @@ URI: [noid_transforms:MapAxis](https://github.com/nclack/noid/transforms/MapAxis
 ```yaml
 name: MapAxis
 description: Axis permutation transform
-from_schema: https://github.com/nclack/noid/transforms/transforms.linkml
+from_schema: https://github.com/nclack/noid/transforms/transform.linkml
 is_a: Transform
 attributes:
   map-axis:
@@ -99,8 +99,9 @@ attributes:
     description: Permutation vector of 0-based input dimension indices. Array length
       equals number of output dimensions. Each value specifies which input dimension
       maps to the corresponding output dimension.
-    from_schema: https://github.com/nclack/noid/transforms/transforms.linkml
+    from_schema: https://github.com/nclack/noid/transforms/transform.linkml
     rank: 1000
+    list_elements_ordered: true
     domain_of:
     - MapAxis
     range: integer
@@ -117,7 +118,7 @@ attributes:
 ```yaml
 name: MapAxis
 description: Axis permutation transform
-from_schema: https://github.com/nclack/noid/transforms/transforms.linkml
+from_schema: https://github.com/nclack/noid/transforms/transform.linkml
 is_a: Transform
 attributes:
   map-axis:
@@ -125,8 +126,9 @@ attributes:
     description: Permutation vector of 0-based input dimension indices. Array length
       equals number of output dimensions. Each value specifies which input dimension
       maps to the corresponding output dimension.
-    from_schema: https://github.com/nclack/noid/transforms/transforms.linkml
+    from_schema: https://github.com/nclack/noid/transforms/transform.linkml
     rank: 1000
+    list_elements_ordered: true
     alias: map_axis
     owner: MapAxis
     domain_of:

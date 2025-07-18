@@ -9,7 +9,7 @@ _Coordinate lookup table transform_
 
 
 
-URI: [noid_transforms:CoordinateLookupTable](https://github.com/nclack/noid/transforms/CoordinateLookupTable)
+URI: [noid_transform:CoordinateLookupTable](https://github.com/nclack/noid/transforms/transform/CoordinateLookupTable)
 
 
 
@@ -75,7 +75,7 @@ URI: [noid_transforms:CoordinateLookupTable](https://github.com/nclack/noid/tran
 ### Schema Source
 
 
-* from schema: https://github.com/nclack/noid/transforms/transforms.linkml
+* from schema: https://github.com/nclack/noid/transforms/transform.linkml
 
 
 
@@ -84,8 +84,8 @@ URI: [noid_transforms:CoordinateLookupTable](https://github.com/nclack/noid/tran
 
 | Mapping Type | Mapped Value |
 | ---  | ---  |
-| self | noid_transforms:CoordinateLookupTable |
-| native | noid_transforms:CoordinateLookupTable |
+| self | noid_transform:CoordinateLookupTable |
+| native | noid_transform:CoordinateLookupTable |
 
 
 
@@ -103,13 +103,13 @@ URI: [noid_transforms:CoordinateLookupTable](https://github.com/nclack/noid/tran
 ```yaml
 name: CoordinateLookupTable
 description: Coordinate lookup table transform
-from_schema: https://github.com/nclack/noid/transforms/transforms.linkml
+from_schema: https://github.com/nclack/noid/transforms/transform.linkml
 is_a: Transform
 attributes:
   path:
     name: path
     description: Path to coordinate lookup table data file
-    from_schema: https://github.com/nclack/noid/transforms/transforms.linkml
+    from_schema: https://github.com/nclack/noid/transforms/transform.linkml
     domain_of:
     - DisplacementLookupTable
     - CoordinateLookupTable
@@ -118,7 +118,7 @@ attributes:
   lookup-table:
     name: lookup-table
     description: Coordinate lookup table configuration
-    from_schema: https://github.com/nclack/noid/transforms/transforms.linkml
+    from_schema: https://github.com/nclack/noid/transforms/transform.linkml
     rank: 1000
     domain_of:
     - CoordinateLookupTable
@@ -133,13 +133,13 @@ attributes:
 ```yaml
 name: CoordinateLookupTable
 description: Coordinate lookup table transform
-from_schema: https://github.com/nclack/noid/transforms/transforms.linkml
+from_schema: https://github.com/nclack/noid/transforms/transform.linkml
 is_a: Transform
 attributes:
   path:
     name: path
     description: Path to coordinate lookup table data file
-    from_schema: https://github.com/nclack/noid/transforms/transforms.linkml
+    from_schema: https://github.com/nclack/noid/transforms/transform.linkml
     alias: path
     owner: CoordinateLookupTable
     domain_of:
@@ -150,7 +150,7 @@ attributes:
   lookup-table:
     name: lookup-table
     description: Coordinate lookup table configuration
-    from_schema: https://github.com/nclack/noid/transforms/transforms.linkml
+    from_schema: https://github.com/nclack/noid/transforms/transform.linkml
     rank: 1000
     alias: lookup_table
     owner: CoordinateLookupTable

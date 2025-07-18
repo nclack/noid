@@ -33,7 +33,7 @@ URI: [xsd:boolean](http://www.w3.org/2001/XMLSchema#boolean)
 ### Schema Source
 
 
-* from schema: https://github.com/nclack/noid/transforms/transforms.linkml
+* from schema: https://github.com/nclack/noid/transforms/transform.linkml
 
 
 
@@ -43,7 +43,7 @@ URI: [xsd:boolean](http://www.w3.org/2001/XMLSchema#boolean)
 | Mapping Type | Mapped Value |
 | ---  | ---  |
 | self | xsd:boolean |
-| native | noid_transforms:boolean |
+| native | noid_transform:boolean |
 | exact | schema:Boolean |
 
 

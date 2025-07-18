@@ -192,11 +192,11 @@
             "type": "object"
         }
     },
-    "$id": "https://github.com/nclack/noid/transforms/transforms.linkml",
+    "$id": "https://github.com/nclack/noid/transforms/transform.linkml",
     "$schema": "https://json-schema.org/draft/2019-09/schema",
     "additionalProperties": true,
     "metamodel_version": "1.7.0",
-    "title": "transforms",
+    "title": "transform",
     "type": "object",
     "version": "0.1.0"
 }

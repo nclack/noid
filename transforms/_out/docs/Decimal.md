@@ -32,7 +32,7 @@ URI: [xsd:decimal](http://www.w3.org/2001/XMLSchema#decimal)
 ### Schema Source
 
 
-* from schema: https://github.com/nclack/noid/transforms/transforms.linkml
+* from schema: https://github.com/nclack/noid/transforms/transform.linkml
 
 
 
@@ -42,7 +42,7 @@ URI: [xsd:decimal](http://www.w3.org/2001/XMLSchema#decimal)
 | Mapping Type | Mapped Value |
 | ---  | ---  |
 | self | xsd:decimal |
-| native | noid_transforms:decimal |
+| native | noid_transform:decimal |
 | broad | schema:Number |
 
 

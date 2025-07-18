@@ -1,8 +1,8 @@
-# Auto generated from samplers.linkml.yaml by pythongen.py version: 0.0.1
-# Generation date: 2025-07-18T15:13:32
-# Schema: samplers
+# Auto generated from sampler.linkml.yaml by pythongen.py version: 0.0.1
+# Generation date: 2025-07-18T16:11:16
+# Schema: sampler
 #
-# id: https://github.com/nclack/noid/transforms/samplers.linkml
+# id: https://github.com/nclack/noid/transforms/sampler.linkml
 # description: Interpolation and extrapolation methods for array sampling and coordinate transforms
 # license: https://creativecommons.org/publicdomain/zero/1.0/
 
@@ -63,8 +63,8 @@ version = "0.1.0"
 
 # Namespaces
 LINKML = CurieNamespace('linkml', 'https://w3id.org/linkml/')
-NOID_SAMPLERS = CurieNamespace('noid_samplers', 'https://github.com/nclack/noid/transforms/samplers/')
-DEFAULT_ = NOID_SAMPLERS
+NOID_SAMPLER = CurieNamespace('noid_sampler', 'https://github.com/nclack/noid/transforms/sampler/')
+DEFAULT_ = NOID_SAMPLER
 
 
 # Types
@@ -80,10 +80,10 @@ class SamplerConfig(YAMLRoot):
     """
     _inherited_slots: ClassVar[list[str]] = []
 
-    class_class_uri: ClassVar[URIRef] = NOID_SAMPLERS["SamplerConfig"]
-    class_class_curie: ClassVar[str] = "noid_samplers:SamplerConfig"
+    class_class_uri: ClassVar[URIRef] = NOID_SAMPLER["SamplerConfig"]
+    class_class_curie: ClassVar[str] = "noid_sampler:SamplerConfig"
     class_name: ClassVar[str] = "SamplerConfig"
-    class_model_uri: ClassVar[URIRef] = NOID_SAMPLERS.SamplerConfig
+    class_model_uri: ClassVar[URIRef] = NOID_SAMPLER.SamplerConfig
 
     interpolation: Optional[str] = "nearest"
     extrapolation: Optional[str] = "nearest"
@@ -141,8 +141,8 @@ class ExtrapolationMethod(EnumDefinitionImpl):
 class slots:
     pass
 
-slots.samplerConfig__interpolation = Slot(uri=NOID_SAMPLERS.interpolation, name="samplerConfig__interpolation", curie=NOID_SAMPLERS.curie('interpolation'),
-                   model_uri=NOID_SAMPLERS.samplerConfig__interpolation, domain=None, range=Optional[str])
+slots.samplerConfig__interpolation = Slot(uri=NOID_SAMPLER.interpolation, name="samplerConfig__interpolation", curie=NOID_SAMPLER.curie('interpolation'),
+                   model_uri=NOID_SAMPLER.samplerConfig__interpolation, domain=None, range=Optional[str])
 
-slots.samplerConfig__extrapolation = Slot(uri=NOID_SAMPLERS.extrapolation, name="samplerConfig__extrapolation", curie=NOID_SAMPLERS.curie('extrapolation'),
-                   model_uri=NOID_SAMPLERS.samplerConfig__extrapolation, domain=None, range=Optional[str])
+slots.samplerConfig__extrapolation = Slot(uri=NOID_SAMPLER.extrapolation, name="samplerConfig__extrapolation", curie=NOID_SAMPLER.curie('extrapolation'),
+                   model_uri=NOID_SAMPLER.samplerConfig__extrapolation, domain=None, range=Optional[str])

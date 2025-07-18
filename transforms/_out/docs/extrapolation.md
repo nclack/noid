@@ -9,7 +9,7 @@ _Extrapolation method_
 
 
 
-URI: [noid_transforms:extrapolation](https://github.com/nclack/noid/transforms/extrapolation)
+URI: [noid_transform:extrapolation](https://github.com/nclack/noid/transforms/transform/extrapolation)
 Alias: extrapolation
 
 <!-- no inheritance hierarchy -->
@@ -49,7 +49,7 @@ Alias: extrapolation
 ### Schema Source
 
 
-* from schema: https://github.com/nclack/noid/transforms/transforms.linkml
+* from schema: https://github.com/nclack/noid/transforms/transform.linkml
 
 
 
@@ -58,8 +58,8 @@ Alias: extrapolation
 
 | Mapping Type | Mapped Value |
 | ---  | ---  |
-| self | noid_transforms:extrapolation |
-| native | noid_transforms:extrapolation |
+| self | noid_transform:extrapolation |
+| native | noid_transform:extrapolation |
 
 
 
@@ -70,7 +70,7 @@ Alias: extrapolation
 ```yaml
 name: extrapolation
 description: Extrapolation method
-from_schema: https://github.com/nclack/noid/transforms/transforms.linkml
+from_schema: https://github.com/nclack/noid/transforms/transform.linkml
 rank: 1000
 ifabsent: string(nearest)
 alias: extrapolation

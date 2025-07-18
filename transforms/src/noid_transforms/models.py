@@ -16,7 +16,7 @@ _python_dir = Path(__file__).parent.parent.parent / "_out" / "python"
 sys.path.insert(0, str(_python_dir))
 
 try:
-    from transforms import (
+    from transform import (
         CoordinateLookupTable as _CoordinateLookupTable,
         DisplacementLookupTable as _DisplacementLookupTable,
         ExtrapolationMethod as _ExtrapolationMethod,

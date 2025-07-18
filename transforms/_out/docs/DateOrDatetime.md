@@ -33,7 +33,7 @@ URI: [linkml:DateOrDatetime](https://w3id.org/linkml/DateOrDatetime)
 ### Schema Source
 
 
-* from schema: https://github.com/nclack/noid/transforms/transforms.linkml
+* from schema: https://github.com/nclack/noid/transforms/transform.linkml
 
 
 
@@ -43,7 +43,7 @@ URI: [linkml:DateOrDatetime](https://w3id.org/linkml/DateOrDatetime)
 | Mapping Type | Mapped Value |
 | ---  | ---  |
 | self | linkml:DateOrDatetime |
-| native | noid_transforms:date_or_datetime |
+| native | noid_transform:date_or_datetime |
 
 
 

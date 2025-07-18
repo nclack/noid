@@ -94,3 +94,8 @@ addopts = ["-v", "--strict-markers"]
 [tool.coverage.run]
 source = ["src/transforms"]
 omit = ["*/tests/*", "*/_out/*", "*/_old/*"]
+
+[dependency-groups]
+dev = [
+    "ruff>=0.12.4",
+]

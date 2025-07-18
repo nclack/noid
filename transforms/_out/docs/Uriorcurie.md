@@ -33,7 +33,7 @@ URI: [xsd:anyURI](http://www.w3.org/2001/XMLSchema#anyURI)
 ### Schema Source
 
 
-* from schema: https://github.com/nclack/noid/transforms/transforms.linkml
+* from schema: https://github.com/nclack/noid/transforms/transform.linkml
 
 
 
@@ -43,7 +43,7 @@ URI: [xsd:anyURI](http://www.w3.org/2001/XMLSchema#anyURI)
 | Mapping Type | Mapped Value |
 | ---  | ---  |
 | self | xsd:anyURI |
-| native | noid_transforms:uriorcurie |
+| native | noid_transform:uriorcurie |
 
 
 

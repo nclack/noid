@@ -11,7 +11,7 @@ _A coordinate transformation with self-describing parameters_
 * __NOTE__: this is an abstract class and should not be instantiated directly
 
 
-URI: [noid_transforms:Transform](https://github.com/nclack/noid/transforms/Transform)
+URI: [noid_transform:Transform](https://github.com/nclack/noid/transforms/transform/Transform)
 
 
 
@@ -80,7 +80,7 @@ URI: [noid_transforms:Transform](https://github.com/nclack/noid/transforms/Trans
 ### Schema Source
 
 
-* from schema: https://github.com/nclack/noid/transforms/transforms.linkml
+* from schema: https://github.com/nclack/noid/transforms/transform.linkml
 
 
 
@@ -89,8 +89,8 @@ URI: [noid_transforms:Transform](https://github.com/nclack/noid/transforms/Trans
 
 | Mapping Type | Mapped Value |
 | ---  | ---  |
-| self | noid_transforms:Transform |
-| native | noid_transforms:Transform |
+| self | noid_transform:Transform |
+| native | noid_transform:Transform |
 
 
 
@@ -108,7 +108,7 @@ URI: [noid_transforms:Transform](https://github.com/nclack/noid/transforms/Trans
 ```yaml
 name: Transform
 description: A coordinate transformation with self-describing parameters
-from_schema: https://github.com/nclack/noid/transforms/transforms.linkml
+from_schema: https://github.com/nclack/noid/transforms/transform.linkml
 abstract: true
 
 ```
@@ -120,7 +120,7 @@ abstract: true
 ```yaml
 name: Transform
 description: A coordinate transformation with self-describing parameters
-from_schema: https://github.com/nclack/noid/transforms/transforms.linkml
+from_schema: https://github.com/nclack/noid/transforms/transform.linkml
 abstract: true
 
 ```

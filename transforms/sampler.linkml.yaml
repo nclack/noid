@@ -1,5 +1,5 @@
-id: https://github.com/nclack/noid/transforms/samplers.linkml
-name: samplers
+id: https://github.com/nclack/noid/transforms/sampler.linkml
+name: sampler
 title: Sampler Methods Schema
 description: Interpolation and extrapolation methods for array sampling and coordinate transforms
 version: 0.1.0
@@ -7,9 +7,9 @@ license: https://creativecommons.org/publicdomain/zero/1.0/
 
 prefixes:
   linkml: https://w3id.org/linkml/
-  noid_samplers: https://github.com/nclack/noid/transforms/samplers/
+  noid_sampler: https://github.com/nclack/noid/transforms/sampler/
 
-default_prefix: noid_samplers
+default_prefix: noid_sampler
 
 imports:
   - linkml:types

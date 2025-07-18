@@ -38,7 +38,7 @@ URI: [xsd:string](http://www.w3.org/2001/XMLSchema#string)
 ### Schema Source
 
 
-* from schema: https://github.com/nclack/noid/transforms/transforms.linkml
+* from schema: https://github.com/nclack/noid/transforms/transform.linkml
 
 
 
@@ -48,7 +48,7 @@ URI: [xsd:string](http://www.w3.org/2001/XMLSchema#string)
 | Mapping Type | Mapped Value |
 | ---  | ---  |
 | self | xsd:string |
-| native | noid_transforms:curie |
+| native | noid_transform:curie |
 
 
 

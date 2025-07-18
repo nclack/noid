@@ -9,7 +9,7 @@ _Scale factors as array of numbers_
 
 
 
-URI: [noid_transforms:scale](https://github.com/nclack/noid/transforms/scale)
+URI: [noid_transform:scale](https://github.com/nclack/noid/transforms/transform/scale)
 Alias: scale
 
 <!-- no inheritance hierarchy -->
@@ -55,7 +55,7 @@ Alias: scale
 ### Schema Source
 
 
-* from schema: https://github.com/nclack/noid/transforms/transforms.linkml
+* from schema: https://github.com/nclack/noid/transforms/transform.linkml
 
 
 
@@ -64,8 +64,8 @@ Alias: scale
 
 | Mapping Type | Mapped Value |
 | ---  | ---  |
-| self | noid_transforms:scale |
-| native | noid_transforms:scale |
+| self | noid_transform:scale |
+| native | noid_transform:scale |
 
 
 
@@ -76,8 +76,9 @@ Alias: scale
 ```yaml
 name: scale
 description: Scale factors as array of numbers
-from_schema: https://github.com/nclack/noid/transforms/transforms.linkml
+from_schema: https://github.com/nclack/noid/transforms/transform.linkml
 rank: 1000
+list_elements_ordered: true
 alias: scale
 owner: Scale
 domain_of:

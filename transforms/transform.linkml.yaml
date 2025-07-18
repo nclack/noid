@@ -1,5 +1,5 @@
-id: https://github.com/nclack/noid/transforms/transforms.linkml
-name: transforms
+id: https://github.com/nclack/noid/transforms/transform.linkml
+name: transform
 title: Transform Parameters Schema
 description: Schema for validating transform parameters using self-describing format
 version: 0.1.0
@@ -7,13 +7,13 @@ license: https://creativecommons.org/publicdomain/zero/1.0/
 
 prefixes:
   linkml: https://w3id.org/linkml/
-  noid_transforms: https://github.com/nclack/noid/transforms/
+  noid_transform: https://github.com/nclack/noid/transforms/transform/
 
-default_prefix: noid_transforms
+default_prefix: noid_transform
 
 imports:
   - linkml:types
-  - samplers.linkml
+  - sampler.linkml
 
 classes:
   Transform:
@@ -32,6 +32,7 @@ classes:
       translation:
         description: Translation vector as array of numbers
         multivalued: true
+        list_elements_ordered: true
         required: true
         range: float
         minimum_value: 1
@@ -43,6 +44,7 @@ classes:
       scale:
         description: Scale factors as array of numbers
         multivalued: true
+        list_elements_ordered: true
         required: true
         range: float
         minimum_value: 1
@@ -54,6 +56,7 @@ classes:
       map-axis:
         description: Permutation vector of 0-based input dimension indices. Array length equals number of output dimensions. Each value specifies which input dimension maps to the corresponding output dimension.
         multivalued: true
+        list_elements_ordered: true
         required: true
         range: integer
         minimum_value: 0
@@ -65,6 +68,7 @@ classes:
       homogeneous:
         description: Homogeneous transformation matrix as 2D array
         multivalued: true
+        list_elements_ordered: true
         required: true
         range: float
         

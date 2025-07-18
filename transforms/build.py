@@ -258,14 +258,14 @@ def main():
     out_dir.mkdir(exist_ok=True)
 
     # Generate artifacts for samplers schema
-    samplers_file = script_dir / "samplers.linkml.yaml"
+    samplers_file = script_dir / "sampler.linkml.yaml"
     if samplers_file.exists():
-        generate_artifacts(samplers_file, out_dir, "samplers")
+        generate_artifacts(samplers_file, out_dir, "sampler")
 
     # Generate artifacts for transforms schema
-    transforms_file = script_dir / "transforms.linkml.yaml"
+    transforms_file = script_dir / "transform.linkml.yaml"
     if transforms_file.exists():
-        generate_artifacts(transforms_file, out_dir, "transforms")
+        generate_artifacts(transforms_file, out_dir, "transform")
 
     print("\n✓ All LinkML artifacts generated successfully!")
     print(f"Output directory: {out_dir}")

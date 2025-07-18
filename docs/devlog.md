@@ -2,7 +2,7 @@
 
 ## 2025-07-18
 
-Reviewing the generated code.
+Reviewing the generated code. Finishing up transforms.
 
 ## 2025-07-16
 

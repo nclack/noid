@@ -59,11 +59,11 @@
             "type": "object"
         }
     },
-    "$id": "https://github.com/nclack/noid/transforms/samplers.linkml",
+    "$id": "https://github.com/nclack/noid/transforms/sampler.linkml",
     "$schema": "https://json-schema.org/draft/2019-09/schema",
     "additionalProperties": true,
     "metamodel_version": "1.7.0",
-    "title": "samplers",
+    "title": "sampler",
     "type": "object",
     "version": "0.1.0"
 }

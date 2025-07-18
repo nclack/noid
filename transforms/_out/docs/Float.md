@@ -32,7 +32,7 @@ URI: [xsd:float](http://www.w3.org/2001/XMLSchema#float)
 ### Schema Source
 
 
-* from schema: https://github.com/nclack/noid/transforms/transforms.linkml
+* from schema: https://github.com/nclack/noid/transforms/transform.linkml
 
 
 
@@ -42,7 +42,7 @@ URI: [xsd:float](http://www.w3.org/2001/XMLSchema#float)
 | Mapping Type | Mapped Value |
 | ---  | ---  |
 | self | xsd:float |
-| native | noid_transforms:float |
+| native | noid_transform:float |
 | exact | schema:Float |
 
 

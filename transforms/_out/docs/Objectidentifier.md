@@ -37,7 +37,7 @@ URI: [shex:iri](http://www.w3.org/ns/shex#iri)
 ### Schema Source
 
 
-* from schema: https://github.com/nclack/noid/transforms/transforms.linkml
+* from schema: https://github.com/nclack/noid/transforms/transform.linkml
 
 
 
@@ -47,7 +47,7 @@ URI: [shex:iri](http://www.w3.org/ns/shex#iri)
 | Mapping Type | Mapped Value |
 | ---  | ---  |
 | self | shex:iri |
-| native | noid_transforms:objectidentifier |
+| native | noid_transform:objectidentifier |
 
 
 

@@ -9,7 +9,7 @@ _Coordinate lookup table configuration_
 
 
 
-URI: [noid_transforms:lookup_table](https://github.com/nclack/noid/transforms/lookup_table)
+URI: [noid_transform:lookup_table](https://github.com/nclack/noid/transforms/transform/lookup_table)
 Alias: lookup_table
 
 <!-- no inheritance hierarchy -->
@@ -49,7 +49,7 @@ Alias: lookup_table
 ### Schema Source
 
 
-* from schema: https://github.com/nclack/noid/transforms/transforms.linkml
+* from schema: https://github.com/nclack/noid/transforms/transform.linkml
 
 
 
@@ -58,8 +58,8 @@ Alias: lookup_table
 
 | Mapping Type | Mapped Value |
 | ---  | ---  |
-| self | noid_transforms:lookup_table |
-| native | noid_transforms:lookup_table |
+| self | noid_transform:lookup_table |
+| native | noid_transform:lookup_table |
 
 
 
@@ -70,7 +70,7 @@ Alias: lookup_table
 ```yaml
 name: lookup-table
 description: Coordinate lookup table configuration
-from_schema: https://github.com/nclack/noid/transforms/transforms.linkml
+from_schema: https://github.com/nclack/noid/transforms/transform.linkml
 rank: 1000
 alias: lookup_table
 owner: CoordinateLookupTable

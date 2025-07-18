@@ -32,7 +32,7 @@ URI: [xsd:double](http://www.w3.org/2001/XMLSchema#double)
 ### Schema Source
 
 
-* from schema: https://github.com/nclack/noid/transforms/transforms.linkml
+* from schema: https://github.com/nclack/noid/transforms/transform.linkml
 
 
 
@@ -42,7 +42,7 @@ URI: [xsd:double](http://www.w3.org/2001/XMLSchema#double)
 | Mapping Type | Mapped Value |
 | ---  | ---  |
 | self | xsd:double |
-| native | noid_transforms:double |
+| native | noid_transform:double |
 | close | schema:Float |
 
 

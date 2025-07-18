@@ -9,7 +9,7 @@ _Displacement field lookup table transform_
 
 
 
-URI: [noid_transforms:DisplacementLookupTable](https://github.com/nclack/noid/transforms/DisplacementLookupTable)
+URI: [noid_transform:DisplacementLookupTable](https://github.com/nclack/noid/transforms/transform/DisplacementLookupTable)
 
 
 
@@ -75,7 +75,7 @@ URI: [noid_transforms:DisplacementLookupTable](https://github.com/nclack/noid/tr
 ### Schema Source
 
 
-* from schema: https://github.com/nclack/noid/transforms/transforms.linkml
+* from schema: https://github.com/nclack/noid/transforms/transform.linkml
 
 
 
@@ -84,8 +84,8 @@ URI: [noid_transforms:DisplacementLookupTable](https://github.com/nclack/noid/tr
 
 | Mapping Type | Mapped Value |
 | ---  | ---  |
-| self | noid_transforms:DisplacementLookupTable |
-| native | noid_transforms:DisplacementLookupTable |
+| self | noid_transform:DisplacementLookupTable |
+| native | noid_transform:DisplacementLookupTable |
 
 
 
@@ -103,13 +103,13 @@ URI: [noid_transforms:DisplacementLookupTable](https://github.com/nclack/noid/tr
 ```yaml
 name: DisplacementLookupTable
 description: Displacement field lookup table transform
-from_schema: https://github.com/nclack/noid/transforms/transforms.linkml
+from_schema: https://github.com/nclack/noid/transforms/transform.linkml
 is_a: Transform
 attributes:
   path:
     name: path
     description: Path to displacement field data file
-    from_schema: https://github.com/nclack/noid/transforms/transforms.linkml
+    from_schema: https://github.com/nclack/noid/transforms/transform.linkml
     rank: 1000
     domain_of:
     - DisplacementLookupTable
@@ -119,7 +119,7 @@ attributes:
   displacements:
     name: displacements
     description: Displacement field configuration
-    from_schema: https://github.com/nclack/noid/transforms/transforms.linkml
+    from_schema: https://github.com/nclack/noid/transforms/transform.linkml
     rank: 1000
     domain_of:
     - DisplacementLookupTable
@@ -134,13 +134,13 @@ attributes:
 ```yaml
 name: DisplacementLookupTable
 description: Displacement field lookup table transform
-from_schema: https://github.com/nclack/noid/transforms/transforms.linkml
+from_schema: https://github.com/nclack/noid/transforms/transform.linkml
 is_a: Transform
 attributes:
   path:
     name: path
     description: Path to displacement field data file
-    from_schema: https://github.com/nclack/noid/transforms/transforms.linkml
+    from_schema: https://github.com/nclack/noid/transforms/transform.linkml
     rank: 1000
     alias: path
     owner: DisplacementLookupTable
@@ -152,7 +152,7 @@ attributes:
   displacements:
     name: displacements
     description: Displacement field configuration
-    from_schema: https://github.com/nclack/noid/transforms/transforms.linkml
+    from_schema: https://github.com/nclack/noid/transforms/transform.linkml
     rank: 1000
     alias: displacements
     owner: DisplacementLookupTable

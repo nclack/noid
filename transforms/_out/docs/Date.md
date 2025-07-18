@@ -33,7 +33,7 @@ URI: [xsd:date](http://www.w3.org/2001/XMLSchema#date)
 ### Schema Source
 
 
-* from schema: https://github.com/nclack/noid/transforms/transforms.linkml
+* from schema: https://github.com/nclack/noid/transforms/transform.linkml
 
 
 
@@ -43,7 +43,7 @@ URI: [xsd:date](http://www.w3.org/2001/XMLSchema#date)
 | Mapping Type | Mapped Value |
 | ---  | ---  |
 | self | xsd:date |
-| native | noid_transforms:date |
+| native | noid_transform:date |
 | exact | schema:Date |
 
 

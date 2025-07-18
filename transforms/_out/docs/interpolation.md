@@ -9,7 +9,7 @@ _Interpolation method_
 
 
 
-URI: [noid_transforms:interpolation](https://github.com/nclack/noid/transforms/interpolation)
+URI: [noid_transform:interpolation](https://github.com/nclack/noid/transforms/transform/interpolation)
 Alias: interpolation
 
 <!-- no inheritance hierarchy -->
@@ -49,7 +49,7 @@ Alias: interpolation
 ### Schema Source
 
 
-* from schema: https://github.com/nclack/noid/transforms/transforms.linkml
+* from schema: https://github.com/nclack/noid/transforms/transform.linkml
 
 
 
@@ -58,8 +58,8 @@ Alias: interpolation
 
 | Mapping Type | Mapped Value |
 | ---  | ---  |
-| self | noid_transforms:interpolation |
-| native | noid_transforms:interpolation |
+| self | noid_transform:interpolation |
+| native | noid_transform:interpolation |
 
 
 
@@ -70,7 +70,7 @@ Alias: interpolation
 ```yaml
 name: interpolation
 description: Interpolation method
-from_schema: https://github.com/nclack/noid/transforms/transforms.linkml
+from_schema: https://github.com/nclack/noid/transforms/transform.linkml
 rank: 1000
 ifabsent: string(nearest)
 alias: interpolation

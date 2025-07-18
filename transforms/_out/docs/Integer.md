@@ -32,7 +32,7 @@ URI: [xsd:integer](http://www.w3.org/2001/XMLSchema#integer)
 ### Schema Source
 
 
-* from schema: https://github.com/nclack/noid/transforms/transforms.linkml
+* from schema: https://github.com/nclack/noid/transforms/transform.linkml
 
 
 
@@ -42,7 +42,7 @@ URI: [xsd:integer](http://www.w3.org/2001/XMLSchema#integer)
 | Mapping Type | Mapped Value |
 | ---  | ---  |
 | self | xsd:integer |
-| native | noid_transforms:integer |
+| native | noid_transform:integer |
 | exact | schema:Integer |
 
 

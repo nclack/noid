@@ -1,8 +1,8 @@
-# Auto generated from transforms.linkml.yaml by pythongen.py version: 0.0.1
-# Generation date: 2025-07-18T15:13:34
-# Schema: transforms
+# Auto generated from transform.linkml.yaml by pythongen.py version: 0.0.1
+# Generation date: 2025-07-18T16:11:17
+# Schema: transform
 #
-# id: https://github.com/nclack/noid/transforms/transforms.linkml
+# id: https://github.com/nclack/noid/transforms/transform.linkml
 # description: Schema for validating transform parameters using self-describing format
 # license: https://creativecommons.org/publicdomain/zero/1.0/
 
@@ -63,9 +63,9 @@ version = "0.1.0"
 
 # Namespaces
 LINKML = CurieNamespace('linkml', 'https://w3id.org/linkml/')
-NOID_SAMPLERS = CurieNamespace('noid_samplers', 'https://github.com/nclack/noid/transforms/samplers/')
-NOID_TRANSFORMS = CurieNamespace('noid_transforms', 'https://github.com/nclack/noid/transforms/')
-DEFAULT_ = NOID_TRANSFORMS
+NOID_SAMPLER = CurieNamespace('noid_sampler', 'https://github.com/nclack/noid/transforms/sampler/')
+NOID_TRANSFORM = CurieNamespace('noid_transform', 'https://github.com/nclack/noid/transforms/transform/')
+DEFAULT_ = NOID_TRANSFORM
 
 
 # Types
@@ -80,10 +80,10 @@ class Transform(YAMLRoot):
     """
     _inherited_slots: ClassVar[list[str]] = []
 
-    class_class_uri: ClassVar[URIRef] = NOID_TRANSFORMS["Transform"]
-    class_class_curie: ClassVar[str] = "noid_transforms:Transform"
+    class_class_uri: ClassVar[URIRef] = NOID_TRANSFORM["Transform"]
+    class_class_curie: ClassVar[str] = "noid_transform:Transform"
     class_name: ClassVar[str] = "Transform"
-    class_model_uri: ClassVar[URIRef] = NOID_TRANSFORMS.Transform
+    class_model_uri: ClassVar[URIRef] = NOID_TRANSFORM.Transform
 
 
 class Identity(Transform):
@@ -92,10 +92,10 @@ class Identity(Transform):
     """
     _inherited_slots: ClassVar[list[str]] = []
 
-    class_class_uri: ClassVar[URIRef] = NOID_TRANSFORMS["Identity"]
-    class_class_curie: ClassVar[str] = "noid_transforms:Identity"
+    class_class_uri: ClassVar[URIRef] = NOID_TRANSFORM["Identity"]
+    class_class_curie: ClassVar[str] = "noid_transform:Identity"
     class_name: ClassVar[str] = "Identity"
-    class_model_uri: ClassVar[URIRef] = NOID_TRANSFORMS.Identity
+    class_model_uri: ClassVar[URIRef] = NOID_TRANSFORM.Identity
 
 
 @dataclass(repr=False)
@@ -105,10 +105,10 @@ class Translation(Transform):
     """
     _inherited_slots: ClassVar[list[str]] = []
 
-    class_class_uri: ClassVar[URIRef] = NOID_TRANSFORMS["Translation"]
-    class_class_curie: ClassVar[str] = "noid_transforms:Translation"
+    class_class_uri: ClassVar[URIRef] = NOID_TRANSFORM["Translation"]
+    class_class_curie: ClassVar[str] = "noid_transform:Translation"
     class_name: ClassVar[str] = "Translation"
-    class_model_uri: ClassVar[URIRef] = NOID_TRANSFORMS.Translation
+    class_model_uri: ClassVar[URIRef] = NOID_TRANSFORM.Translation
 
     translation: Union[float, list[float]] = None
 
@@ -129,10 +129,10 @@ class Scale(Transform):
     """
     _inherited_slots: ClassVar[list[str]] = []
 
-    class_class_uri: ClassVar[URIRef] = NOID_TRANSFORMS["Scale"]
-    class_class_curie: ClassVar[str] = "noid_transforms:Scale"
+    class_class_uri: ClassVar[URIRef] = NOID_TRANSFORM["Scale"]
+    class_class_curie: ClassVar[str] = "noid_transform:Scale"
     class_name: ClassVar[str] = "Scale"
-    class_model_uri: ClassVar[URIRef] = NOID_TRANSFORMS.Scale
+    class_model_uri: ClassVar[URIRef] = NOID_TRANSFORM.Scale
 
     scale: Union[float, list[float]] = None
 
@@ -153,10 +153,10 @@ class MapAxis(Transform):
     """
     _inherited_slots: ClassVar[list[str]] = []
 
-    class_class_uri: ClassVar[URIRef] = NOID_TRANSFORMS["MapAxis"]
-    class_class_curie: ClassVar[str] = "noid_transforms:MapAxis"
+    class_class_uri: ClassVar[URIRef] = NOID_TRANSFORM["MapAxis"]
+    class_class_curie: ClassVar[str] = "noid_transform:MapAxis"
     class_name: ClassVar[str] = "MapAxis"
-    class_model_uri: ClassVar[URIRef] = NOID_TRANSFORMS.MapAxis
+    class_model_uri: ClassVar[URIRef] = NOID_TRANSFORM.MapAxis
 
     map_axis: Union[int, list[int]] = None
 
@@ -177,10 +177,10 @@ class Homogeneous(Transform):
     """
     _inherited_slots: ClassVar[list[str]] = []
 
-    class_class_uri: ClassVar[URIRef] = NOID_TRANSFORMS["Homogeneous"]
-    class_class_curie: ClassVar[str] = "noid_transforms:Homogeneous"
+    class_class_uri: ClassVar[URIRef] = NOID_TRANSFORM["Homogeneous"]
+    class_class_curie: ClassVar[str] = "noid_transform:Homogeneous"
     class_name: ClassVar[str] = "Homogeneous"
-    class_model_uri: ClassVar[URIRef] = NOID_TRANSFORMS.Homogeneous
+    class_model_uri: ClassVar[URIRef] = NOID_TRANSFORM.Homogeneous
 
     homogeneous: Union[float, list[float]] = None
 
@@ -201,10 +201,10 @@ class DisplacementLookupTable(Transform):
     """
     _inherited_slots: ClassVar[list[str]] = []
 
-    class_class_uri: ClassVar[URIRef] = NOID_TRANSFORMS["DisplacementLookupTable"]
-    class_class_curie: ClassVar[str] = "noid_transforms:DisplacementLookupTable"
+    class_class_uri: ClassVar[URIRef] = NOID_TRANSFORM["DisplacementLookupTable"]
+    class_class_curie: ClassVar[str] = "noid_transform:DisplacementLookupTable"
     class_name: ClassVar[str] = "DisplacementLookupTable"
-    class_model_uri: ClassVar[URIRef] = NOID_TRANSFORMS.DisplacementLookupTable
+    class_model_uri: ClassVar[URIRef] = NOID_TRANSFORM.DisplacementLookupTable
 
     path: str = None
     displacements: Optional[Union[dict, "SamplerConfig"]] = None
@@ -228,10 +228,10 @@ class CoordinateLookupTable(Transform):
     """
     _inherited_slots: ClassVar[list[str]] = []
 
-    class_class_uri: ClassVar[URIRef] = NOID_TRANSFORMS["CoordinateLookupTable"]
-    class_class_curie: ClassVar[str] = "noid_transforms:CoordinateLookupTable"
+    class_class_uri: ClassVar[URIRef] = NOID_TRANSFORM["CoordinateLookupTable"]
+    class_class_curie: ClassVar[str] = "noid_transform:CoordinateLookupTable"
     class_name: ClassVar[str] = "CoordinateLookupTable"
-    class_model_uri: ClassVar[URIRef] = NOID_TRANSFORMS.CoordinateLookupTable
+    class_model_uri: ClassVar[URIRef] = NOID_TRANSFORM.CoordinateLookupTable
 
     path: str = None
     lookup_table: Optional[Union[dict, "SamplerConfig"]] = None
@@ -255,10 +255,10 @@ class SamplerConfig(YAMLRoot):
     """
     _inherited_slots: ClassVar[list[str]] = []
 
-    class_class_uri: ClassVar[URIRef] = NOID_SAMPLERS["SamplerConfig"]
-    class_class_curie: ClassVar[str] = "noid_samplers:SamplerConfig"
+    class_class_uri: ClassVar[URIRef] = NOID_SAMPLER["SamplerConfig"]
+    class_class_curie: ClassVar[str] = "noid_sampler:SamplerConfig"
     class_name: ClassVar[str] = "SamplerConfig"
-    class_model_uri: ClassVar[URIRef] = NOID_TRANSFORMS.SamplerConfig
+    class_model_uri: ClassVar[URIRef] = NOID_TRANSFORM.SamplerConfig
 
     interpolation: Optional[str] = "nearest"
     extrapolation: Optional[str] = "nearest"
@@ -316,32 +316,32 @@ class ExtrapolationMethod(EnumDefinitionImpl):
 class slots:
     pass
 
-slots.translation__translation = Slot(uri=NOID_TRANSFORMS.translation, name="translation__translation", curie=NOID_TRANSFORMS.curie('translation'),
-                   model_uri=NOID_TRANSFORMS.translation__translation, domain=None, range=Union[float, list[float]])
+slots.translation__translation = Slot(uri=NOID_TRANSFORM.translation, name="translation__translation", curie=NOID_TRANSFORM.curie('translation'),
+                   model_uri=NOID_TRANSFORM.translation__translation, domain=None, range=Union[float, list[float]])
 
-slots.scale__scale = Slot(uri=NOID_TRANSFORMS.scale, name="scale__scale", curie=NOID_TRANSFORMS.curie('scale'),
-                   model_uri=NOID_TRANSFORMS.scale__scale, domain=None, range=Union[float, list[float]])
+slots.scale__scale = Slot(uri=NOID_TRANSFORM.scale, name="scale__scale", curie=NOID_TRANSFORM.curie('scale'),
+                   model_uri=NOID_TRANSFORM.scale__scale, domain=None, range=Union[float, list[float]])
 
-slots.mapAxis__map_axis = Slot(uri=NOID_TRANSFORMS.map_axis, name="mapAxis__map_axis", curie=NOID_TRANSFORMS.curie('map_axis'),
-                   model_uri=NOID_TRANSFORMS.mapAxis__map_axis, domain=None, range=Union[int, list[int]])
+slots.mapAxis__map_axis = Slot(uri=NOID_TRANSFORM.map_axis, name="mapAxis__map_axis", curie=NOID_TRANSFORM.curie('map_axis'),
+                   model_uri=NOID_TRANSFORM.mapAxis__map_axis, domain=None, range=Union[int, list[int]])
 
-slots.homogeneous__homogeneous = Slot(uri=NOID_TRANSFORMS.homogeneous, name="homogeneous__homogeneous", curie=NOID_TRANSFORMS.curie('homogeneous'),
-                   model_uri=NOID_TRANSFORMS.homogeneous__homogeneous, domain=None, range=Union[float, list[float]])
+slots.homogeneous__homogeneous = Slot(uri=NOID_TRANSFORM.homogeneous, name="homogeneous__homogeneous", curie=NOID_TRANSFORM.curie('homogeneous'),
+                   model_uri=NOID_TRANSFORM.homogeneous__homogeneous, domain=None, range=Union[float, list[float]])
 
-slots.displacementLookupTable__path = Slot(uri=NOID_TRANSFORMS.path, name="displacementLookupTable__path", curie=NOID_TRANSFORMS.curie('path'),
-                   model_uri=NOID_TRANSFORMS.displacementLookupTable__path, domain=None, range=str)
+slots.displacementLookupTable__path = Slot(uri=NOID_TRANSFORM.path, name="displacementLookupTable__path", curie=NOID_TRANSFORM.curie('path'),
+                   model_uri=NOID_TRANSFORM.displacementLookupTable__path, domain=None, range=str)
 
-slots.displacementLookupTable__displacements = Slot(uri=NOID_TRANSFORMS.displacements, name="displacementLookupTable__displacements", curie=NOID_TRANSFORMS.curie('displacements'),
-                   model_uri=NOID_TRANSFORMS.displacementLookupTable__displacements, domain=None, range=Optional[Union[dict, SamplerConfig]])
+slots.displacementLookupTable__displacements = Slot(uri=NOID_TRANSFORM.displacements, name="displacementLookupTable__displacements", curie=NOID_TRANSFORM.curie('displacements'),
+                   model_uri=NOID_TRANSFORM.displacementLookupTable__displacements, domain=None, range=Optional[Union[dict, SamplerConfig]])
 
-slots.coordinateLookupTable__path = Slot(uri=NOID_TRANSFORMS.path, name="coordinateLookupTable__path", curie=NOID_TRANSFORMS.curie('path'),
-                   model_uri=NOID_TRANSFORMS.coordinateLookupTable__path, domain=None, range=str)
+slots.coordinateLookupTable__path = Slot(uri=NOID_TRANSFORM.path, name="coordinateLookupTable__path", curie=NOID_TRANSFORM.curie('path'),
+                   model_uri=NOID_TRANSFORM.coordinateLookupTable__path, domain=None, range=str)
 
-slots.coordinateLookupTable__lookup_table = Slot(uri=NOID_TRANSFORMS.lookup_table, name="coordinateLookupTable__lookup_table", curie=NOID_TRANSFORMS.curie('lookup_table'),
-                   model_uri=NOID_TRANSFORMS.coordinateLookupTable__lookup_table, domain=None, range=Optional[Union[dict, SamplerConfig]])
+slots.coordinateLookupTable__lookup_table = Slot(uri=NOID_TRANSFORM.lookup_table, name="coordinateLookupTable__lookup_table", curie=NOID_TRANSFORM.curie('lookup_table'),
+                   model_uri=NOID_TRANSFORM.coordinateLookupTable__lookup_table, domain=None, range=Optional[Union[dict, SamplerConfig]])
 
-slots.samplerConfig__interpolation = Slot(uri=NOID_SAMPLERS.interpolation, name="samplerConfig__interpolation", curie=NOID_SAMPLERS.curie('interpolation'),
-                   model_uri=NOID_TRANSFORMS.samplerConfig__interpolation, domain=None, range=Optional[str])
+slots.samplerConfig__interpolation = Slot(uri=NOID_SAMPLER.interpolation, name="samplerConfig__interpolation", curie=NOID_SAMPLER.curie('interpolation'),
+                   model_uri=NOID_TRANSFORM.samplerConfig__interpolation, domain=None, range=Optional[str])
 
-slots.samplerConfig__extrapolation = Slot(uri=NOID_SAMPLERS.extrapolation, name="samplerConfig__extrapolation", curie=NOID_SAMPLERS.curie('extrapolation'),
-                   model_uri=NOID_TRANSFORMS.samplerConfig__extrapolation, domain=None, range=Optional[str])
+slots.samplerConfig__extrapolation = Slot(uri=NOID_SAMPLER.extrapolation, name="samplerConfig__extrapolation", curie=NOID_SAMPLER.curie('extrapolation'),
+                   model_uri=NOID_TRANSFORM.samplerConfig__extrapolation, domain=None, range=Optional[str])
