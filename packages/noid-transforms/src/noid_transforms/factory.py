@@ -38,7 +38,7 @@ set_namespace(get_schema_namespace("transform"))
 
 
 # Registry-based factory functions
-@register
+@register()
 def identity() -> Identity:
     """Create an identity transform.
 
@@ -52,7 +52,7 @@ def identity() -> Identity:
     return Identity()
 
 
-@register
+@register()
 def translation(translation: Sequence[float | int]) -> Translation:
     """Create a translation transform.
 
@@ -72,7 +72,7 @@ def translation(translation: Sequence[float | int]) -> Translation:
     return Translation(translation=translation)
 
 
-@register
+@register()
 def scale(scale: Sequence[float | int]) -> Scale:
     """Create a scale transform.
 
@@ -114,7 +114,7 @@ def mapaxis(map_axis: Sequence[int]) -> MapAxis:
     return MapAxis(map_axis=map_axis)
 
 
-@register
+@register()
 def homogeneous(homogeneous: HomogeneousMatrix) -> Homogeneous:
     """Create a homogeneous transformation matrix.
 
@@ -137,7 +137,7 @@ def homogeneous(homogeneous: HomogeneousMatrix) -> Homogeneous:
     return Homogeneous(homogeneous=homogeneous)
 
 
-@register
+@register()
 def displacements(
     path: str, interpolation: str = "nearest", extrapolation: str = "nearest"
 ) -> DisplacementLookupTable:
@@ -196,9 +196,9 @@ def coordinate_lookup(
 
 
 # Main orchestration functions
-def from_dict(data: dict[str, Any] | str) -> Transform:
+def from_data(data: dict[str, Any] | str) -> Transform:
     """
-    Create a transform from a dictionary or string representation.
+    Create a transform from a data representation.
 
     This function uses the registry system for extensible transform creation.
 
@@ -213,16 +213,16 @@ def from_dict(data: dict[str, Any] | str) -> Transform:
 
     Example:
         >>> # Identity transform
-        >>> identity = from_dict("identity")
+        >>> identity = from_data("identity")
         >>>
         >>> # Translation transform
-        >>> trans = from_dict({"translation": [10, 20, 5]})
+        >>> trans = from_data({"translation": [10, 20, 5]})
         >>>
         >>> # Scale transform
-        >>> scale = from_dict({"scale": [2.0, 1.5, 0.5]})
+        >>> scale = from_data({"scale": [2.0, 1.5, 0.5]})
         >>>
         >>> # Homogeneous transform
-        >>> matrix = from_dict({
+        >>> matrix = from_data({
         ...     "homogeneous": [[2.0, 0, 0, 10], [0, 1.5, 0, 20], [0, 0, 0.5, 5], [0, 0, 0, 1]]
         ... })
     """
@@ -270,8 +270,30 @@ def from_json(json_str: str) -> Transform:
 
     Example:
         >>> trans = from_json('{"translation": [10, 20, 5]}')
-        >>> trans.to_dict()
+        >>> trans.to_data()
         {'translation': [10.0, 20.0, 5.0]}
     """
     data = json.loads(json_str)
-    return from_dict(data)
+    return from_data(data)
+
+
+def from_dict(data: dict[str, Any] | str) -> Transform:
+    """
+    Create a transform from a dictionary or string representation (deprecated).
+
+    This function is deprecated. Use from_data() instead.
+
+    Args:
+        data: Dictionary with transform parameters or "identity" string
+
+    Returns:
+        Transform object of appropriate type
+    """
+    import warnings
+
+    warnings.warn(
+        "from_dict() is deprecated, use from_data() instead",
+        DeprecationWarning,
+        stacklevel=2,
+    )
+    return from_data(data)

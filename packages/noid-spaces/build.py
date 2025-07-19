@@ -5,9 +5,9 @@ Build script for generating Python models from LinkML schema.
 This script generates Python classes and JSON-LD context from the spaces LinkML schema.
 """
 
-import os
-import subprocess
 from pathlib import Path
+import shutil
+import subprocess
 
 
 def run_command(cmd, cwd=None):
@@ -24,10 +24,22 @@ def main():
     """Generate Python models and other artifacts from LinkML schema."""
     # Get the directory containing this script
     base_dir = Path(__file__).parent
-    # Reference schema from common versioned location
-    schemas_dir = base_dir.parent.parent / "schemas" / "v0"
-    schema_file = schemas_dir / "space.linkml.yaml"
+    # Reference schema from common versioned location (go up to noid root)
+    noid_root = base_dir.parent.parent
+    schemas_dir = noid_root / "schemas" / "space"
+    schema_file = schemas_dir / "v0.linkml.yaml"
+
+    # Verify the schema file exists
+    if not schema_file.exists():
+        raise FileNotFoundError(f"Schema file not found: {schema_file}")
+
+    print(f"Using schema file: {schema_file}")
     output_dir = base_dir / "_out"
+
+    # Clean out the _out directory before regenerating everything
+    if output_dir.exists():
+        print(f"Cleaning output directory: {output_dir}")
+        shutil.rmtree(output_dir)
 
     # Create output directories
     output_dir.mkdir(exist_ok=True)
@@ -38,9 +50,9 @@ def main():
     print("Generating Python classes...")
     cmd = ["gen-python", "--mergeimports", str(schema_file)]
     python_output = run_command(cmd, cwd=base_dir)
-    
-    # Write Python output to file
-    python_file = output_dir / "python" / "space.v0.py"
+
+    # Write Python output to file with versioned name
+    python_file = output_dir / "python" / "spaces_v0.py"
     python_file.write_text(python_output)
 
     # Generate JSON-LD context
@@ -53,9 +65,9 @@ def main():
         ],
         cwd=base_dir,
     )
-    
-    # Write JSON-LD context to file
-    context_file = output_dir / "space.v0.context.jsonld"
+
+    # Write JSON-LD context to file with versioned name
+    context_file = output_dir / "spaces_v0.context.jsonld"
     context_file.write_text(context_output)
 
     # Generate JSON Schema
@@ -68,9 +80,9 @@ def main():
         ],
         cwd=base_dir,
     )
-    
-    # Write JSON Schema to file
-    json_schema_file = output_dir / "space.v0.schema.json"
+
+    # Write JSON Schema to file with versioned name
+    json_schema_file = output_dir / "spaces_v0.schema.json"
     json_schema_file.write_text(json_schema_output)
 
     # Generate documentation

@@ -5,7 +5,7 @@
     "sc": "https://schema.org/",
     "noid": "../../schemas/transforms/vocabulary.jsonld",
     "citeAs": "cr:citeAs",
-    "column": "cr:column", 
+    "column": "cr:column",
     "conformsTo": "dct:conformsTo",
     "cr": "http://mlcommons.org/croissant/",
     "rai": "http://mlcommons.org/croissant/RAI/",
@@ -88,8 +88,8 @@
         },
         {
           "@type": "cr:Field",
-          "@id": "records1/label", 
-          "name": "records1/label", 
+          "@id": "records1/label",
+          "name": "records1/label",
           "description": "Human readable description of the transform",
           "dataType": "sc:Text",
           "source": {

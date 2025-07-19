@@ -146,7 +146,7 @@ enums:
       arbitrary:
         description: Arbitrary or dimensionless unit
         meaning: noid_spaces:ArbitraryUnit
-      
+
       # Spatial units (UDUNITS-2 compatible)
       meter:
         description: SI base unit of length
@@ -178,7 +178,7 @@ enums:
       pixels:
         description: Pixel unit for digital images (plural)
         meaning: noid_spaces:PixelUnit
-      
+
       # Temporal units (UDUNITS-2 compatible)
       second:
         description: SI base unit of time
@@ -204,7 +204,7 @@ enums:
       hours:
         description: Hour (3600 seconds, plural)
         meaning: noid_spaces:HourUnit
-      
+
       # Angular units
       radian:
         description: SI unit of angle
@@ -218,7 +218,7 @@ enums:
       degrees:
         description: Degree of arc (π/180 radians, plural)
         meaning: noid_spaces:DegreeUnit
-      
+
       # Common physical units
       wavelength:
         description: Wavelength measurement
@@ -226,4 +226,3 @@ enums:
       intensity:
         description: Intensity measurement
         meaning: noid_spaces:IntensityUnit
-

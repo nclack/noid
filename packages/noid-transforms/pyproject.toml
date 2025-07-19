@@ -42,6 +42,10 @@ Repository = "https://github.com/nclack/noid"
 Issues = "https://github.com/nclack/noid/issues"
 Documentation = "https://github.com/nclack/noid/tree/main/transforms"
 
+[project.scripts]
+noid-transforms-check = "noid_transforms.scripts:check_main"
+noid-transforms-build = "noid_transforms.scripts:build_main"
+
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
@@ -68,8 +72,29 @@ extend-exclude = [
 ]
 
 [tool.ruff.lint]
-select = ["E", "W", "F", "I", "N", "UP", "C4", "B"]  # Basic errors, warnings, pyflakes, and isort
-ignore = ["E501"]  # Line length handled by formatter
+select = [
+    "E",    # pycodestyle errors
+    "W",    # pycodestyle warnings
+    "F",    # pyflakes
+    "I",    # isort
+    "N",    # pep8-naming
+    "UP",   # pyupgrade
+    "C4",   # flake8-comprehensions
+    "B",    # flake8-bugbear
+    "ANN",  # flake8-annotations (type annotations)
+]
+ignore = [
+    "E501",    # Line length handled by formatter
+    "ANN401",  # Dynamically typed expressions (Any) - allow when needed
+]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**/*.py" = [
+    "ANN001",  # Missing type annotation for function argument
+    "ANN201",  # Missing return type annotation for public function
+    "ANN202",  # Missing return type annotation for private function
+    "B011",    # Don't use assert False in tests (it's fine in tests)
+]
 
 [tool.ruff.lint.isort]
 combine-as-imports = true
@@ -97,7 +122,12 @@ omit = ["*/tests/*", "*/_out/*", "*/_old/*"]
 [dependency-groups]
 dev = [
     "ruff>=0.12.4",
+    "pre-commit>=3.0.0",
 ]
+
+# Note: uv scripts didn't work as expected in uv 0.7.19
+# Using tasks.py as the task runner instead
+
 
 [tool.uv.sources]
 noid-registry = { workspace = true }

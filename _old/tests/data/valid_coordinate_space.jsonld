@@ -15,14 +15,14 @@
       "type": "space"
     },
     {
-      "@type": "Dimension", 
+      "@type": "Dimension",
       "name": "y",
       "unit": "micrometer",
       "type": "space"
     },
     {
       "@type": "Dimension",
-      "name": "z", 
+      "name": "z",
       "unit": "micrometer",
       "type": "space"
     }

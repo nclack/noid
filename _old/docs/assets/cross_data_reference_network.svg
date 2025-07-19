@@ -37,7 +37,7 @@
   <rect x="20" y="20" width="220" height="180" class="data-source-box array-box" rx="5"/>
   <text x="130" y="40" class="header" text-anchor="middle">microscopy_image</text>
   <line x1="20" y1="50" x2="240" y2="50" stroke="#2d3748" stroke-width="1"/>
-  
+
   <text x="30" y="70" class="reference">microscopy_image</text>
   <text x="30" y="90" class="reference">├─ dims/</text>
   <text x="30" y="110" class="reference">│  ├─ x</text>
@@ -49,7 +49,7 @@
   <rect x="20" y="230" width="220" height="140" class="data-source-box array-box" rx="5"/>
   <text x="130" y="250" class="header" text-anchor="middle">segmentation_mask</text>
   <line x1="20" y1="260" x2="240" y2="260" stroke="#2d3748" stroke-width="1"/>
-  
+
   <text x="30" y="280" class="reference">segmentation_mask</text>
   <text x="30" y="300" class="reference">├─ dims/</text>
   <text x="30" y="320" class="reference">│  ├─ x</text>
@@ -60,7 +60,7 @@
   <rect x="300" y="200" width="220" height="140" class="data-source-box table-box" rx="5"/>
   <text x="410" y="220" class="header" text-anchor="middle">cell_measurements</text>
   <line x1="300" y1="230" x2="520" y2="230" stroke="#2d3748" stroke-width="1"/>
-  
+
   <text x="310" y="250" class="reference">cell_measurements/</text>
   <text x="310" y="270" class="reference">├─ cell_id</text>
   <text x="310" y="290" class="reference">├─ area</text>
@@ -70,7 +70,7 @@
   <rect x="300" y="20" width="220" height="140" class="data-source-box table-box" rx="5"/>
   <text x="410" y="40" class="header" text-anchor="middle">channels</text>
   <line x1="300" y1="50" x2="520" y2="50" stroke="#2d3748" stroke-width="1"/>
-  
+
   <text x="310" y="70" class="reference">channels/</text>
   <text x="310" y="90" class="reference">├─ channel_id</text>
   <text x="310" y="110" class="reference">├─ wavelength</text>
@@ -80,7 +80,7 @@
   <rect x="560" y="110" width="220" height="160" class="data-source-box points-box" rx="5"/>
   <text x="670" y="130" class="header" text-anchor="middle">cell_centroids</text>
   <line x1="560" y1="140" x2="780" y2="140" stroke="#2d3748" stroke-width="1"/>
-  
+
   <text x="570" y="160" class="reference">cell_centroids</text>
   <text x="570" y="180" class="reference">├─ x</text>
   <text x="570" y="200" class="reference">├─ y</text>
@@ -114,52 +114,52 @@
 
   <!-- Legend Box -->
   <rect x="20" y="400" width="760" height="280" fill="white" stroke="#2d3748" stroke-width="1" rx="5"/>
-  
+
   <!-- Legend Title -->
   <text x="30" y="420" class="header">Relationship Types and Examples:</text>
-  
+
   <!-- Legend Entries -->
   <g transform="translate(30, 440)">
     <!-- Coordinate Transform -->
     <line x1="0" y1="5" x2="30" y2="5" class="transform-arrow"/>
     <text x="40" y="10" class="label" font-weight="bold">Coordinate Transform</text>
     <text x="200" y="10" class="label">(maps between spatial coordinate spaces)</text>
-    
+
     <!-- Foreign Key Relation -->
     <line x1="0" y1="25" x2="30" y2="25" class="relation-arrow"/>
     <text x="40" y="30" class="label" font-weight="bold">Foreign Key Relation</text>
     <text x="200" y="30" class="label">(establishes equivalence between dimensions/columns)</text>
-    
+
     <!-- Spatial Alignment -->
     <line x1="0" y1="45" x2="30" y2="45" class="align-arrow"/>
     <text x="40" y="50" class="label" font-weight="bold">Spatial Alignment</text>
     <text x="200" y="50" class="label">(enables coordinate system mapping)</text>
   </g>
-  
+
   <!-- Specific Examples -->
   <text x="30" y="520" class="header">Specific Relationships:</text>
-  
+
   <g transform="translate(30, 540)">
     <circle cx="10" cy="5" r="10" class="arrow-label-bg"/>
     <text x="10" y="9" class="arrow-label" text-anchor="middle">A</text>
     <text x="30" y="10" class="reference">microscopy_image → segmentation_mask</text>
     <text x="400" y="10" class="label">Transform preserves spatial registration</text>
-    
+
     <circle cx="10" cy="30" r="10" class="arrow-label-bg"/>
     <text x="10" y="34" class="arrow-label" text-anchor="middle">B</text>
     <text x="30" y="35" class="reference">segmentation_mask/values ↔ cell_measurements/cell_id</text>
     <text x="400" y="35" class="label">Links segmentation labels to measurements</text>
-    
+
     <circle cx="10" cy="55" r="10" class="arrow-label-bg"/>
     <text x="10" y="59" class="arrow-label" text-anchor="middle">C</text>
     <text x="30" y="60" class="reference">cell_centroids/cell_id ↔ cell_measurements/cell_id</text>
     <text x="400" y="60" class="label">Links point annotations to measurements</text>
-    
+
     <circle cx="10" cy="80" r="10" class="arrow-label-bg"/>
     <text x="10" y="84" class="arrow-label" text-anchor="middle">D</text>
     <text x="30" y="85" class="reference">microscopy_image ↔ cell_centroids</text>
     <text x="400" y="85" class="label">Spatial coordinates can be aligned</text>
-    
+
     <circle cx="10" cy="105" r="10" class="arrow-label-bg"/>
     <text x="10" y="109" class="arrow-label" text-anchor="middle">E</text>
     <text x="30" y="110" class="reference">microscopy_image/dims/channel ↔ channels/channel_id</text>

@@ -154,7 +154,7 @@
 <body>
     <div class="container">
         <h1 style="text-align: center; color: #2c3e50; margin-bottom: 32px;">Coordinate Systems and Transformations</h1>
-        
+
         <!-- Example 1: Pixel to Physical Coordinates -->
         <div class="example">
             <h2>Example 1: Pixel Coordinates → Physical Coordinates</h2>
@@ -173,9 +173,9 @@
                         </div>
                     </div>
                 </div>
-                
+
                 <div class="arrow">→</div>
-                
+
                 <div>
                     <h3 style="font-size: 16px; text-align: center;">Physical Coordinates</h3>
                     <div class="coordinate-grid" style="width: 240px; height: 240px; display: flex; align-items: center; justify-content: center;">
@@ -202,7 +202,7 @@
         <!-- Example 2: Multi-dimensional -->
         <div class="example">
             <h2>Example 2: Multi-dimensional Data</h2>
-            
+
             <!-- Channels -->
             <div>
                 <h3 style="font-size: 16px;">Categorical Dimension: Fluorescence Channels</h3>
@@ -221,7 +221,7 @@
                     </div>
                 </div>
             </div>
-            
+
             <!-- Time -->
             <div style="margin-top: 24px;">
                 <h3 style="font-size: 16px;">Temporal Dimension: Time-lapse</h3>
@@ -277,7 +277,7 @@
                     ${row} × 0.65 = ${physicalY}
                 </div>
             `;
-            
+
             // Highlight the selected pixel
             document.querySelectorAll('.pixel').forEach(p => p.classList.remove('highlighted'));
             pixelGrid.children[row * 8 + col].classList.add('highlighted');

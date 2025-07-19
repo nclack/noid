@@ -40,7 +40,7 @@ enums:
         description: Nearest neighbor interpolation
       cubic:
         description: Cubic interpolation
-        
+
   ExtrapolationMethod:
     permissible_values:
       nearest:

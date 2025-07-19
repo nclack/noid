@@ -16,7 +16,7 @@ _python_dir = Path(__file__).parent.parent.parent / "_out" / "python"
 sys.path.insert(0, str(_python_dir))
 
 try:
-    from transform import (
+    from transforms_v0 import (
         CoordinateLookupTable as _CoordinateLookupTable,
         DisplacementLookupTable as _DisplacementLookupTable,
         ExtrapolationMethod as _ExtrapolationMethod,
@@ -40,8 +40,8 @@ except ImportError as e:
 class Transform(_Transform):
     """Enhanced base transform class with additional methods."""
 
-    def to_dict(self) -> dict[str, Any]:
-        """Convert transform to dictionary representation."""
+    def to_data(self) -> dict[str, Any] | str:
+        """Convert transform to data representation for serialization."""
         # For Identity transforms, return just the string
         if isinstance(self, Identity):
             return "identity"
@@ -61,25 +61,36 @@ class Transform(_Transform):
             if self.displacements:
                 result["displacements"] = {
                     "path": self.path,
-                    **self.displacements.to_dict(),
+                    **self.displacements.to_data(),
                 }
             else:
                 result["displacements"] = self.path
         elif isinstance(self, CoordinateLookupTable):
             lookup_data = {"path": self.path}
             if self.lookup_table:
-                lookup_data.update(self.lookup_table.to_dict())
+                lookup_data.update(self.lookup_table.to_data())
             result["lookup-table"] = lookup_data
 
         return result
 
     def __str__(self) -> str:
         """String representation of transform."""
-        return str(self.to_dict())
+        return str(self.to_data())
 
     def __repr__(self) -> str:
         """Developer representation of transform."""
-        return f"{self.__class__.__name__}({self.to_dict()})"
+        return f"{self.__class__.__name__}({self.to_data()})"
+
+    def to_dict(self) -> dict[str, Any] | str:
+        """Convert transform to dictionary representation (deprecated, use to_data)."""
+        import warnings
+
+        warnings.warn(
+            "to_dict() is deprecated, use to_data() instead",
+            DeprecationWarning,
+            stacklevel=2,
+        )
+        return self.to_data()
 
 
 class Identity(_Identity, Transform):
@@ -91,11 +102,11 @@ class Identity(_Identity, Transform):
         - No parameters required
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         """Create an identity transform."""
         super().__init__()
 
-    def to_dict(self) -> str:
+    def to_data(self) -> str:
         """Return identity transform as string."""
         return "identity"
 
@@ -110,7 +121,7 @@ class Translation(_Translation, Transform):
         - Vector length determines dimensionality
     """
 
-    def __init__(self, translation: Sequence[float] | Sequence[int]):
+    def __init__(self, translation: Sequence[float] | Sequence[int]) -> None:
         """
         Create a translation transform.
 
@@ -148,7 +159,7 @@ class Scale(_Scale, Transform):
         - Vector length determines dimensionality
     """
 
-    def __init__(self, scale: Sequence[float] | Sequence[int]):
+    def __init__(self, scale: Sequence[float] | Sequence[int]) -> None:
         """
         Create a scale transform.
 
@@ -190,7 +201,7 @@ class MapAxis(_MapAxis, Transform):
         - Vector length determines output dimensionality
     """
 
-    def __init__(self, map_axis: Sequence[int] | Sequence[int]):
+    def __init__(self, map_axis: Sequence[int] | Sequence[int]) -> None:
         """
         Create an axis mapping transform.
 
@@ -244,7 +255,7 @@ class Homogeneous(_Homogeneous, Transform):
         | Sequence[Sequence[int]]
         | Sequence[float]
         | Sequence[int],
-    ):
+    ) -> None:
         """
         Create a homogeneous transformation matrix.
 
@@ -324,7 +335,9 @@ class Homogeneous(_Homogeneous, Transform):
 class DisplacementLookupTable(_DisplacementLookupTable, Transform):
     """Displacement field lookup table transform."""
 
-    def __init__(self, path: str, displacements: dict | _SamplerConfig | None = None):
+    def __init__(
+        self, path: str, displacements: dict | _SamplerConfig | None = None
+    ) -> None:
         """
         Create a displacement lookup table transform.
 
@@ -341,7 +354,9 @@ class DisplacementLookupTable(_DisplacementLookupTable, Transform):
 class CoordinateLookupTable(_CoordinateLookupTable, Transform):
     """Coordinate lookup table transform."""
 
-    def __init__(self, path: str, lookup_table: dict | _SamplerConfig | None = None):
+    def __init__(
+        self, path: str, lookup_table: dict | _SamplerConfig | None = None
+    ) -> None:
         """
         Create a coordinate lookup table transform.
 
@@ -362,7 +377,7 @@ class SamplerConfig(_SamplerConfig):
         self,
         interpolation: str | None = "nearest",
         extrapolation: str | None = "nearest",
-    ):
+    ) -> None:
         """
         Create a sampler configuration.
 
@@ -372,12 +387,23 @@ class SamplerConfig(_SamplerConfig):
         """
         super().__init__(interpolation=interpolation, extrapolation=extrapolation)
 
-    def to_dict(self) -> dict[str, str]:
-        """Convert to dictionary representation."""
+    def to_data(self) -> dict[str, str]:
+        """Convert to data representation."""
         return {
             "interpolation": self.interpolation,
             "extrapolation": self.extrapolation,
         }
+
+    def to_dict(self) -> dict[str, str]:
+        """Convert to dictionary representation (deprecated, use to_data)."""
+        import warnings
+
+        warnings.warn(
+            "to_dict() is deprecated, use to_data() instead",
+            DeprecationWarning,
+            stacklevel=2,
+        )
+        return self.to_data()
 
 
 # Re-export enums from generated code

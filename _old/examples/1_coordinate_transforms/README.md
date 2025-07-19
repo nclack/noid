@@ -12,4 +12,3 @@ vocabulary and the Croissant dataset format.
 ```bash
 uv run display.py
 ```
-

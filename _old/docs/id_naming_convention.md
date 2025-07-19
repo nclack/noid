@@ -115,7 +115,7 @@ metadata_table/acquisition_date
 
 # Array dimension references
 image_stack/dims/x
-image_stack/dims/y  
+image_stack/dims/y
 image_stack/dims/z
 image_stack/dims/channel
 image_stack/values

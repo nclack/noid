@@ -52,8 +52,8 @@ def to_dict(
         ['identity', {'translation': [10.0, 20.0, 5.0]}]
     """
     if not isinstance(transform, Transform):
-        return [t.to_dict() for t in transform]
-    return transform.to_dict()
+        return [t.to_data() for t in transform]
+    return transform.to_data()
 
 
 def to_json(
@@ -82,6 +82,7 @@ def to_json(
     return json.dumps(to_dict(transform), indent=indent)
 
 
+# CLAUDE: This might not be necessary. maybe Transform should have a to_jsonld method.
 def to_jsonld(
     transform: Transform | Sequence[Transform] | dict[str, Any],
     include_context: bool = True,
@@ -152,6 +153,7 @@ def to_jsonld(
     return json.dumps(jsonld_data, indent=indent)
 
 
+# CLAUDE: Do I really need this function? I'm not a fan of the fallback.
 def from_jsonld(jsonld_str: str) -> Transform | dict[str, Any]:
     """
     Create transforms from JSON-LD string using enhanced processing.
@@ -178,8 +180,9 @@ def from_jsonld(jsonld_str: str) -> Transform | dict[str, Any]:
         >>> simple_jsonld = '{"translation": [10, 20, 5]}'
         >>> trans = from_jsonld(simple_jsonld)
     """
-    from .factory import from_dict
     from noid_registry import from_jsonld as enhanced_from_jsonld
+
+    from .factory import from_dict
 
     # Try enhanced processing first
     try:
@@ -191,7 +194,7 @@ def from_jsonld(jsonld_str: str) -> Transform | dict[str, Any]:
         if len(non_context_items) == 1:
             single_value = list(non_context_items.values())[0]
             # Check if this is actually a Transform object
-            if hasattr(single_value, "to_dict"):
+            if hasattr(single_value, "to_data"):
                 return single_value
             else:
                 # Not a transform object - fall back to from_dict with the original data

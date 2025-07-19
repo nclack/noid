@@ -162,7 +162,7 @@ def _validate_transform_semantics(transform: Transform) -> None:
             _validate_sampler_config(config)
 
 
-def _validate_sampler_config(config) -> None:
+def _validate_sampler_config(config: object) -> None:
     """Validate sampler configuration."""
     from .models import SamplerConfig
 

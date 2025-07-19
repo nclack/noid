@@ -76,7 +76,7 @@
   },
   {
     "id": "channel_mapping",
-    "name": "Channel Mapping Transform", 
+    "name": "Channel Mapping Transform",
     "description": "Map fluorescence channels to RGB display channels using lookup table",
     "input": [
       {"id": "fluorescence_array/dims/c", "unit": "index", "type": "other"}

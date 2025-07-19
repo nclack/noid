@@ -147,7 +147,7 @@ Must reference a valid transform definition from the transforms vocabulary as sp
 {
   "id": "transform_1",
   "input": "world_coordinates",
-  "output": "pixel_coordinates", 
+  "output": "pixel_coordinates",
   "transform": {"scale": [0.1, 0.1]}
 }
 ```

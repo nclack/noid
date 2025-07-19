@@ -234,7 +234,7 @@ class TestIntegration:
         for original in transforms:
             dict_repr = original.to_dict()
             recreated = from_dict(dict_repr)
-            assert type(recreated) == type(original)
+            assert isinstance(recreated, type(original))
             assert recreated.to_dict() == dict_repr
 
     def test_json_round_trip(self):

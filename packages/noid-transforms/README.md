@@ -74,6 +74,39 @@ This creates:
 - JSON-LD context for semantic web compatibility
 - Documentation in multiple formats
 
+The build process also includes:
+- Code linting and type checking (via ruff)
+- Test execution
+- Example validation
+- Code formatting verification
+
+## Quality Checks
+
+The project uses pre-commit hooks to ensure code quality. All checks run automatically on commit, but you can also run them manually:
+
+```bash
+# Install pre-commit (one-time setup)
+pip install pre-commit
+pre-commit install
+
+# Run all quality checks manually (same as what runs on commit)
+python check.py
+
+# Or run pre-commit directly
+pre-commit run --all-files
+
+# Individual checks (if you need them):
+ruff check src/              # Linting and type checking
+ruff format src/             # Auto-format code
+pytest tests/ -v            # Tests only
+```
+
+The quality checks include:
+- **Linting & Type Checking**: via ruff (includes ANN rules for type annotations)
+- **Code Formatting**: via ruff format
+- **Tests**: via pytest
+- **File Checks**: trailing whitespace, YAML/TOML syntax, etc.
+
 ## Installation
 
 Install the library in development mode:

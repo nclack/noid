@@ -100,7 +100,7 @@ This approach extends beyond arrays to all spatial data types. Every spatial dat
 A 3D microscopy array named `image_stack` with unspecified dimension names would have:
 - `image_stack` - the implicit coordinate space
 - `image_stack/dims/dim_0` - first dimension (default name)
-- `image_stack/dims/dim_1` - second dimension (default name)  
+- `image_stack/dims/dim_1` - second dimension (default name)
 - `image_stack/dims/dim_2` - third dimension (default name)
 - `image_stack/values` - pixel intensity values
 
@@ -123,10 +123,10 @@ Spatial queries extract bounded regions from arrays and point sets through coord
 # Query microscopy array with physical coordinates
 bbox = BoundingBox(x=(10.5, 50.2), y=(20.1, 60.8), z=(0, 10))  # micrometers
 scale = 2  # downsample by factor of 2
-region = dataset.query_spatial('microscopy_image', bbox, scale=scale, 
+region = dataset.query_spatial('microscopy_image', bbox, scale=scale,
                                coordinate_space='physical_space')
 
-# Query points in image pixel coordinates  
+# Query points in image pixel coordinates
 pixel_bbox = BoundingBox(x=(100, 500), y=(200, 600))
 points = dataset.query_spatial('cell_centroids', pixel_bbox,
                                coordinate_space='microscopy_image')
@@ -137,8 +137,8 @@ Coordinate transforms map tuples of numeric coordinates between compatible space
 ```python
 # Transform pixel coordinates to physical space
 pixel_coords = np.array([[256, 512], [128, 384]])  # (x, y) pixels
-physical = dataset.transform(pixel_coords, 
-                           from_space='microscopy_image', 
+physical = dataset.transform(pixel_coords,
+                           from_space='microscopy_image',
                            to_space='physical_space')
 # Returns: [[166.4, 332.8], [83.2, 249.6]]  # micrometers
 
@@ -154,20 +154,20 @@ Table queries leverage the relational view of arrays where dimensions serve as j
 ```python
 # Query cell measurements for specific segmentation labels
 labels = dataset.query_spatial('segmentation', bbox)
-measurements = dataset.query_table('measurements', 
+measurements = dataset.query_table('measurements',
                                  where='cell_id IN segmentation/values',
                                  values=labels.unique())
 
 # Resolve categorical dimension to metadata
 channel_idx = 2
 channel_info = dataset.query_table('fluorescence_channels',
-                                  where='@row_index = microscopy_image/dims/channel', 
+                                  where='@row_index = microscopy_image/dims/channel',
                                   values=[channel_idx])
 # Returns: {'fluorophore': 'GFP', 'wavelength': 488, 'exposure_ms': 100}
 
 # Join array coordinates with annotation table
 coords = dataset.query_table('annotations',
-                           join_on=['microscopy_image/dims/x', 
+                           join_on=['microscopy_image/dims/x',
                                    'microscopy_image/dims/y'],
                            where='confidence > 0.8')
 ```
@@ -562,7 +562,7 @@ Must reference a valid transform definition from the transforms vocabulary as sp
 {
   "id": "transform_1",
   "input": "world_coordinates",
-  "output": "pixel_coordinates", 
+  "output": "pixel_coordinates",
   "transform": {"scale": [0.1, 0.1]}
 }
 ```
@@ -633,7 +633,7 @@ Defines a typed, addressable resource containing spatial or tabular data with fo
 
 ##### Array Data Sources
 
-**Type:** `"array"`  
+**Type:** `"array"`
 **Required Encoding Format:** `"application/zarr+ome"`
 
 Array data sources represent multidimensional arrays for images, volumes, and other gridded data.
@@ -651,7 +651,7 @@ Array data sources represent multidimensional arrays for images, volumes, and ot
 
 ##### Table Data Sources
 
-**Type:** `"table"`  
+**Type:** `"table"`
 **Required Encoding Format:** `"application/parquet"`
 
 Table data sources represent structured tabular data with rows and columns.
@@ -669,7 +669,7 @@ Table data sources represent structured tabular data with rows and columns.
 
 ##### Point Data Sources
 
-**Type:** `"points"`  
+**Type:** `"points"`
 **Required Encoding Format:** `"application/parquet"`
 
 Point data sources represent point cloud data with coordinates and optional features.
@@ -687,7 +687,7 @@ Point data sources represent point cloud data with coordinates and optional feat
 
 ##### Mesh Data Sources
 
-**Type:** `"mesh"`  
+**Type:** `"mesh"`
 **Required Encoding Format:** `"application/neuroglancer-precomputed"`
 
 Mesh data sources represent 3D surface meshes with vertices and faces.
@@ -941,23 +941,23 @@ Defines equivalence relationships between columns and dimensions across data sou
 Relations reference specific entity types within the dataset using hierarchical naming patterns:
 
 ##### Data Source Coordinate Spaces
-**Pattern:** `<datasource_id>`  
-**Example:** `fluorescence_image`  
+**Pattern:** `<datasource_id>`
+**Example:** `fluorescence_image`
 **Description:** References the implicit coordinate space defined by a spatial data source
 
 ##### Table Columns
-**Pattern:** `<datasource_id>/<column_name>`  
-**Example:** `measurements/cell_id`  
+**Pattern:** `<datasource_id>/<column_name>`
+**Example:** `measurements/cell_id`
 **Description:** References a specific column within a table data source
 
 ##### Array Coordinate Dimensions
-**Pattern:** `<datasource_id>/dims/<dimension_id>`  
-**Example:** `image_stack/dims/z`  
+**Pattern:** `<datasource_id>/dims/<dimension_id>`
+**Example:** `image_stack/dims/z`
 **Description:** References a coordinate dimension within an array data source
 
 ##### Array Value Dimensions
-**Pattern:** `<datasource_id>/values`  
-**Example:** `segmentation/values`  
+**Pattern:** `<datasource_id>/values`
+**Example:** `segmentation/values`
 **Description:** References the value dimension of an array data source
 
 #### Dataset Structure
@@ -1102,7 +1102,7 @@ Complete datasets integrate multiple data sources through transforms and relatio
       "name": "Cell Labels",
       "description": "Segmented cell labels",
       "contentUrl": "https://example.com/image.zarr#labels",
-      "type": "array", 
+      "type": "array",
       "encodingFormat": "application/zarr+ome"
     },
     {
@@ -1117,7 +1117,7 @@ Complete datasets integrate multiple data sources through transforms and relatio
   "transforms": [{
     "id": "fluorescence_to_segmentation",
     "input": "fluorescence",
-    "output": "segmentation", 
+    "output": "segmentation",
     "transform": "identity",
     "description": "Shared coordinate space"
   }],
@@ -1144,7 +1144,7 @@ Complete datasets integrate multiple data sources through transforms and relatio
       "contentUrl": "microscopy.zarr"
     },
     {
-      "id": "measurements", 
+      "id": "measurements",
       "name": "Cell Measurements",
       "type": "table",
       "encodingFormat": "application/parquet",
@@ -1153,13 +1153,13 @@ Complete datasets integrate multiple data sources through transforms and relatio
     {
       "id": "centroids",
       "name": "Cell Centers",
-      "type": "points", 
+      "type": "points",
       "encodingFormat": "application/parquet",
       "contentUrl": "centroids.parquet"
     },
     {
       "id": "surfaces",
-      "name": "Cell Surfaces", 
+      "name": "Cell Surfaces",
       "type": "mesh",
       "encodingFormat": "application/neuroglancer-precomputed",
       "contentUrl": "meshes/cells"
@@ -1188,7 +1188,7 @@ Complete datasets integrate multiple data sources through transforms and relatio
       "description": "Cell centroids are already in physical coordinates"
     },
     {
-      "id": "surfaces_to_physical", 
+      "id": "surfaces_to_physical",
       "input": "surfaces",
       "output": "physical_space",
       "transform": "identity",

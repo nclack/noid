@@ -5,7 +5,7 @@
     "transform": "\"identity\""
   },
   {
-    "id": "translation1", 
+    "id": "translation1",
     "label": "Translation by [10, 20, 5]",
     "transform": "{\"translation\": [10, 20, 5]}"
   },
@@ -16,7 +16,7 @@
   },
   {
     "id": "mapAxis1",
-    "label": "Swap first two dimensions", 
+    "label": "Swap first two dimensions",
     "transform": "{\"mapAxis\": [1, 0, 2]}"
   },
   {
@@ -26,7 +26,7 @@
   },
   {
     "id": "homogeneous2",
-    "label": "Projective transformation", 
+    "label": "Projective transformation",
     "transform": "{\"homogeneous\": [[1, 0, 0, 0], [0, 1, 0, 0], [0, 0, 1, 0], [0.001, 0.002, 0, 1]]}"
   },
   {

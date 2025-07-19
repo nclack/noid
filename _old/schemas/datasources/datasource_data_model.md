@@ -37,7 +37,7 @@ Defines a typed, addressable resource containing spatial or tabular data with fo
 
 ### Array Data Sources
 
-**Type:** `"array"`  
+**Type:** `"array"`
 **Required Encoding Format:** `"application/zarr+ome"`
 
 Array data sources represent multidimensional arrays for images, volumes, and other gridded data.
@@ -55,7 +55,7 @@ Array data sources represent multidimensional arrays for images, volumes, and ot
 
 ### Table Data Sources
 
-**Type:** `"table"`  
+**Type:** `"table"`
 **Required Encoding Format:** `"application/parquet"`
 
 Table data sources represent structured tabular data with rows and columns.
@@ -73,7 +73,7 @@ Table data sources represent structured tabular data with rows and columns.
 
 ### Point Data Sources
 
-**Type:** `"points"`  
+**Type:** `"points"`
 **Required Encoding Format:** `"application/parquet"`
 
 Point data sources represent point cloud data with coordinates and optional features.
@@ -91,7 +91,7 @@ Point data sources represent point cloud data with coordinates and optional feat
 
 ### Mesh Data Sources
 
-**Type:** `"mesh"`  
+**Type:** `"mesh"`
 **Required Encoding Format:** `"application/neuroglancer-precomputed"`
 
 Mesh data sources represent 3D surface meshes with vertices and faces.

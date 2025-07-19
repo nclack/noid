@@ -8,6 +8,13 @@ Spun out the noid-registry repo.
 
 Started making noid-spaces.
 
+We should be able to use the factory functions to build a graph of coordinate
+spaces as they're read in.
+
+- [ ] finish the basics spaces implementation
+- [ ] Have claude handle the CLAUDE comments
+
+
 ## 2025-07-16
 
 Changing things to linkml and refactoring to a library per schema.
@@ -23,13 +30,14 @@ I can't quite tell how much is lost in the [linkml] to [jsonld] conversion.
 
 Created a registry system that can be used to invoke
 factory functions based on the name of the key. Using
-pyld, this enables a from_jsonld that should just 
+pyld, this enables a from_jsonld that should just
 work for any schema with registered transforms.
 
 ### References
 
-- [linkML][linkml] is a flexible modeling language that allows you to author schemas in YAML that describe the structure of your data. 
-- [calamus]: A JSON-LD Serialization Library for Python 
+- [linkML][linkml] is a flexible modeling language that allows you to author
+  schemas in YAML that describe the structure of your data.
+- [calamus]: A JSON-LD Serialization Library for Python
 
 [pyld]: https://github.com/digitalbazaar/pyld
 [jsonld]: https://json-ld.org/

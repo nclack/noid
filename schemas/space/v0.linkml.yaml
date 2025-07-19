@@ -119,6 +119,18 @@ classes:
         minimum_cardinality: 1
         range: DimensionSpec
 
+  UnitTerm:
+    description: Unit specification that supports special terms or UDUNITS-2 strings
+    union_of:
+      - SpecialUnits
+      - UdunitsString
+
+types:
+  UdunitsString:
+    description: UDUNITS-2 compatible unit string
+    typeof: string
+    pattern: "^.+$"  # Non-empty string; validation handled in Python
+
 enums:
   DimensionType:
     description: Classification of dimension types
@@ -136,94 +148,12 @@ enums:
         description: Array index dimensions
         meaning: noid_spaces:IndexDimension
 
-  UnitTerm:
-    description: Controlled vocabulary for measurement units
+  SpecialUnits:
+    description: Special unit terms not covered by UDUNITS-2
     permissible_values:
-      # Universal units (valid for any dimension type)
       index:
         description: Array index unit
         meaning: noid_spaces:IndexUnit
       arbitrary:
         description: Arbitrary or dimensionless unit
         meaning: noid_spaces:ArbitraryUnit
-      
-      # Spatial units (UDUNITS-2 compatible)
-      meter:
-        description: SI base unit of length
-        meaning: noid_spaces:MeterUnit
-      meters:
-        description: SI base unit of length (plural)
-        meaning: noid_spaces:MeterUnit
-      millimeter:
-        description: Millimeter (10^-3 meter)
-        meaning: noid_spaces:MillimeterUnit
-      millimeters:
-        description: Millimeter (10^-3 meter, plural)
-        meaning: noid_spaces:MillimeterUnit
-      micrometer:
-        description: Micrometer (10^-6 meter)
-        meaning: noid_spaces:MicrometerUnit
-      micrometers:
-        description: Micrometer (10^-6 meter, plural)
-        meaning: noid_spaces:MicrometerUnit
-      nanometer:
-        description: Nanometer (10^-9 meter)
-        meaning: noid_spaces:NanometerUnit
-      nanometers:
-        description: Nanometer (10^-9 meter, plural)
-        meaning: noid_spaces:NanometerUnit
-      pixel:
-        description: Pixel unit for digital images
-        meaning: noid_spaces:PixelUnit
-      pixels:
-        description: Pixel unit for digital images (plural)
-        meaning: noid_spaces:PixelUnit
-      
-      # Temporal units (UDUNITS-2 compatible)
-      second:
-        description: SI base unit of time
-        meaning: noid_spaces:SecondUnit
-      seconds:
-        description: SI base unit of time (plural)
-        meaning: noid_spaces:SecondUnit
-      millisecond:
-        description: Millisecond (10^-3 second)
-        meaning: noid_spaces:MillisecondUnit
-      milliseconds:
-        description: Millisecond (10^-3 second, plural)
-        meaning: noid_spaces:MillisecondUnit
-      minute:
-        description: Minute (60 seconds)
-        meaning: noid_spaces:MinuteUnit
-      minutes:
-        description: Minute (60 seconds, plural)
-        meaning: noid_spaces:MinuteUnit
-      hour:
-        description: Hour (3600 seconds)
-        meaning: noid_spaces:HourUnit
-      hours:
-        description: Hour (3600 seconds, plural)
-        meaning: noid_spaces:HourUnit
-      
-      # Angular units
-      radian:
-        description: SI unit of angle
-        meaning: noid_spaces:RadianUnit
-      radians:
-        description: SI unit of angle (plural)
-        meaning: noid_spaces:RadianUnit
-      degree:
-        description: Degree of arc (π/180 radians)
-        meaning: noid_spaces:DegreeUnit
-      degrees:
-        description: Degree of arc (π/180 radians, plural)
-        meaning: noid_spaces:DegreeUnit
-      
-      # Common physical units
-      wavelength:
-        description: Wavelength measurement
-        meaning: noid_spaces:WavelengthUnit
-      intensity:
-        description: Intensity measurement
-        meaning: noid_spaces:IntensityUnit
-

@@ -7,6 +7,7 @@ to transform creation and back to JSON-LD serialization.
 
 import json
 
+from noid_registry import get_schema_namespace
 from pyld import jsonld
 import pytest
 
@@ -19,7 +20,6 @@ from noid_transforms import (
     to_jsonld,
     translation,
 )
-from noid_registry import get_schema_namespace
 
 # Import enhanced version for testing enhanced functionality
 from noid_transforms.models import Identity, Scale, Translation
@@ -238,7 +238,7 @@ class TestEnhancedJSONLDIntegration:
         assert len(transform_list) == 3
 
         # Each item should be properly serialized
-        for i, (original, serialized) in enumerate(
+        for _i, (original, serialized) in enumerate(
             zip(transforms, transform_list, strict=False)
         ):
             if hasattr(original, "to_dict"):
@@ -348,7 +348,7 @@ class TestEnhancedJSONLDIntegration:
 
         # Order should be preserved
         expected_translations = [[10, 20, 30], [40, 50, 60], [70, 80, 90]]
-        for i, (expected_trans, serialized) in enumerate(
+        for _i, (expected_trans, serialized) in enumerate(
             zip(expected_translations, transform_list, strict=False)
         ):
             # Compare the translation values

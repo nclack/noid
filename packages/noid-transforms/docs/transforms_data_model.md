@@ -1,4 +1,4 @@
-# Transform Data Model 
+# Transform Data Model
 
 ## Transform Types Overview
 
@@ -148,4 +148,3 @@ Maps coordinates through a lookup table that directly specifies output coordinat
 |---|---|
 | `interpolation` | `"linear"`, `"nearest"`, `"cubic"` |
 | `extrapolation` | `"nearest"`, `"zero"`, `"constant"` |
-

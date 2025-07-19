@@ -94,7 +94,6 @@ class TestTransformValidation:
         assert len(transform.root.homogeneous) == 4
         assert len(transform.root.homogeneous[0]) == 4
 
-
     def test_displacements_valid_string(self):
         """Test valid displacements transform with string path."""
         data = {"displacements": "path/to/displacement_field.zarr"}
@@ -179,7 +178,6 @@ class TestTransformSerialization:
         transform = Transform(data)
         serialized = transform.model_dump()
         assert serialized == {"mapAxis": [1, 0, 2]}
-
 
     def test_displacements_object_serialization(self):
         """Test displacements transform object serialization."""
@@ -292,7 +290,6 @@ class TestEdgeCases:
         }
         with pytest.raises(ValidationError):
             Transform(data)
-
 
 
 if __name__ == "__main__":

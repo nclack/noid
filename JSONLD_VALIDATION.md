@@ -22,11 +22,11 @@ uv run validate_jsonld.py --all-transforms
 
 The script performs comprehensive JSON-LD validation:
 
-✅ **JSON Syntax** - Basic JSON parsing correctness  
-✅ **JSON-LD Processing** - Expansion, compaction, and flattening  
-✅ **Context Resolution** - Namespace and vocabulary validation  
-✅ **Schema Validation** - Against JSON Schema files (when available)  
-✅ **Structural Requirements** - Basic JSON-LD structure rules  
+✅ **JSON Syntax** - Basic JSON parsing correctness
+✅ **JSON-LD Processing** - Expansion, compaction, and flattening
+✅ **Context Resolution** - Namespace and vocabulary validation
+✅ **Schema Validation** - Against JSON Schema files (when available)
+✅ **Structural Requirements** - Basic JSON-LD structure rules
 
 ## Dependencies
 
@@ -62,10 +62,10 @@ flattened = jsonld.flatten(data)
 ## Status
 
 Current files validation status:
-- ✅ `transforms/examples/transforms.jsonld` - VALID  
-- ✅ `transforms/examples/sequences.jsonld` - VALID  
+- ✅ `transforms/examples/transforms.jsonld` - VALID
+- ✅ `transforms/examples/sequences.jsonld` - VALID
 
 ## Alternative Tools
 
 - **JSON-LD Playground**: https://json-ld.org/playground/
-- **MLCroissant validation**: `uv run mlcroissant validate --jsonld <file>` 
+- **MLCroissant validation**: `uv run mlcroissant validate --jsonld <file>`

@@ -12,7 +12,7 @@
     {
       "@type": "schema:DefinedTermSet",
       "@id": "https://github.com/nclack/noid/schemas/spaces/vocabulary.jsonld",
-      "name": "NOID Coordinate Spaces Vocabulary", 
+      "name": "NOID Coordinate Spaces Vocabulary",
       "description": "Vocabulary for coordinate spaces, dimensions, and coordinate transformations",
       "schema:creator": "NOID Project",
       "schema:version": "0.1.0"
@@ -27,7 +27,7 @@
     {
       "@type": "schema:Property",
       "@id": "schema",
-      "name": "schema", 
+      "name": "schema",
       "description": "URL of the JSON Schema used to validate this JSON value",
       "domainIncludes": "JsonValue",
       "rangeIncludes": "schema:URL"

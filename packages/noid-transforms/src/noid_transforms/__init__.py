@@ -57,7 +57,8 @@ See individual modules for detailed documentation:
 from .factory import (
     coordinate_lookup,
     displacements,
-    from_dict,
+    from_data,
+    from_dict,  # deprecated
     from_json,
     homogeneous,
     identity,
@@ -116,7 +117,8 @@ __all__ = [
     "homogeneous",
     "displacements",
     "coordinate_lookup",
-    "from_dict",
+    "from_data",
+    "from_dict",  # deprecated
     "from_json",
     # Serialization
     "to_dict",

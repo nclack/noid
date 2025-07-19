@@ -8,7 +8,9 @@ schema-agnostic and extractable as a standalone library.
 
 from collections.abc import Callable
 import inspect
-from typing import Any
+from typing import Any, TypeVar
+
+F = TypeVar("F", bound=Callable[..., Any])
 
 # Global namespace context - simpler than thread-local
 _current_namespace_iri: str | None = None
@@ -59,7 +61,7 @@ class Registry:
     """Registry supporting IRI→factory mapping and bidirectional type→short_name mapping."""
 
     def __init__(self):
-        self._factories: dict[str, Callable[[Any], Any]] = {}
+        self._factories: dict[str, Callable[..., Any]] = {}
         self._type_to_iri: dict[type, str] = {}
 
     def register(self, name_override: str | None = None):
@@ -78,7 +80,7 @@ class Registry:
             Avoid: `def func(config: dict) -> Result` (conflicts with kwargs expansion)
         """
 
-        def decorator(func: Callable[[Any], Any]) -> Callable[[Any], Any]:
+        def decorator(func: F) -> F:
             # Get current namespace from global context
             namespace_iri = _current_namespace_iri
 

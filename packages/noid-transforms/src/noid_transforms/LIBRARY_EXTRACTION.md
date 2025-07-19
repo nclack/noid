@@ -8,7 +8,7 @@ These modules contain no transforms-specific logic and can be moved to a standal
 
 ### Core Registry System
 - `registry.py` - Core registry infrastructure with IRI→factory mapping and collision detection
-- `adapter.py` - PyLD data normalization adapter  
+- `adapter.py` - PyLD data normalization adapter
 - `abbreviation.py` - Namespace abbreviation system
 - `jsonld_processing.py` - Enhanced JSON-LD processing with PyLD integration
 
@@ -38,7 +38,7 @@ These modules contain transforms-specific logic:
 jsonld_registry/
   __init__.py
   registry.py          # Move from noid_transforms/registry.py
-  adapter.py           # Move from noid_transforms/adapter.py  
+  adapter.py           # Move from noid_transforms/adapter.py
   abbreviation.py      # Move from noid_transforms/abbreviation.py
   jsonld_processing.py # Move from noid_transforms/jsonld_processing.py
 ```
@@ -81,7 +81,7 @@ The extracted library would expose:
 # Core registry
 from jsonld_registry import registry, register, set_namespace
 
-# PyLD processing  
+# PyLD processing
 from jsonld_registry import from_jsonld, to_jsonld
 from jsonld_registry import PyLDDataAdapter
 
@@ -106,7 +106,7 @@ def my_transform(data: List[float]) -> MyTransform:
     """Single parameter - works with direct values."""
     return MyTransform(data=data)
 
-@jsonld_registry.register  
+@jsonld_registry.register
 def my_complex_transform(path: str, mode: str = "default") -> MyTransform:
     """Multi-parameter - works with dict input via kwargs expansion."""
     return MyTransform(path=path, mode=mode)
@@ -117,7 +117,7 @@ result = jsonld_registry.from_jsonld({
     "ex:my_transform": [1, 2, 3],  # Direct value → my_transform([1, 2, 3])
     "ex:my_complex_transform": {   # Dict → my_complex_transform(path="...", mode="...")
         "path": "data.json",
-        "mode": "fast" 
+        "mode": "fast"
     }
 })
 
@@ -130,7 +130,7 @@ output = jsonld_registry.to_jsonld(result)
 When using the extracted library, factory functions must follow these patterns:
 
 1. **✅ Single parameter**: `def func(data: Type) -> Result`
-2. **✅ Multiple named parameters**: `def func(param1: Type, param2: Type = default) -> Result` 
+2. **✅ Multiple named parameters**: `def func(param1: Type, param2: Type = default) -> Result`
 3. **✅ No parameters**: `def func() -> Result`
 4. **❌ Single dict parameter**: `def func(config: dict) -> Result` (conflicts with kwargs expansion)
 
@@ -145,8 +145,8 @@ When using the extracted library, factory functions must follow these patterns:
 ## Benefits of Extraction
 
 1. **Reusability**: Other projects can use the same registry pattern
-2. **Maintainability**: Generic logic separated from schema-specific code  
+2. **Maintainability**: Generic logic separated from schema-specific code
 3. **Testing**: Library components can be tested independently
 4. **Documentation**: Clear boundaries between generic and specific functionality
 5. **Performance**: Library can be optimized independently
-6. **Simplicity**: No complex thread-local storage, just straightforward global state 
+6. **Simplicity**: No complex thread-local storage, just straightforward global state

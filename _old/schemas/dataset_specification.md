@@ -11,7 +11,7 @@ The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "S
 A NOID dataset is a container that organizes heterogeneous data sources into a coherent, queryable collection. It consists of:
 
 - **Data Sources** (required): Typed, addressable data resources that form the dataset content
-- **Coordinate Transforms** (optional): Mathematical mappings between coordinate spaces for spatial alignment  
+- **Coordinate Transforms** (optional): Mathematical mappings between coordinate spaces for spatial alignment
 - **Equivalence Relations** (optional): Mappings identifying columns and dimensions representing the same logical entity
 
 ## 3. Required Properties
@@ -19,7 +19,7 @@ A NOID dataset is a container that organizes heterogeneous data sources into a c
 ### 3.1 Identifier (`id`)
 The `id` property MUST be a non-empty string that uniquely identifies the dataset and SHOULD be descriptive of the dataset content.
 
-### 3.2 Name (`name`) 
+### 3.2 Name (`name`)
 The `name` property MUST be a non-empty string providing a human-readable name suitable for display in user interfaces.
 
 ### 3.3 Description (`description`)

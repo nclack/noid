@@ -10,7 +10,7 @@ multidimensional array processing.
 ## Status
 
 This document describes the v0 schema for coordinate spaces and coordinate
-transformations. The specification is influenced by the [RFC-5 Coordinate 
+transformations. The specification is influenced by the [RFC-5 Coordinate
 systems and transformations][RFC-5] specification.
 
 ## Table of Contents
@@ -71,14 +71,14 @@ The `unit` property MUST be a non-empty string.
 For dimensions with `type` "space" or "time", the unit SHOULD use UDUNITS-2
 terms (e.g., "micrometers", "seconds", "radians").
 
-For all dimension types, "index" and "arbitrary" are valid unit values. 
+For all dimension types, "index" and "arbitrary" are valid unit values.
 Dimensions with unit "index" MAY have any type ("space", "time", "other", or "index").
 
 #### 3.1.3 Dimension Type
 
 The `type` property MUST be one of the following enumerated values:
 - "space": Spatial dimensions
-- "time": Temporal dimensions  
+- "time": Temporal dimensions
 - "other": Channels, indices, or other non-spatial/temporal dimensions
 - "index": Array index dimensions
 
@@ -188,7 +188,7 @@ IDs exist within the dataset scope.
 ```json
 {
   "id": "x",
-  "unit": "micrometers", 
+  "unit": "micrometers",
   "type": "space"
 }
 ```
@@ -243,7 +243,7 @@ IDs exist within the dataset scope.
 {
   "id": "physical_to_pixel",
   "input": "physical_space",
-  "output": "image_coordinates", 
+  "output": "image_coordinates",
   "transform": {
     "scale": [0.1, 0.1, 0.2]
   },

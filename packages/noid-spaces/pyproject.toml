@@ -10,6 +10,7 @@ requires-python = ">=3.10"
 dependencies = [
     "linkml>=1.9.2",
     "linkml-runtime>=1.9.2",
+    "jsonasobj2>=1.0.0",
     "pydantic>=2.0.0",
     "typing-extensions>=4.0.0",
     "noid-registry",

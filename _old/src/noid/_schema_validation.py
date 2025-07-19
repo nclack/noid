@@ -43,7 +43,7 @@ To add validation to a model class:
    ```python
    from ._schema import MyModel as _MyModel
    from ._schema_validation import MyModelValidationMixin
-   
+
    class MyModel(MyModelValidationMixin, _MyModel):
        pass
    ```
@@ -66,32 +66,32 @@ from ._schema import DimensionType
 class DimensionValidationMixin:
     """
     Validation mixin for Dimension objects.
-    
+
     Enforces business rules that cannot be expressed in JSON Schema:
     - Index dimensions must have 'index' unit (JSON Schema if-then constraints
       are not supported by datamodel-codegen)
-    
+
     Example:
         # Valid index dimension
         Dimension(id="i", unit="index", type=DimensionType.index)
-        
+
         # Invalid - will raise ValueError
         Dimension(id="i", unit="micrometers", type=DimensionType.index)
     """
-    
-    @model_validator(mode='after')
+
+    @model_validator(mode="after")
     def validate_dimension_constraints(self):
         """
         Validate dimension-specific business rules.
-        
+
         Enforces that index-type dimensions must use "index" as their unit.
         This constraint is defined in the JSON Schema using if-then logic,
         but datamodel-codegen cannot generate equivalent Pydantic validation.
-        
+
         Raises:
             ValueError: If an index dimension has a non-"index" unit
         """
-        if hasattr(self, 'type') and hasattr(self, 'unit'):
+        if hasattr(self, "type") and hasattr(self, "unit"):
             if self.type == DimensionType.index and self.unit != "index":
                 raise ValueError("Index dimensions must have 'index' unit")
         return self

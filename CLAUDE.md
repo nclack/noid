@@ -29,7 +29,7 @@ The noid repository is organized as a multi-package structure using uv workspace
 noid/
 ├── packages/
 │   ├── noid-registry/           # Generic JSON-LD registry system
-│   └── noid-transforms/         # Transform-specific functionality  
+│   └── noid-transforms/         # Transform-specific functionality
 ├── pyproject.toml              # Workspace configuration
 └── uv.lock                     # Workspace lockfile
 ```
@@ -110,6 +110,34 @@ imports:
 - Schema URLs correspond to the actual GitHub repository structure
 - Namespace URLs use clean schema-based paths: `https://github.com/nclack/noid/schemas/{schema}/`
 - This provides logical namespaces that don't reference specific JSON-LD context files
+
+# CLAUDE.md - noid-transforms
+
+This file provides guidance to Claude Code when working with code in this package.
+
+## Build Script Conventions
+
+When working with build scripts in this project, follow these conventions:
+
+### Error Handling
+- **Centralize error handling** in helper functions like `run_command()`
+- **Let errors bubble up** - don't catch exceptions just to ignore them
+- **Avoid excessive try/except blocks** around function calls that already handle their own errors
+- **Use `sys.exit(1)` on failures** to properly terminate the build process
+
+### Logging
+- **Use logging over print** for all output
+- **Keep logging minimal** - avoid redundant messages
+- **Single success messages** - don't log both "starting" and "completed" for the same operation
+- **Consolidate related information** into single log messages
+- **Remove section headers** when function names already indicate purpose
+- **Use appropriate log levels**: `info()` for status, `warning()` for issues, `error()` for failures
+
+### Code Organization
+- **Create reusable helper functions** for common operations like running subprocess commands
+- **Make functions focused and single-purpose**
+- **Avoid code duplication** - if you're running subprocess.run in multiple places, extract it to a helper
+- **Use type hints** for better code clarity
 
 ## References
 

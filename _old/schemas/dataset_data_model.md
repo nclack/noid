@@ -52,23 +52,23 @@ Defines equivalence relationships between columns and dimensions across data sou
 Relations reference specific entity types within the dataset using hierarchical naming patterns:
 
 ### Data Source Coordinate Spaces
-**Pattern:** `<datasource_id>`  
-**Example:** `fluorescence_image`  
+**Pattern:** `<datasource_id>`
+**Example:** `fluorescence_image`
 **Description:** References the implicit coordinate space defined by a spatial data source
 
 ### Table Columns
-**Pattern:** `<datasource_id>/<column_name>`  
-**Example:** `measurements/cell_id`  
+**Pattern:** `<datasource_id>/<column_name>`
+**Example:** `measurements/cell_id`
 **Description:** References a specific column within a table data source
 
 ### Array Coordinate Dimensions
-**Pattern:** `<datasource_id>/dims/<dimension_id>`  
-**Example:** `image_stack/dims/z`  
+**Pattern:** `<datasource_id>/dims/<dimension_id>`
+**Example:** `image_stack/dims/z`
 **Description:** References a coordinate dimension within an array data source
 
 ### Array Value Dimensions
-**Pattern:** `<datasource_id>/values`  
-**Example:** `segmentation/values`  
+**Pattern:** `<datasource_id>/values`
+**Example:** `segmentation/values`
 **Description:** References the value dimension of an array data source
 
 ## Dataset Structure
@@ -205,7 +205,7 @@ Complete datasets integrate multiple data sources through transforms and relatio
       "name": "Cell Labels",
       "description": "Segmented cell labels",
       "contentUrl": "https://example.com/image.zarr#labels",
-      "type": "array", 
+      "type": "array",
       "encodingFormat": "application/zarr+ome"
     },
     {
@@ -220,7 +220,7 @@ Complete datasets integrate multiple data sources through transforms and relatio
   "transforms": [{
     "id": "fluorescence_to_segmentation",
     "input": "fluorescence",
-    "output": "segmentation", 
+    "output": "segmentation",
     "transform": "identity",
     "description": "Shared coordinate space"
   }],
@@ -247,7 +247,7 @@ Complete datasets integrate multiple data sources through transforms and relatio
       "contentUrl": "microscopy.zarr"
     },
     {
-      "id": "measurements", 
+      "id": "measurements",
       "name": "Cell Measurements",
       "type": "table",
       "encodingFormat": "application/parquet",
@@ -256,13 +256,13 @@ Complete datasets integrate multiple data sources through transforms and relatio
     {
       "id": "centroids",
       "name": "Cell Centers",
-      "type": "points", 
+      "type": "points",
       "encodingFormat": "application/parquet",
       "contentUrl": "centroids.parquet"
     },
     {
       "id": "surfaces",
-      "name": "Cell Surfaces", 
+      "name": "Cell Surfaces",
       "type": "mesh",
       "encodingFormat": "application/neuroglancer-precomputed",
       "contentUrl": "meshes/cells"

@@ -44,7 +44,7 @@ See the merged [PR](https://github.com/mlcommons/croissant/pull/807/files)
   transform json values to strings. If there were, I could easily use the
   type of a field to parse a json string that I extract. But this looks to be
   impossible which is fr:reustrating.
-  
+
 
 ## Rules for Making Joins Between RecordSets
 

@@ -280,5 +280,5 @@ bounds.
 
 - RFC 2119: Key words for use in RFCs to Indicate Requirement Levels
 - OME-Zarr specification
-- Apache Parquet specification  
+- Apache Parquet specification
 - Neuroglancer Precomputed format specification

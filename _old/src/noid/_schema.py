@@ -15,19 +15,19 @@ class CoordinateSpacesSchema(BaseModel):
 
 
 class DimensionType(Enum):
-    space = 'space'
-    time = 'time'
-    other = 'other'
-    index = 'index'
+    space = "space"
+    time = "time"
+    other = "other"
+    index = "index"
 
 
 class Dimension(BaseModel):
     model_config = ConfigDict(
-        extra='forbid',
+        extra="forbid",
     )
     id: str = Field(
         ...,
-        description='Unique identifier for the dimension across all dimensions in a dataset',
+        description="Unique identifier for the dimension across all dimensions in a dataset",
     )
     unit: str = Field(
         ...,
@@ -36,39 +36,39 @@ class Dimension(BaseModel):
     type: DimensionType = Field(
         ...,
         description="Type of dimension: 'space' for spatial, 'time' for temporal, 'other' for channels/indices/etc, 'index' for array indices",
-        title='DimensionType',
+        title="DimensionType",
     )
 
 
 class CoordinateSystem(BaseModel):
     model_config = ConfigDict(
-        extra='forbid',
+        extra="forbid",
     )
-    id: str = Field(..., description='Unique identifier for the coordinate system')
+    id: str = Field(..., description="Unique identifier for the coordinate system")
     dimensions: List[Union[str, Dimension]] = Field(
         ...,
-        description='List of dimensions, specified either by ID reference or as full Dimension objects',
+        description="List of dimensions, specified either by ID reference or as full Dimension objects",
     )
     description: Optional[str] = Field(
-        None, description='Optional description of the coordinate system'
+        None, description="Optional description of the coordinate system"
     )
 
 
 class Translation(BaseModel):
     model_config = ConfigDict(
-        extra='forbid',
+        extra="forbid",
     )
     translation: List[float] = Field(
-        ..., description='Translation vector as array of numbers', min_length=1
+        ..., description="Translation vector as array of numbers", min_length=1
     )
 
 
 class Scale(BaseModel):
     model_config = ConfigDict(
-        extra='forbid',
+        extra="forbid",
     )
     scale: List[float] = Field(
-        ..., description='Scale factors as array of numbers', min_length=1
+        ..., description="Scale factors as array of numbers", min_length=1
     )
 
 
@@ -78,41 +78,41 @@ class MapAxi(RootModel[conint(ge=0)]):
 
 class MapAxis(BaseModel):
     model_config = ConfigDict(
-        extra='forbid',
+        extra="forbid",
     )
     mapAxis: List[MapAxi] = Field(
         ...,
-        description='Permutation vector of 0-based input dimension indices. Array length equals number of output dimensions. Each value specifies which input dimension maps to the corresponding output dimension.',
+        description="Permutation vector of 0-based input dimension indices. Array length equals number of output dimensions. Each value specifies which input dimension maps to the corresponding output dimension.",
         min_length=1,
     )
 
 
 class Homogeneous(BaseModel):
     model_config = ConfigDict(
-        extra='forbid',
+        extra="forbid",
     )
     homogeneous: List[List[float]] = Field(
         ...,
-        description='Homogeneous transformation matrix as 2D array (affine/projective)',
+        description="Homogeneous transformation matrix as 2D array (affine/projective)",
         min_length=2,
     )
 
 
 class Interpolation(Enum):
-    linear = 'linear'
-    nearest = 'nearest'
-    cubic = 'cubic'
+    linear = "linear"
+    nearest = "nearest"
+    cubic = "cubic"
 
 
 class Extrapolation(Enum):
-    nearest = 'nearest'
-    zero = 'zero'
-    constant = 'constant'
+    nearest = "nearest"
+    zero = "zero"
+    constant = "constant"
 
 
 class Displacements(BaseModel):
     model_config = ConfigDict(
-        extra='forbid',
+        extra="forbid",
     )
     path: str
     interpolation: Optional[Interpolation] = None
@@ -121,7 +121,7 @@ class Displacements(BaseModel):
 
 class DisplacementLookupTable(BaseModel):
     model_config = ConfigDict(
-        extra='forbid',
+        extra="forbid",
     )
     displacements: Union[str, Displacements]
 
@@ -131,7 +131,7 @@ LookupTable = Displacements
 
 class CoordinateLookupTable(BaseModel):
     model_config = ConfigDict(
-        extra='forbid',
+        extra="forbid",
     )
     lookup_table: Union[str, LookupTable]
 
@@ -159,21 +159,21 @@ class Transform(
         CoordinateLookupTable,
     ] = Field(
         ...,
-        description='A coordinate transformation with self-describing parameters',
-        title='Transform',
+        description="A coordinate transformation with self-describing parameters",
+        title="Transform",
     )
 
 
 class CoordinateTransform(BaseModel):
     model_config = ConfigDict(
-        extra='forbid',
+        extra="forbid",
     )
-    id: str = Field(..., description='Unique identifier for the coordinate transform')
+    id: str = Field(..., description="Unique identifier for the coordinate transform")
     input: Union[List[Union[str, Dimension]], CoordinateSystem, str]
     output: Union[List[Union[str, Dimension]], CoordinateSystem, str]
     transform: Transform = Field(
-        ..., description='Transform definition from the transforms vocabulary'
+        ..., description="Transform definition from the transforms vocabulary"
     )
     description: Optional[str] = Field(
-        None, description='Optional description of the coordinate transform'
+        None, description="Optional description of the coordinate transform"
     )

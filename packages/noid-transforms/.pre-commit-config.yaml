@@ -1,0 +1,37 @@
+repos:
+  # Ruff linting and formatting
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.8.4
+    hooks:
+      # Run the linter (includes type checking via ANN rules)
+      - id: ruff
+        name: ruff check (linting + type checking)
+        args: [--fix, packages/noid-transforms/src/, packages/noid-transforms/tests/]
+        pass_filenames: false
+      # Run the formatter
+      - id: ruff-format
+        name: ruff format (code formatting)
+        args: [packages/noid-transforms/src/, packages/noid-transforms/tests/]
+        pass_filenames: false
+
+  # Basic file checks
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.4.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-yaml
+      - id: check-toml
+      - id: check-merge-conflict
+      - id: check-added-large-files
+
+  # Run tests
+  - repo: local
+    hooks:
+      - id: pytest
+        name: pytest (run tests)
+        entry: bash -c 'cd packages/noid-transforms && python -m pytest tests/ -v'
+        language: system
+        pass_filenames: false
+        always_run: true
+        files: ^(src/|tests/)
