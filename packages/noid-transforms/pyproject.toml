@@ -119,15 +119,6 @@ addopts = ["-v", "--strict-markers"]
 source = ["src/transforms"]
 omit = ["*/tests/*", "*/_out/*", "*/_old/*"]
 
-[dependency-groups]
-dev = [
-    "ruff>=0.12.4",
-    "pre-commit>=3.0.0",
-]
-
-# Note: uv scripts didn't work as expected in uv 0.7.19
-# Using tasks.py as the task runner instead
-
 
 [tool.uv.sources]
 noid-registry = { workspace = true }

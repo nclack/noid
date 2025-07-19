@@ -8,7 +8,7 @@ Replace manual if/elif chains with maintainable registries that support multi-sc
 
 ```python
 # Single transform from dictionary
-result = transforms.from_dict({"translation": [10, 20, 5]})
+result = transforms.from_data({"translation": [10, 20, 5]})
 # -> Translation(translation=[10, 20, 5])
 
 # Multi-schema JSON-LD processing
@@ -35,12 +35,12 @@ jsonld_output = transforms.to_jsonld(result)
 
 # Error handling with smart suggestions
 try:
-    transforms.from_dict({"translaton": [1, 2, 3]})  # typo
+    transforms.from_data({"translaton": [1, 2, 3]})  # typo
 except ValueError as e:
     print(e)  # "Unknown transform type: 'translaton'. Did you mean 'translation'?"
 
 try:
-    transforms.from_dict({"unknown": [1, 2, 3]})
+    transforms.from_data({"unknown": [1, 2, 3]})
 except ValueError as e:
     print(e)  # "Unknown transform type: 'unknown'. Available: [translation, scale, mapAxis, ...]"
 ```
@@ -552,7 +552,7 @@ def to_jsonld(transform_dict: Dict[str, Transform]) -> Dict[str, Any]:
         short_name = registry.get_short_name(transform_obj, abbreviator)
 
         # Serialize transform to dict
-        transform_data = transform_obj.to_dict()
+        transform_data = transform_obj.to_data()
 
         # Use short name in output
         result[short_name] = transform_data

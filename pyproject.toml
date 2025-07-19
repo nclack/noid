@@ -3,6 +3,7 @@ dev-dependencies = [
     "pytest>=7.0.0",
     "pytest-cov>=4.0.0",
     "ruff>=0.12.4",
+    "pre-commit>=3.0.0",
     "python-lsp-server>=1.7.0",
 ]
 

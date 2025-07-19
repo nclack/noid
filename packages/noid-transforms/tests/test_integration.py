@@ -13,7 +13,7 @@ import pytest
 
 # Import the full system
 from noid_transforms import (
-    from_dict,
+    from_data,
     from_jsonld,
     identity,
     scale,
@@ -64,24 +64,24 @@ def validate_jsonld_spec(data) -> bool:
 class TestBasicIntegration:
     """Test basic integration with existing functionality."""
 
-    def test_from_dict_registry_integration(self):
-        """Test that from_dict uses the registry system internally."""
+    def test_from_data_registry_integration(self):
+        """Test that from_data uses the registry system internally."""
         # Test that registry-based dispatch works for standard transforms
-        trans = from_dict({"translation": [10, 20, 30]})
+        trans = from_data({"translation": [10, 20, 30]})
         assert isinstance(trans, Translation)
         assert trans.translation == [10, 20, 30]
 
-        sc = from_dict({"scale": [2.0, 1.5, 0.5]})
+        sc = from_data({"scale": [2.0, 1.5, 0.5]})
         assert isinstance(sc, Scale)
         assert sc.scale == [2.0, 1.5, 0.5]
 
-        ident = from_dict("identity")
+        ident = from_data("identity")
         assert isinstance(ident, Identity)
 
     def test_clean_error_messages(self):
         """Test clean error messages for unknown transforms."""
         with pytest.raises(ValueError) as exc_info:
-            from_dict({"unknown_transform": [1, 2, 3]})
+            from_data({"unknown_transform": [1, 2, 3]})
 
         error_msg = str(exc_info.value)
         # Should provide a clean error message
@@ -210,8 +210,8 @@ class TestEnhancedJSONLDIntegration:
         for key in transform_keys:
             serialized_data = result[key]
             assert isinstance(serialized_data, dict)
-            if hasattr(trans, "to_dict"):
-                expected = trans.to_dict()
+            if hasattr(trans, "to_data"):
+                expected = trans.to_data()
                 assert serialized_data == expected
 
         # Validate JSON-LD specification compliance
@@ -241,8 +241,8 @@ class TestEnhancedJSONLDIntegration:
         for _i, (original, serialized) in enumerate(
             zip(transforms, transform_list, strict=False)
         ):
-            if hasattr(original, "to_dict"):
-                expected = original.to_dict()
+            if hasattr(original, "to_data"):
+                expected = original.to_data()
                 assert serialized == expected
 
         # Validate JSON-LD specification compliance
@@ -438,7 +438,7 @@ class TestRealWorldScenarios:
 
         results = []
         for transform_data in transforms_data:
-            result = from_dict(transform_data)
+            result = from_data(transform_data)
             results.append(result)
 
         # Check results
@@ -466,7 +466,7 @@ class TestRealWorldScenarios:
 
         for transform_data in transforms_data:
             try:
-                result = from_dict(transform_data)
+                result = from_data(transform_data)
                 results.append(result)
             except ValueError as e:
                 errors.append(str(e))
@@ -529,7 +529,7 @@ class TestPerformanceAndScaling:
         # Process all transforms
         results = []
         for transform_data in large_batch:
-            result = from_dict(transform_data)
+            result = from_data(transform_data)
             results.append(result)
 
         # Verify results

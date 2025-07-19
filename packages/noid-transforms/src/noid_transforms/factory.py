@@ -160,7 +160,7 @@ def displacements(
         >>> disp = displacements("path/to/field.zarr", "linear", "zero")
         >>>
         >>> # Registry usage with dict expansion
-        >>> from_dict({"displacements": {"path": "path/to/field.zarr", "interpolation": "linear"}})
+        >>> from_data({"displacements": {"path": "path/to/field.zarr", "interpolation": "linear"}})
     """
     config = SamplerConfig(interpolation=interpolation, extrapolation=extrapolation)
     return DisplacementLookupTable(path=path, displacements=config)
@@ -189,7 +189,7 @@ def coordinate_lookup(
         >>> lookup = coordinate_lookup("path/to/lut.zarr", "cubic", "reflect")
         >>>
         >>> # Registry usage with dict expansion
-        >>> from_dict({"lookup_table": {"path": "path/to/lut.zarr", "interpolation": "cubic"}})
+        >>> from_data({"lookup_table": {"path": "path/to/lut.zarr", "interpolation": "cubic"}})
     """
     config = SamplerConfig(interpolation=interpolation, extrapolation=extrapolation)
     return CoordinateLookupTable(path=path, lookup_table=config)
@@ -274,26 +274,4 @@ def from_json(json_str: str) -> Transform:
         {'translation': [10.0, 20.0, 5.0]}
     """
     data = json.loads(json_str)
-    return from_data(data)
-
-
-def from_dict(data: dict[str, Any] | str) -> Transform:
-    """
-    Create a transform from a dictionary or string representation (deprecated).
-
-    This function is deprecated. Use from_data() instead.
-
-    Args:
-        data: Dictionary with transform parameters or "identity" string
-
-    Returns:
-        Transform object of appropriate type
-    """
-    import warnings
-
-    warnings.warn(
-        "from_dict() is deprecated, use from_data() instead",
-        DeprecationWarning,
-        stacklevel=2,
-    )
     return from_data(data)

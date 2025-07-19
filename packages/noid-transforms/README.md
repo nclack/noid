@@ -126,7 +126,7 @@ scale = transforms.create_scale([2.0, 1.5, 0.5])
 identity = transforms.create_identity()
 
 # Create from dictionaries
-homogeneous = transforms.from_dict({
+homogeneous = transforms.from_data({
     "homogeneous": [
         [2.0, 0, 0, 10],
         [0, 1.5, 0, 20],

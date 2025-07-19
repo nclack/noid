@@ -16,7 +16,7 @@ scale = noid_transforms.scale([2.0, 1.5, 0.5])
 identity = noid_transforms.identity()
 
 # Create from dictionaries
-homogeneous = noid_transforms.from_dict({
+homogeneous = noid_transforms.from_data({
     "homogeneous": [
         [2.0, 0, 0, 10],
         [0, 1.5, 0, 20],
@@ -58,7 +58,6 @@ from .factory import (
     coordinate_lookup,
     displacements,
     from_data,
-    from_dict,  # deprecated
     from_json,
     homogeneous,
     identity,
@@ -79,14 +78,7 @@ from .models import (
     Transform,
     Translation,
 )
-from .serialization import to_dict, to_json
-
-# # Import factory functions to ensure they get registered
-# try:
-#     from . import factory
-# except ImportError:
-#     # Registry not available - skip registration
-#     pass
+from .serialization import to_data, to_json
 from .validation import (
     ValidationError,
     check_transform_compatibility,
@@ -118,10 +110,9 @@ __all__ = [
     "displacements",
     "coordinate_lookup",
     "from_data",
-    "from_dict",  # deprecated
     "from_json",
     # Serialization
-    "to_dict",
+    "to_data",
     "to_json",
     "to_jsonld",
     "from_jsonld",

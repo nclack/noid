@@ -91,7 +91,7 @@ def factory_usage():
     # Create transforms from data
     transform_objects = []
     for data in transforms_data:
-        transform = transforms.from_dict(data)
+        transform = transforms.from_data(data)
         transform_objects.append(transform)
         print(f"Created {type(transform).__name__}: {transform}")
 
@@ -101,7 +101,7 @@ def factory_usage():
     print(f"From JSON: {from_json}")
 
     # Create sequence using list comprehension
-    sequence = [transforms.from_dict(data) for data in transforms_data]
+    sequence = [transforms.from_data(data) for data in transforms_data]
     print(f"Sequence length: {len(sequence)}")
     print()
 
@@ -114,7 +114,7 @@ def serialization_usage():
     translation = transforms.translation([10, 20, 5])
 
     # Serialize to different formats
-    dict_repr = transforms.to_dict(translation)
+    dict_repr = transforms.to_data(translation)
     json_repr = transforms.to_json(translation, indent=2)
     jsonld_repr = transforms.to_jsonld(translation, indent=2)
 
@@ -256,8 +256,8 @@ def jsonld_examples():
     legacy_json = '{"translation": [10, 20, 5]}'
     try:
         legacy_result = transforms.from_json(legacy_json)
-        if hasattr(legacy_result, "to_dict"):
-            print(f"Legacy format support: {legacy_result.to_dict()}")
+        if hasattr(legacy_result, "to_data"):
+            print(f"Legacy format support: {legacy_result.to_data()}")
         else:
             print(f"Legacy format support: {legacy_result}")
     except Exception as e:

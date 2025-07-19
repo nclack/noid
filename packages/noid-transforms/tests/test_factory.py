@@ -16,7 +16,7 @@ sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 from noid_transforms.factory import (
     coordinate_lookup,
     displacements,
-    from_dict,
+    from_data,
     from_json,
     homogeneous,
     identity,
@@ -42,7 +42,7 @@ class TestCreateFunctions:
         """Test identity creation."""
         ident = identity()
         assert isinstance(ident, Identity)
-        assert ident.to_dict() == "identity"
+        assert ident.to_data() == "identity"
 
     def test_translation(self):
         """Test translation creation."""
@@ -87,36 +87,36 @@ class TestCreateFunctions:
 
 
 class TestFromDict:
-    """Test from_dict function."""
+    """Test from_data function."""
 
     def test_identity_from_string(self):
         """Test identity creation from string."""
-        identity = from_dict("identity")
+        identity = from_data("identity")
         assert isinstance(identity, Identity)
-        assert identity.to_dict() == "identity"
+        assert identity.to_data() == "identity"
 
-    def test_translation_from_dict(self):
+    def test_translation_from_data(self):
         """Test translation creation from dict."""
         data = {"translation": [10, 20, 5]}
-        trans = from_dict(data)
+        trans = from_data(data)
         assert isinstance(trans, Translation)
         assert trans.translation == [10.0, 20.0, 5.0]
 
-    def test_scale_from_dict(self):
+    def test_scale_from_data(self):
         """Test scale creation from dict."""
         data = {"scale": [2.0, 1.5, 0.5]}
-        scale = from_dict(data)
+        scale = from_data(data)
         assert isinstance(scale, Scale)
         assert scale.scale == [2.0, 1.5, 0.5]
 
-    def test_mapaxis_from_dict(self):
+    def test_mapaxis_from_data(self):
         """Test mapaxis creation from dict."""
         data = {"map-axis": [1, 0, 2]}
-        mapaxis = from_dict(data)
+        mapaxis = from_data(data)
         assert isinstance(mapaxis, MapAxis)
         assert mapaxis.map_axis == [1, 0, 2]
 
-    def test_homogeneous_from_dict(self):
+    def test_homogeneous_from_data(self):
         """Test homogeneous creation from dict."""
         data = {
             "homogeneous": [
@@ -126,18 +126,18 @@ class TestFromDict:
                 [0, 0, 0, 1],
             ]
         }
-        homogeneous = from_dict(data)
+        homogeneous = from_data(data)
         assert isinstance(homogeneous, Homogeneous)
         assert homogeneous.matrix_shape == (4, 4)
 
-    def test_displacements_from_dict_path_only(self):
+    def test_displacements_from_data_path_only(self):
         """Test displacements creation from dict with path only."""
         data = {"displacements": "path/to/field.zarr"}
-        disp = from_dict(data)
+        disp = from_data(data)
         assert isinstance(disp, DisplacementLookupTable)
         assert disp.path == "path/to/field.zarr"
 
-    def test_displacements_from_dict_full(self):
+    def test_displacements_from_data_full(self):
         """Test displacements creation from dict with full config."""
         data = {
             "displacements": {
@@ -146,13 +146,13 @@ class TestFromDict:
                 "extrapolation": "zero",
             }
         }
-        disp = from_dict(data)
+        disp = from_data(data)
         assert isinstance(disp, DisplacementLookupTable)
         assert disp.path == "path/to/field.zarr"
         assert disp.displacements.interpolation == "linear"
         assert disp.displacements.extrapolation == "zero"
 
-    def test_coordinate_lookup_from_dict(self):
+    def test_coordinate_lookup_from_data(self):
         """Test coordinate lookup creation from dict."""
         data = {
             "lookup-table": {
@@ -161,7 +161,7 @@ class TestFromDict:
                 "extrapolation": "reflect",
             }
         }
-        lookup = from_dict(data)
+        lookup = from_data(data)
         assert isinstance(lookup, CoordinateLookupTable)
         assert lookup.path == "path/to/lut.zarr"
         assert lookup.lookup_table.interpolation == "cubic"
@@ -170,17 +170,17 @@ class TestFromDict:
     def test_invalid_dict_type(self):
         """Test error on invalid dict type."""
         with pytest.raises(ValueError, match="must be a dictionary"):
-            from_dict(123)
+            from_data(123)
 
     def test_multiple_keys_error(self):
         """Test error on multiple keys."""
         with pytest.raises(ValueError, match="exactly one key"):
-            from_dict({"translation": [1, 2], "scale": [3, 4]})
+            from_data({"translation": [1, 2], "scale": [3, 4]})
 
     def test_unknown_transform_type(self):
         """Test error on unknown transform type."""
         with pytest.raises(ValueError, match="Unknown transform type"):
-            from_dict({"unknown": [1, 2, 3]})
+            from_data({"unknown": [1, 2, 3]})
 
     def test_missing_path_error(self):
         """Test error on missing path in lookup table."""
@@ -191,7 +191,7 @@ class TestFromDict:
             FactoryValidationError,
             match="Factory for.*failed with data",
         ):
-            from_dict({"displacements": {"interpolation": "linear"}})
+            from_data({"displacements": {"interpolation": "linear"}})
 
 
 class TestFromJson:
@@ -232,15 +232,15 @@ class TestIntegration:
         ]
 
         for original in transforms:
-            dict_repr = original.to_dict()
-            recreated = from_dict(dict_repr)
+            dict_repr = original.to_data()
+            recreated = from_data(dict_repr)
             assert isinstance(recreated, type(original))
-            assert recreated.to_dict() == dict_repr
+            assert recreated.to_data() == dict_repr
 
     def test_json_round_trip(self):
         """Test JSON serialization round trip."""
         original = translation([10, 20, 5])
-        json_str = json.dumps(original.to_dict())
+        json_str = json.dumps(original.to_data())
         recreated = from_json(json_str)
         assert isinstance(recreated, Translation)
         assert recreated.translation == original.translation

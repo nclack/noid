@@ -29,26 +29,26 @@ def _load_jsonld_context() -> dict[str, Any]:
     return context_data.get("@context", {})
 
 
-def to_dict(
+def to_data(
     transform: Transform | Sequence[Transform],
 ) -> DictRepr | list[DictRepr]:
     """
-    Convert a transform or sequence of transforms to dictionary representation.
+    Convert a transform or sequence of transforms to data representation.
 
     Args:
         transform: Transform object or list of transform objects to serialize
 
     Returns:
-        Dictionary representation of the transform(s)
+        Data representation of the transform(s)
 
     Example:
         >>> from .factory import translation, identity
         >>> trans = translation([10, 20, 5])
-        >>> to_dict(trans)
+        >>> to_data(trans)
         {'translation': [10.0, 20.0, 5.0]}
         >>>
         >>> sequence = [identity(), trans]
-        >>> to_dict(sequence)
+        >>> to_data(sequence)
         ['identity', {'translation': [10.0, 20.0, 5.0]}]
     """
     if not isinstance(transform, Transform):
@@ -79,7 +79,7 @@ def to_json(
         >>> to_json(sequence)
         '["identity", {"scale": [2.0, 1.5, 0.5]}]'
     """
-    return json.dumps(to_dict(transform), indent=indent)
+    return json.dumps(to_data(transform), indent=indent)
 
 
 # CLAUDE: This might not be necessary. maybe Transform should have a to_jsonld method.
@@ -136,7 +136,7 @@ def to_jsonld(
             pass
 
     # Legacy processing for Transform objects and sequences
-    data = to_dict(transform)
+    data = to_data(transform)
 
     if include_context:
         context = _load_jsonld_context()
@@ -182,7 +182,7 @@ def from_jsonld(jsonld_str: str) -> Transform | dict[str, Any]:
     """
     from noid_registry import from_jsonld as enhanced_from_jsonld
 
-    from .factory import from_dict
+    from .factory import from_data
 
     # Try enhanced processing first
     try:
@@ -197,7 +197,7 @@ def from_jsonld(jsonld_str: str) -> Transform | dict[str, Any]:
             if hasattr(single_value, "to_data"):
                 return single_value
             else:
-                # Not a transform object - fall back to from_dict with the original data
+                # Not a transform object - fall back to from_data with the original data
                 raise ValueError("Enhanced processing didn't create transform objects")
 
         # Multiple items or items with context - return full dict
@@ -216,9 +216,9 @@ def from_jsonld(jsonld_str: str) -> Transform | dict[str, Any]:
 
         # Handle @value wrapper for simple values
         if "@value" in data:
-            return from_dict(data["@value"])
+            return from_data(data["@value"])
 
-        return from_dict(data)
+        return from_data(data)
 
 
 def serialize_sequence(
@@ -250,11 +250,11 @@ def serialize_sequence(
         True
     """
     if format == "dict":
-        return str([to_dict(t) for t in transforms])
+        return str([to_data(t) for t in transforms])
     elif format == "json":
-        return json.dumps([to_dict(t) for t in transforms], indent=indent)
+        return json.dumps([to_data(t) for t in transforms], indent=indent)
     elif format == "jsonld":
-        sequence_data = [to_dict(t) for t in transforms]
+        sequence_data = [to_data(t) for t in transforms]
 
         if include_context:
             context = _load_jsonld_context()
@@ -289,7 +289,7 @@ def deserialize_sequence(data_str: str, format: str = "json") -> list[Transform]
         >>> len(transforms)
         2
     """
-    from .factory import from_dict
+    from .factory import from_data
 
     try:
         data = json.loads(data_str)
@@ -299,7 +299,7 @@ def deserialize_sequence(data_str: str, format: str = "json") -> list[Transform]
     if format == "json":
         if not isinstance(data, list):
             raise ValueError("JSON data must be a list for sequence deserialization")
-        return [from_dict(item) for item in data]
+        return [from_data(item) for item in data]
     elif format == "jsonld":
         # Handle JSON-LD with @context
         if isinstance(data, dict):
@@ -314,7 +314,7 @@ def deserialize_sequence(data_str: str, format: str = "json") -> list[Transform]
         if not isinstance(sequence_data, list):
             raise ValueError("JSON-LD data must contain a list of transforms")
 
-        return [from_dict(item) for item in sequence_data]
+        return [from_data(item) for item in sequence_data]
     else:
         raise ValueError(f"Unsupported format: {format}. Use 'json' or 'jsonld'.")
 

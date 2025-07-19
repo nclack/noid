@@ -33,10 +33,10 @@ class TestIdentity:
         identity = Identity()
         assert isinstance(identity, Identity)
 
-    def test_to_dict(self):
+    def test_to_data(self):
         """Test identity transform serialization."""
         identity = Identity()
-        assert identity.to_dict() == "identity"
+        assert identity.to_data() == "identity"
 
     def test_str_repr(self):
         """Test string representations."""
@@ -58,11 +58,11 @@ class TestTranslation:
         trans = Translation([10, 20, 5])
         assert trans.dimensions == 3
 
-    def test_to_dict(self):
+    def test_to_data(self):
         """Test translation transform serialization."""
         trans = Translation([10, 20, 5])
         expected = {"translation": [10.0, 20.0, 5.0]}
-        assert trans.to_dict() == expected
+        assert trans.to_data() == expected
 
     def test_empty_translation_error(self):
         """Test error on empty translation vector."""
@@ -88,11 +88,11 @@ class TestScale:
         scale = Scale([2.0, 1.5, 0.5])
         assert scale.dimensions == 3
 
-    def test_to_dict(self):
+    def test_to_data(self):
         """Test scale transform serialization."""
         scale = Scale([2.0, 1.5, 0.5])
         expected = {"scale": [2.0, 1.5, 0.5]}
-        assert scale.to_dict() == expected
+        assert scale.to_data() == expected
 
     def test_empty_scale_error(self):
         """Test error on empty scale vector."""
@@ -119,11 +119,11 @@ class TestMapAxis:
         assert mapaxis.output_dimensions == 3
         assert mapaxis.input_dimensions == 3
 
-    def test_to_dict(self):
+    def test_to_data(self):
         """Test mapaxis transform serialization."""
         mapaxis = MapAxis([1, 0, 2])
         expected = {"map-axis": [1, 0, 2]}
-        assert mapaxis.to_dict() == expected
+        assert mapaxis.to_data() == expected
 
     def test_empty_mapaxis_error(self):
         """Test error on empty mapaxis vector."""
@@ -152,11 +152,11 @@ class TestHomogeneous:
         retrieved = homogeneous.get_matrix()
         assert retrieved == matrix
 
-    def test_to_dict(self):
+    def test_to_data(self):
         """Test homogeneous transform serialization."""
         matrix = [[2.0, 0, 0, 10], [0, 1.5, 0, 20], [0, 0, 0.5, 5], [0, 0, 0, 1]]
         homogeneous = Homogeneous(matrix)
-        result = homogeneous.to_dict()
+        result = homogeneous.to_data()
         assert "homogeneous" in result
         assert len(result["homogeneous"]) == 16  # 4x4 matrix flattened
 
@@ -186,11 +186,11 @@ class TestDisplacementLookupTable:
         assert disp.displacements.interpolation == "linear"
         assert disp.displacements.extrapolation == "zero"
 
-    def test_to_dict(self):
+    def test_to_data(self):
         """Test displacement lookup table serialization."""
         config = SamplerConfig(interpolation="linear", extrapolation="zero")
         disp = DisplacementLookupTable("path/to/field.zarr", displacements=config)
-        result = disp.to_dict()
+        result = disp.to_data()
         assert "displacements" in result
         assert result["displacements"]["path"] == "path/to/field.zarr"
         assert result["displacements"]["interpolation"] == "linear"
@@ -211,11 +211,11 @@ class TestCoordinateLookupTable:
         assert lookup.lookup_table.interpolation == "cubic"
         assert lookup.lookup_table.extrapolation == "reflect"
 
-    def test_to_dict(self):
+    def test_to_data(self):
         """Test coordinate lookup table serialization."""
         config = SamplerConfig(interpolation="cubic", extrapolation="reflect")
         lookup = CoordinateLookupTable("path/to/lut.zarr", lookup_table=config)
-        result = lookup.to_dict()
+        result = lookup.to_data()
         assert "lookup-table" in result
         assert result["lookup-table"]["path"] == "path/to/lut.zarr"
         assert result["lookup-table"]["interpolation"] == "cubic"
@@ -236,8 +236,8 @@ class TestSamplerConfig:
         assert config.interpolation == "linear"
         assert config.extrapolation == "zero"
 
-    def test_to_dict(self):
+    def test_to_data(self):
         """Test sampler config serialization."""
         config = SamplerConfig(interpolation="linear", extrapolation="zero")
         expected = {"interpolation": "linear", "extrapolation": "zero"}
-        assert config.to_dict() == expected
+        assert config.to_data() == expected

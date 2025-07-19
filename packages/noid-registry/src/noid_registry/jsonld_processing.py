@@ -209,8 +209,8 @@ def _handle_sequence_serialization(
     # Serialize each item in the list
     serialized_items = []
     for item in data:
-        if hasattr(item, "to_dict"):
-            serialized_items.append(item.to_dict())
+        if hasattr(item, "to_data"):
+            serialized_items.append(item.to_data())
         else:
             serialized_items.append(item)
 
@@ -312,7 +312,10 @@ def _serialize_dict_objects(
         )
 
         # Serialize the object
-        result[abbreviated_key] = obj.to_dict() if hasattr(obj, "to_dict") else obj
+        if hasattr(obj, "to_data"):
+            result[abbreviated_key] = obj.to_data()
+        else:
+            result[abbreviated_key] = obj
 
     return result
 
@@ -388,7 +391,10 @@ def to_jsonld(
         for key, obj in data_dict.items():
             if key == "@context":
                 continue
-            result[key] = obj.to_dict() if hasattr(obj, "to_dict") else obj
+            if hasattr(obj, "to_data"):
+                result[key] = obj.to_data()
+            else:
+                result[key] = obj
         return json.dumps(result, indent=indent) if indent is not None else result
 
     context, abbreviator = _create_context_for_objects(data_dict)

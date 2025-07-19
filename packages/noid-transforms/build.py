@@ -29,9 +29,9 @@ logging.basicConfig(level=logging.INFO)
 
 def run_command(cmd: list[str], description: str, cwd: Path | None = None) -> subprocess.CompletedProcess[str]:
     """Run a command and handle errors."""
-    logging.info(f"✓ {description}")
     try:
         result = subprocess.run(cmd, check=True, capture_output=True, text=True, cwd=cwd)
+        logging.info(f"✓ {description}")
         return result
     except subprocess.CalledProcessError as e:
         logging.error(f"✗ Failed to run {description}")

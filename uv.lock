@@ -15,6 +15,7 @@ members = [
 
 [manifest.dependency-groups]
 dev = [
+    { name = "pre-commit", specifier = ">=3.0.0" },
     { name = "pytest", specifier = ">=7.0.0" },
     { name = "pytest-cov", specifier = ">=4.0.0" },
     { name = "python-lsp-server", specifier = ">=1.7.0" },
@@ -971,12 +972,6 @@ dev = [
     { name = "pytest-cov" },
 ]
 
-[package.dev-dependencies]
-dev = [
-    { name = "pre-commit" },
-    { name = "ruff" },
-]
-
 [package.metadata]
 requires-dist = [
     { name = "jsonasobj2", specifier = ">=1.0.0" },
@@ -989,12 +984,6 @@ requires-dist = [
     { name = "typing-extensions", specifier = ">=4.0.0" },
 ]
 provides-extras = ["dev"]
-
-[package.metadata.requires-dev]
-dev = [
-    { name = "pre-commit", specifier = ">=3.0.0" },
-    { name = "ruff", specifier = ">=0.12.4" },
-]
 
 [[package]]
 name = "openpyxl"

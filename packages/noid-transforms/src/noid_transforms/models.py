@@ -81,17 +81,6 @@ class Transform(_Transform):
         """Developer representation of transform."""
         return f"{self.__class__.__name__}({self.to_data()})"
 
-    def to_dict(self) -> dict[str, Any] | str:
-        """Convert transform to dictionary representation (deprecated, use to_data)."""
-        import warnings
-
-        warnings.warn(
-            "to_dict() is deprecated, use to_data() instead",
-            DeprecationWarning,
-            stacklevel=2,
-        )
-        return self.to_data()
-
 
 class Identity(_Identity, Transform):
     """
@@ -393,17 +382,6 @@ class SamplerConfig(_SamplerConfig):
             "interpolation": self.interpolation,
             "extrapolation": self.extrapolation,
         }
-
-    def to_dict(self) -> dict[str, str]:
-        """Convert to dictionary representation (deprecated, use to_data)."""
-        import warnings
-
-        warnings.warn(
-            "to_dict() is deprecated, use to_data() instead",
-            DeprecationWarning,
-            stacklevel=2,
-        )
-        return self.to_data()
 
 
 # Re-export enums from generated code
