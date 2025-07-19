@@ -9,7 +9,7 @@ _Homogeneous transformation matrix as 2D array_
 
 
 
-URI: [noid_transform:homogeneous](https://github.com/nclack/noid/transforms/transform/homogeneous)
+URI: [noid_transform:homogeneous](https://github.com/nclack/noid/schemas/transform/homogeneous)
 Alias: homogeneous
 
 <!-- no inheritance hierarchy -->
@@ -53,7 +53,7 @@ Alias: homogeneous
 ### Schema Source
 
 
-* from schema: https://github.com/nclack/noid/transforms/transform.linkml
+* from schema: https://github.com/nclack/noid/schemas/transform/v0.linkml
 
 
 
@@ -74,7 +74,7 @@ Alias: homogeneous
 ```yaml
 name: homogeneous
 description: Homogeneous transformation matrix as 2D array
-from_schema: https://github.com/nclack/noid/transforms/transform.linkml
+from_schema: https://github.com/nclack/noid/schemas/transform/v0.linkml
 rank: 1000
 list_elements_ordered: true
 alias: homogeneous

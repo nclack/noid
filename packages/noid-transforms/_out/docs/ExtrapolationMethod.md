@@ -33,7 +33,7 @@ URI: [ExtrapolationMethod](ExtrapolationMethod.md)
 ### Schema Source
 
 
-* from schema: https://github.com/nclack/noid/transforms/transform.linkml
+* from schema: https://github.com/nclack/noid/schemas/transform/v0.linkml
 
 
 
@@ -45,7 +45,7 @@ URI: [ExtrapolationMethod](ExtrapolationMethod.md)
 <details>
 ```yaml
 name: ExtrapolationMethod
-from_schema: https://github.com/nclack/noid/transforms/transform.linkml
+from_schema: https://github.com/nclack/noid/schemas/transform/v0.linkml
 rank: 1000
 permissible_values:
   nearest:

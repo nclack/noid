@@ -1,0 +1,229 @@
+id: https://github.com/nclack/noid/schemas/space/v0.linkml
+name: space
+title: Coordinate Spaces and Dimensions Schema
+description: >-
+  Schema for defining coordinate systems, dimensions, and coordinate transforms
+  for multidimensional array data.
+version: 0.1.0
+license: MIT
+
+prefixes:
+  linkml: https://w3id.org/linkml/
+  noid_spaces: https://github.com/nclack/noid/schemas/space/
+  noid_transform: https://github.com/nclack/noid/schemas/transform/
+  xsd: http://www.w3.org/2001/XMLSchema#
+
+default_prefix: noid_spaces
+default_range: string
+
+imports:
+  - linkml:types
+  - ../sampler/v0.linkml
+  - ../transform/v0.linkml
+
+classes:
+  Dimension:
+    description: >-
+      A single axis within a coordinate space with its measurement unit and classification.
+    attributes:
+      id:
+        description: Unique identifier for the dimension
+        identifier: true
+        required: true
+        pattern: "^.+$"  # Non-empty string
+      unit:
+        description: Unit of measurement from controlled vocabulary
+        required: true
+        range: UnitTerm
+      type:
+        description: Dimension type classification
+        required: true
+        range: DimensionType
+    rules:
+      - title: Index type must have index unit
+        description: If type is "index", then unit MUST be "index"
+        preconditions:
+          slot_conditions:
+            type:
+              equals_string: "index"
+        postconditions:
+          slot_conditions:
+            unit:
+              equals_string: "index"
+
+  CoordinateSystem:
+    description: >-
+      Collection of dimensions that together define a coordinate space for positioning data elements.
+    attributes:
+      id:
+        description: Unique identifier for the coordinate system
+        identifier: true
+        required: true
+        pattern: "^.+$"  # Non-empty string
+      dimensions:
+        description: List of dimension specifications
+        required: true
+        multivalued: true
+        minimum_cardinality: 1
+        range: DimensionSpec
+      description:
+        description: Optional description of the coordinate system
+        pattern: "^.+$"  # Non-empty string if present
+
+  CoordinateTransform:
+    description: >-
+      Mathematical mapping between input and output coordinate spaces with transform definition.
+    attributes:
+      id:
+        description: Unique identifier for the coordinate transform
+        identifier: true
+        required: true
+        pattern: "^.+$"  # Non-empty string
+      input:
+        description: Input coordinate space specification
+        required: true
+        range: CoordinateSpaceSpec
+      output:
+        description: Output coordinate space specification
+        required: true
+        range: CoordinateSpaceSpec
+      transform:
+        description: Transform definition from noid_transform schema
+        required: true
+        range: Transform
+      description:
+        description: Optional description of the coordinate transform
+        pattern: "^.+$"  # Non-empty string if present
+
+  # Union types for flexible specifications
+  DimensionSpec:
+    description: >-
+      Dimension specification that can be either a string reference or inline Dimension object.
+    union_of:
+      - string
+      - Dimension
+
+  CoordinateSpaceSpec:
+    description: >-
+      Coordinate space specification that can be a string reference, dimension array, or inline CoordinateSystem.
+    union_of:
+      - string
+      - DimensionArray
+      - CoordinateSystem
+
+  DimensionArray:
+    description: Array of dimension specifications
+    attributes:
+      dimensions:
+        multivalued: true
+        minimum_cardinality: 1
+        range: DimensionSpec
+
+enums:
+  DimensionType:
+    description: Classification of dimension types
+    permissible_values:
+      space:
+        description: Spatial dimensions
+        meaning: noid_spaces:SpatialDimension
+      time:
+        description: Temporal dimensions
+        meaning: noid_spaces:TemporalDimension
+      other:
+        description: Channels, indices, categories
+        meaning: noid_spaces:OtherDimension
+      index:
+        description: Array index dimensions
+        meaning: noid_spaces:IndexDimension
+
+  UnitTerm:
+    description: Controlled vocabulary for measurement units
+    permissible_values:
+      # Universal units (valid for any dimension type)
+      index:
+        description: Array index unit
+        meaning: noid_spaces:IndexUnit
+      arbitrary:
+        description: Arbitrary or dimensionless unit
+        meaning: noid_spaces:ArbitraryUnit
+      
+      # Spatial units (UDUNITS-2 compatible)
+      meter:
+        description: SI base unit of length
+        meaning: noid_spaces:MeterUnit
+      meters:
+        description: SI base unit of length (plural)
+        meaning: noid_spaces:MeterUnit
+      millimeter:
+        description: Millimeter (10^-3 meter)
+        meaning: noid_spaces:MillimeterUnit
+      millimeters:
+        description: Millimeter (10^-3 meter, plural)
+        meaning: noid_spaces:MillimeterUnit
+      micrometer:
+        description: Micrometer (10^-6 meter)
+        meaning: noid_spaces:MicrometerUnit
+      micrometers:
+        description: Micrometer (10^-6 meter, plural)
+        meaning: noid_spaces:MicrometerUnit
+      nanometer:
+        description: Nanometer (10^-9 meter)
+        meaning: noid_spaces:NanometerUnit
+      nanometers:
+        description: Nanometer (10^-9 meter, plural)
+        meaning: noid_spaces:NanometerUnit
+      pixel:
+        description: Pixel unit for digital images
+        meaning: noid_spaces:PixelUnit
+      pixels:
+        description: Pixel unit for digital images (plural)
+        meaning: noid_spaces:PixelUnit
+      
+      # Temporal units (UDUNITS-2 compatible)
+      second:
+        description: SI base unit of time
+        meaning: noid_spaces:SecondUnit
+      seconds:
+        description: SI base unit of time (plural)
+        meaning: noid_spaces:SecondUnit
+      millisecond:
+        description: Millisecond (10^-3 second)
+        meaning: noid_spaces:MillisecondUnit
+      milliseconds:
+        description: Millisecond (10^-3 second, plural)
+        meaning: noid_spaces:MillisecondUnit
+      minute:
+        description: Minute (60 seconds)
+        meaning: noid_spaces:MinuteUnit
+      minutes:
+        description: Minute (60 seconds, plural)
+        meaning: noid_spaces:MinuteUnit
+      hour:
+        description: Hour (3600 seconds)
+        meaning: noid_spaces:HourUnit
+      hours:
+        description: Hour (3600 seconds, plural)
+        meaning: noid_spaces:HourUnit
+      
+      # Angular units
+      radian:
+        description: SI unit of angle
+        meaning: noid_spaces:RadianUnit
+      radians:
+        description: SI unit of angle (plural)
+        meaning: noid_spaces:RadianUnit
+      degree:
+        description: Degree of arc (π/180 radians)
+        meaning: noid_spaces:DegreeUnit
+      degrees:
+        description: Degree of arc (π/180 radians, plural)
+        meaning: noid_spaces:DegreeUnit
+      
+      # Common physical units
+      wavelength:
+        description: Wavelength measurement
+        meaning: noid_spaces:WavelengthUnit
+      intensity:
+        description: Intensity measurement
+        meaning: noid_spaces:IntensityUnit
+

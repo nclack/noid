@@ -1,0 +1,69 @@
+{
+    "$defs": {
+        "ExtrapolationMethod": {
+            "description": "",
+            "enum": [
+                "nearest",
+                "zero",
+                "constant",
+                "reflect",
+                "wrap"
+            ],
+            "title": "ExtrapolationMethod",
+            "type": "string"
+        },
+        "InterpolationMethod": {
+            "description": "",
+            "enum": [
+                "linear",
+                "nearest",
+                "cubic"
+            ],
+            "title": "InterpolationMethod",
+            "type": "string"
+        },
+        "SamplerConfig": {
+            "additionalProperties": false,
+            "description": "Configuration for sampling transforms (displacements and lookup tables)",
+            "properties": {
+                "extrapolation": {
+                    "anyOf": [
+                        {
+                            "$ref": "#/$defs/ExtrapolationMethod"
+                        },
+                        {
+                            "type": "string"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "description": "Extrapolation method"
+                },
+                "interpolation": {
+                    "anyOf": [
+                        {
+                            "$ref": "#/$defs/InterpolationMethod"
+                        },
+                        {
+                            "type": "string"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "description": "Interpolation method"
+                }
+            },
+            "title": "SamplerConfig",
+            "type": "object"
+        }
+    },
+    "$id": "https://github.com/nclack/noid/schemas/sampler/v0.linkml",
+    "$schema": "https://json-schema.org/draft/2019-09/schema",
+    "additionalProperties": true,
+    "metamodel_version": "1.7.0",
+    "title": "sampler",
+    "type": "object",
+    "version": "0.1.0"
+}

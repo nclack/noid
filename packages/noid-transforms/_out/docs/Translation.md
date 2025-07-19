@@ -9,7 +9,7 @@ _Translation vector as array of numbers_
 
 
 
-URI: [noid_transform:translation](https://github.com/nclack/noid/transforms/transform/translation)
+URI: [noid_transform:translation](https://github.com/nclack/noid/schemas/transform/translation)
 Alias: translation
 
 <!-- no inheritance hierarchy -->
@@ -55,7 +55,7 @@ Alias: translation
 ### Schema Source
 
 
-* from schema: https://github.com/nclack/noid/transforms/transform.linkml
+* from schema: https://github.com/nclack/noid/schemas/transform/v0.linkml
 
 
 
@@ -76,7 +76,7 @@ Alias: translation
 ```yaml
 name: translation
 description: Translation vector as array of numbers
-from_schema: https://github.com/nclack/noid/transforms/transform.linkml
+from_schema: https://github.com/nclack/noid/schemas/transform/v0.linkml
 rank: 1000
 list_elements_ordered: true
 alias: translation

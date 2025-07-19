@@ -9,7 +9,7 @@ _Configuration for sampling transforms (displacements and lookup tables)_
 
 
 
-URI: [noid_transform:SamplerConfig](https://github.com/nclack/noid/transforms/transform/SamplerConfig)
+URI: [noid_transform:SamplerConfig](https://github.com/nclack/noid/schemas/transform/SamplerConfig)
 
 
 
@@ -67,7 +67,7 @@ URI: [noid_transform:SamplerConfig](https://github.com/nclack/noid/transforms/tr
 ### Schema Source
 
 
-* from schema: https://github.com/nclack/noid/transforms/transform.linkml
+* from schema: https://github.com/nclack/noid/schemas/transform/v0.linkml
 
 
 
@@ -95,12 +95,12 @@ URI: [noid_transform:SamplerConfig](https://github.com/nclack/noid/transforms/tr
 ```yaml
 name: SamplerConfig
 description: Configuration for sampling transforms (displacements and lookup tables)
-from_schema: https://github.com/nclack/noid/transforms/transform.linkml
+from_schema: https://github.com/nclack/noid/schemas/transform/v0.linkml
 attributes:
   interpolation:
     name: interpolation
     description: Interpolation method
-    from_schema: https://github.com/nclack/noid/transforms/sampler.linkml
+    from_schema: https://github.com/nclack/noid/schemas/sampler/v0.linkml
     rank: 1000
     ifabsent: string(nearest)
     domain_of:
@@ -111,7 +111,7 @@ attributes:
   extrapolation:
     name: extrapolation
     description: Extrapolation method
-    from_schema: https://github.com/nclack/noid/transforms/sampler.linkml
+    from_schema: https://github.com/nclack/noid/schemas/sampler/v0.linkml
     rank: 1000
     ifabsent: string(nearest)
     domain_of:
@@ -129,12 +129,12 @@ attributes:
 ```yaml
 name: SamplerConfig
 description: Configuration for sampling transforms (displacements and lookup tables)
-from_schema: https://github.com/nclack/noid/transforms/transform.linkml
+from_schema: https://github.com/nclack/noid/schemas/transform/v0.linkml
 attributes:
   interpolation:
     name: interpolation
     description: Interpolation method
-    from_schema: https://github.com/nclack/noid/transforms/sampler.linkml
+    from_schema: https://github.com/nclack/noid/schemas/sampler/v0.linkml
     rank: 1000
     ifabsent: string(nearest)
     alias: interpolation
@@ -147,7 +147,7 @@ attributes:
   extrapolation:
     name: extrapolation
     description: Extrapolation method
-    from_schema: https://github.com/nclack/noid/transforms/sampler.linkml
+    from_schema: https://github.com/nclack/noid/schemas/sampler/v0.linkml
     rank: 1000
     ifabsent: string(nearest)
     alias: extrapolation

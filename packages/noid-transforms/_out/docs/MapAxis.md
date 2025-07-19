@@ -9,7 +9,7 @@ _Axis permutation transform_
 
 
 
-URI: [noid_transform:MapAxis](https://github.com/nclack/noid/transforms/transform/MapAxis)
+URI: [noid_transform:MapAxis](https://github.com/nclack/noid/schemas/transform/MapAxis)
 
 
 
@@ -63,7 +63,7 @@ URI: [noid_transform:MapAxis](https://github.com/nclack/noid/transforms/transfor
 ### Schema Source
 
 
-* from schema: https://github.com/nclack/noid/transforms/transform.linkml
+* from schema: https://github.com/nclack/noid/schemas/transform/v0.linkml
 
 
 
@@ -91,7 +91,7 @@ URI: [noid_transform:MapAxis](https://github.com/nclack/noid/transforms/transfor
 ```yaml
 name: MapAxis
 description: Axis permutation transform
-from_schema: https://github.com/nclack/noid/transforms/transform.linkml
+from_schema: https://github.com/nclack/noid/schemas/transform/v0.linkml
 is_a: Transform
 attributes:
   map-axis:
@@ -99,7 +99,7 @@ attributes:
     description: Permutation vector of 0-based input dimension indices. Array length
       equals number of output dimensions. Each value specifies which input dimension
       maps to the corresponding output dimension.
-    from_schema: https://github.com/nclack/noid/transforms/transform.linkml
+    from_schema: https://github.com/nclack/noid/schemas/transform/v0.linkml
     rank: 1000
     list_elements_ordered: true
     domain_of:
@@ -118,7 +118,7 @@ attributes:
 ```yaml
 name: MapAxis
 description: Axis permutation transform
-from_schema: https://github.com/nclack/noid/transforms/transform.linkml
+from_schema: https://github.com/nclack/noid/schemas/transform/v0.linkml
 is_a: Transform
 attributes:
   map-axis:
@@ -126,7 +126,7 @@ attributes:
     description: Permutation vector of 0-based input dimension indices. Array length
       equals number of output dimensions. Each value specifies which input dimension
       maps to the corresponding output dimension.
-    from_schema: https://github.com/nclack/noid/transforms/transform.linkml
+    from_schema: https://github.com/nclack/noid/schemas/transform/v0.linkml
     rank: 1000
     list_elements_ordered: true
     alias: map_axis

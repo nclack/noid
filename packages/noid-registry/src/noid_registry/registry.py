@@ -38,7 +38,7 @@ class RegistryError(Exception):
 class UnknownIRIError(RegistryError):
     """Raised when attempting to create object with unknown IRI."""
 
-    def __init__(self, iri: str, available: list = None):
+    def __init__(self, iri: str, available: list | None = None):
         self.iri = iri
         self.available = available or []
         super().__init__(f"Unknown IRI: '{iri}'")
@@ -62,7 +62,7 @@ class Registry:
         self._factories: dict[str, Callable[[Any], Any]] = {}
         self._type_to_iri: dict[type, str] = {}
 
-    def register(self, name_override: str = None):
+    def register(self, name_override: str | None = None):
         """Decorator for registering factory functions with current namespace.
 
         Args:

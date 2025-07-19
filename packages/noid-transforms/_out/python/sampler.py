@@ -1,8 +1,8 @@
 # Auto generated from sampler.linkml.yaml by pythongen.py version: 0.0.1
-# Generation date: 2025-07-18T16:11:16
+# Generation date: 2025-07-18T18:02:46
 # Schema: sampler
 #
-# id: https://github.com/nclack/noid/transforms/sampler.linkml
+# id: https://github.com/nclack/noid/packages/noid-transforms/sampler.linkml.yaml
 # description: Interpolation and extrapolation methods for array sampling and coordinate transforms
 # license: https://creativecommons.org/publicdomain/zero/1.0/
 
@@ -63,7 +63,7 @@ version = "0.1.0"
 
 # Namespaces
 LINKML = CurieNamespace('linkml', 'https://w3id.org/linkml/')
-NOID_SAMPLER = CurieNamespace('noid_sampler', 'https://github.com/nclack/noid/transforms/sampler/')
+NOID_SAMPLER = CurieNamespace('noid_sampler', 'https://github.com/nclack/noid/packages/noid-transforms/sampler/')
 DEFAULT_ = NOID_SAMPLER
 
 

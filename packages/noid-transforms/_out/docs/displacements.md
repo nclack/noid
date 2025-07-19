@@ -9,7 +9,7 @@ _Displacement field configuration_
 
 
 
-URI: [noid_transform:displacements](https://github.com/nclack/noid/transforms/transform/displacements)
+URI: [noid_transform:displacements](https://github.com/nclack/noid/schemas/transform/displacements)
 Alias: displacements
 
 <!-- no inheritance hierarchy -->
@@ -49,7 +49,7 @@ Alias: displacements
 ### Schema Source
 
 
-* from schema: https://github.com/nclack/noid/transforms/transform.linkml
+* from schema: https://github.com/nclack/noid/schemas/transform/v0.linkml
 
 
 
@@ -70,7 +70,7 @@ Alias: displacements
 ```yaml
 name: displacements
 description: Displacement field configuration
-from_schema: https://github.com/nclack/noid/transforms/transform.linkml
+from_schema: https://github.com/nclack/noid/schemas/transform/v0.linkml
 rank: 1000
 alias: displacements
 owner: DisplacementLookupTable

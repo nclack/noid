@@ -1,4 +1,4 @@
-id: https://github.com/nclack/noid/transforms/transform.linkml
+id: https://github.com/nclack/noid/packages/noid-transforms/transform.linkml.yaml
 name: transform
 title: Transform Parameters Schema
 description: Schema for validating transform parameters using self-describing format
@@ -7,7 +7,7 @@ license: https://creativecommons.org/publicdomain/zero/1.0/
 
 prefixes:
   linkml: https://w3id.org/linkml/
-  noid_transform: https://github.com/nclack/noid/transforms/transform/
+  noid_transform: https://github.com/nclack/noid/packages/noid-transforms/transform/
 
 default_prefix: noid_transform
 

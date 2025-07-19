@@ -3,12 +3,14 @@ dev-dependencies = [
     "pytest>=7.0.0",
     "pytest-cov>=4.0.0",
     "ruff>=0.12.4",
+    "python-lsp-server>=1.7.0",
 ]
 
 [tool.uv.workspace]
 members = [
     "packages/noid-registry",
     "packages/noid-transforms",
+    "packages/noid-spaces",
 ]
 
 [build-system]

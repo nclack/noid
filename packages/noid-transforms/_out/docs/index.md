@@ -2,7 +2,7 @@
 
 Schema for validating transform parameters using self-describing format
 
-URI: https://github.com/nclack/noid/transforms/transform.linkml
+URI: https://github.com/nclack/noid/schemas/transform/v0.linkml
 
 Name: transform
 

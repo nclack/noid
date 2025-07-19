@@ -9,7 +9,7 @@ _Identity transform_
 
 
 
-URI: [noid_transform:Identity](https://github.com/nclack/noid/transforms/transform/Identity)
+URI: [noid_transform:Identity](https://github.com/nclack/noid/schemas/transform/Identity)
 
 
 
@@ -60,7 +60,7 @@ URI: [noid_transform:Identity](https://github.com/nclack/noid/transforms/transfo
 ### Schema Source
 
 
-* from schema: https://github.com/nclack/noid/transforms/transform.linkml
+* from schema: https://github.com/nclack/noid/schemas/transform/v0.linkml
 
 
 
@@ -88,7 +88,7 @@ URI: [noid_transform:Identity](https://github.com/nclack/noid/transforms/transfo
 ```yaml
 name: Identity
 description: Identity transform
-from_schema: https://github.com/nclack/noid/transforms/transform.linkml
+from_schema: https://github.com/nclack/noid/schemas/transform/v0.linkml
 is_a: Transform
 
 ```
@@ -100,7 +100,7 @@ is_a: Transform
 ```yaml
 name: Identity
 description: Identity transform
-from_schema: https://github.com/nclack/noid/transforms/transform.linkml
+from_schema: https://github.com/nclack/noid/schemas/transform/v0.linkml
 is_a: Transform
 
 ```

@@ -257,15 +257,18 @@ def main():
     # Create output directory
     out_dir.mkdir(exist_ok=True)
 
+    # Reference schemas from new organized structure
+    schemas_root = script_dir.parent.parent / "schemas"
+    
     # Generate artifacts for samplers schema
-    samplers_file = script_dir / "sampler.linkml.yaml"
+    samplers_file = schemas_root / "sampler" / "v0.linkml.yaml"
     if samplers_file.exists():
-        generate_artifacts(samplers_file, out_dir, "sampler")
+        generate_artifacts(samplers_file, out_dir, "sampler.v0")
 
     # Generate artifacts for transforms schema
-    transforms_file = script_dir / "transform.linkml.yaml"
+    transforms_file = schemas_root / "transform" / "v0.linkml.yaml"
     if transforms_file.exists():
-        generate_artifacts(transforms_file, out_dir, "transform")
+        generate_artifacts(transforms_file, out_dir, "transform.v0")
 
     print("\n✓ All LinkML artifacts generated successfully!")
     print(f"Output directory: {out_dir}")

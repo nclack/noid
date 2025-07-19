@@ -1,8 +1,8 @@
 # Auto generated from transform.linkml.yaml by pythongen.py version: 0.0.1
-# Generation date: 2025-07-18T16:11:17
+# Generation date: 2025-07-18T18:02:48
 # Schema: transform
 #
-# id: https://github.com/nclack/noid/transforms/transform.linkml
+# id: https://github.com/nclack/noid/packages/noid-transforms/transform.linkml.yaml
 # description: Schema for validating transform parameters using self-describing format
 # license: https://creativecommons.org/publicdomain/zero/1.0/
 
@@ -63,8 +63,8 @@ version = "0.1.0"
 
 # Namespaces
 LINKML = CurieNamespace('linkml', 'https://w3id.org/linkml/')
-NOID_SAMPLER = CurieNamespace('noid_sampler', 'https://github.com/nclack/noid/transforms/sampler/')
-NOID_TRANSFORM = CurieNamespace('noid_transform', 'https://github.com/nclack/noid/transforms/transform/')
+NOID_SAMPLER = CurieNamespace('noid_sampler', 'https://github.com/nclack/noid/packages/noid-transforms/sampler/')
+NOID_TRANSFORM = CurieNamespace('noid_transform', 'https://github.com/nclack/noid/packages/noid-transforms/transform/')
 DEFAULT_ = NOID_TRANSFORM
 
 

@@ -4,6 +4,10 @@
 
 Reviewing the generated code. Finishing up transforms.
 
+Spun out the noid-registry repo.
+
+Started making noid-spaces.
+
 ## 2025-07-16
 
 Changing things to linkml and refactoring to a library per schema.
@@ -25,7 +29,7 @@ work for any schema with registered transforms.
 ### References
 
 - [linkML][linkml] is a flexible modeling language that allows you to author schemas in YAML that describe the structure of your data. 
-- [calamus]: A JSON-LD Serialization Libary for Python 
+- [calamus]: A JSON-LD Serialization Library for Python 
 
 [pyld]: https://github.com/digitalbazaar/pyld
 [jsonld]: https://json-ld.org/

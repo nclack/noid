@@ -1,0 +1,97 @@
+[project]
+name = "noid-spaces"
+version = "0.1.0"
+description = "Coordinate spaces vocabulary for multidimensional arrays"
+readme = "README.md"
+authors = [
+    { name = "Nathan Clack", email = "nclack@chanzuckerberg.com" }
+]
+requires-python = ">=3.10"
+dependencies = [
+    "linkml>=1.9.2",
+    "linkml-runtime>=1.9.2",
+    "pydantic>=2.0.0",
+    "typing-extensions>=4.0.0",
+    "noid-registry",
+]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Scientific/Engineering",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0.0",
+    "pytest-cov>=4.0.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/nclack/noid"
+Repository = "https://github.com/nclack/noid"
+Issues = "https://github.com/nclack/noid/issues"
+Documentation = "https://github.com/nclack/noid/tree/main/packages/noid-spaces"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/noid_spaces"]
+
+[tool.hatch.build.targets.sdist]
+include = [
+    "src/noid_spaces/**/*.py",
+    "spaces.linkml.yaml",
+    "build.py",
+    "README.md",
+    "LICENSE",
+]
+
+[tool.ruff]
+line-length = 88
+target-version = "py310"
+extend-exclude = [
+    "_out/**/*",
+]
+
+[tool.ruff.lint]
+select = ["E", "W", "F", "I", "N", "UP", "C4", "B"]
+ignore = ["E501"]
+
+[tool.ruff.lint.isort]
+combine-as-imports = true
+force-single-line = false
+known-first-party = ["noid_spaces"]
+force-sort-within-sections = true
+split-on-trailing-comma = false
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+skip-magic-trailing-comma = false
+line-ending = "auto"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = ["-v", "--strict-markers"]
+
+[tool.coverage.run]
+source = ["src/noid_spaces"]
+omit = ["*/tests/*", "*/_out/*"]
+
+[dependency-groups]
+dev = [
+    "ruff>=0.12.4",
+]
+
+[tool.uv.sources]
+noid-registry = { workspace = true }

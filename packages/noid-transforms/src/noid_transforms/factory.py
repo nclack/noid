@@ -10,6 +10,14 @@ from collections.abc import Sequence
 import json
 from typing import Any
 
+from noid_registry import (
+    UnknownIRIError,
+    get_schema_namespace,
+    register,
+    registry,
+    set_namespace,
+)
+
 from .models import (
     CoordinateLookupTable,
     DisplacementLookupTable,
@@ -21,13 +29,12 @@ from .models import (
     Transform,
     Translation,
 )
-from noid_registry import UnknownIRIError, register, registry, set_namespace
 
 # Type aliases
 HomogeneousMatrix = Sequence[Sequence[float | int]] | Sequence[float | int]
 
-# Set namespace for transforms
-set_namespace("https://github.com/nclack/noid/schemas/transforms/")
+# Set namespace for transforms from LinkML schema
+set_namespace(get_schema_namespace("transform"))
 
 
 # Registry-based factory functions
@@ -236,8 +243,10 @@ def from_dict(data: dict[str, Any] | str) -> Transform:
 
     key, value = next(iter(data.items()))
 
-    # Use registry-based dispatch
-    namespace = "https://github.com/nclack/noid/schemas/transforms/"
+    # Use registry-based dispatch - get namespace from LinkML schema
+    namespace = get_schema_namespace("transform")
+    # Ensure namespace has trailing slash to match set_namespace behavior
+    namespace = namespace.rstrip("/") + "/"
     full_iri = f"{namespace}{key}"
 
     try:

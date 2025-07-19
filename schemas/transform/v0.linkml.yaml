@@ -1,0 +1,98 @@
+id: https://github.com/nclack/noid/schemas/transform/v0.linkml
+name: transform
+title: Transform Parameters Schema
+description: Schema for validating transform parameters using self-describing format
+version: 0.1.0
+license: https://creativecommons.org/publicdomain/zero/1.0/
+
+prefixes:
+  linkml: https://w3id.org/linkml/
+  noid_transform: https://github.com/nclack/noid/schemas/transform/
+
+default_prefix: noid_transform
+
+imports:
+  - linkml:types
+  - ../sampler/v0.linkml
+
+classes:
+  Transform:
+    description: A coordinate transformation with self-describing parameters
+    abstract: true
+    
+  Identity:
+    is_a: Transform
+    description: Identity transform
+    # Identity transform is represented as just the string "identity"
+    
+  Translation:
+    is_a: Transform
+    description: Translation transform
+    attributes:
+      translation:
+        description: Translation vector as array of numbers
+        multivalued: true
+        list_elements_ordered: true
+        required: true
+        range: float
+        minimum_value: 1
+        
+  Scale:
+    is_a: Transform
+    description: Scale transform
+    attributes:
+      scale:
+        description: Scale factors as array of numbers
+        multivalued: true
+        list_elements_ordered: true
+        required: true
+        range: float
+        minimum_value: 1
+        
+  MapAxis:
+    is_a: Transform
+    description: Axis permutation transform
+    attributes:
+      map-axis:
+        description: Permutation vector of 0-based input dimension indices. Array length equals number of output dimensions. Each value specifies which input dimension maps to the corresponding output dimension.
+        multivalued: true
+        list_elements_ordered: true
+        required: true
+        range: integer
+        minimum_value: 0
+        
+  Homogeneous:
+    is_a: Transform
+    description: Homogeneous transformation matrix (affine/projective)
+    attributes:
+      homogeneous:
+        description: Homogeneous transformation matrix as 2D array
+        multivalued: true
+        list_elements_ordered: true
+        required: true
+        range: float
+        
+  DisplacementLookupTable:
+    is_a: Transform
+    description: Displacement field lookup table transform
+    attributes:
+      path:
+        description: Path to displacement field data file
+        required: true
+        range: string
+      displacements:
+        description: Displacement field configuration
+        range: SamplerConfig
+          
+  CoordinateLookupTable:
+    is_a: Transform
+    description: Coordinate lookup table transform
+    attributes:
+      path:
+        description: Path to coordinate lookup table data file
+        required: true
+        range: string
+      lookup-table:
+        description: Coordinate lookup table configuration
+        range: SamplerConfig
+

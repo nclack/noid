@@ -4,7 +4,7 @@
 
 
 
-URI: [noid_transform:path](https://github.com/nclack/noid/transforms/transform/path)
+URI: [noid_transform:path](https://github.com/nclack/noid/schemas/transform/path)
 Alias: path
 
 <!-- no inheritance hierarchy -->

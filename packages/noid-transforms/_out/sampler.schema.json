@@ -59,7 +59,7 @@
             "type": "object"
         }
     },
-    "$id": "https://github.com/nclack/noid/transforms/sampler.linkml",
+    "$id": "https://github.com/nclack/noid/packages/noid-transforms/sampler.linkml.yaml",
     "$schema": "https://json-schema.org/draft/2019-09/schema",
     "additionalProperties": true,
     "metamodel_version": "1.7.0",

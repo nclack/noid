@@ -72,15 +72,44 @@ The project is organized around several key components:
 define the core data model for multidimensional arrays and relational
 model.
 
-**Transform Vocabularies**: Located in `packages/noid-transforms/`, these define
+**Transform Vocabularies**: LinkML schemas located in `schemas/transform/`, these define
 controlled vocabularies for geometric transformations.
 
-**Coordinate Space Vocabularies**: The coordinate spaces vocabulary defines
+**Coordinate Space Vocabularies**: LinkML schemas located in `schemas/space/`, these define
 CoordinateSpace and Dimension classes. Dimensions have name, unit, and type
 properties where type can be "space", "time", or "other". Units for space/time
 dimensions should use UDUNITS-2 terms, while "index" and "arbitrary" are valid
 for all types. Transforms link to coordinate spaces via "input" and "output"
 properties.
+
+**Sampler Vocabularies**: LinkML schemas located in `schemas/sampler/`, these define
+interpolation and extrapolation methods for array sampling and coordinate transforms.
+
+## LinkML Schema Conventions
+
+When working with LinkML schemas in this project:
+
+**Schema Organization**:
+- Schemas are organized in `schemas/{schema-name}/v{version}.linkml.yaml` structure
+- Each schema has its own directory for versioning (e.g., `schemas/transform/v0.linkml.yaml`)
+- Cross-schema imports use relative paths (e.g., `../sampler/v0.linkml`)
+
+**Schema IDs vs Imports**:
+- `id` field should include the full file extension as it represents a resolvable URL to the actual schema file
+- `imports` should use relative paths without the `.yaml` extension, as LinkML automatically adds it
+
+Example:
+```yaml
+id: https://github.com/nclack/noid/schemas/transform/v0.linkml.yaml
+imports:
+  - linkml:types
+  - ../sampler/v0.linkml  # Relative path, LinkML adds .yaml
+```
+
+**URL Structure**:
+- Schema URLs correspond to the actual GitHub repository structure
+- Namespace URLs use clean schema-based paths: `https://github.com/nclack/noid/schemas/{schema}/`
+- This provides logical namespaces that don't reference specific JSON-LD context files
 
 ## References
 

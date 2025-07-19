@@ -19,6 +19,7 @@ from noid_transforms import (
     to_jsonld,
     translation,
 )
+from noid_registry import get_schema_namespace
 
 # Import enhanced version for testing enhanced functionality
 from noid_transforms.models import Identity, Scale, Translation
@@ -113,8 +114,9 @@ class TestEnhancedJSONLDIntegration:
 
     def test_simple_jsonld_roundtrip(self):
         """Test round-trip processing of JSON-LD."""
+        transform_namespace = get_schema_namespace("transform")
         input_jsonld = {
-            "@context": {"tr": "https://github.com/nclack/noid/schemas/transforms/"},
+            "@context": {"tr": transform_namespace},
             "tr:translation": [10, 20, 30],
             "other_data": "preserved",
         }
@@ -139,9 +141,10 @@ class TestEnhancedJSONLDIntegration:
 
     def test_multi_namespace_processing(self):
         """Test processing JSON-LD with multiple namespaces."""
+        transform_namespace = get_schema_namespace("transform")
         input_jsonld = {
             "@context": {
-                "tr": "https://github.com/nclack/noid/schemas/transforms/",
+                "tr": transform_namespace,
                 "other": "https://example.com/other/",
             },
             "tr:translation": [1, 2, 3],
@@ -175,8 +178,8 @@ class TestEnhancedJSONLDIntegration:
         assert isinstance(result, dict)
         if "@context" in result:
             context = result["@context"]
-            # Should have some abbreviation for transforms namespace
-            assert any("transforms" in str(v) for v in context.values())
+            # Should have some abbreviation for transform namespace
+            assert any("transform" in str(v) for v in context.values())
 
         # Should have serialized transforms with abbreviated keys
         transform_keys = [
@@ -375,8 +378,9 @@ class TestEnhancedJSONLDIntegration:
                 from_jsonld(invalid_data)
 
         # Test that valid JSON-LD with proper mappings still works
+        transform_namespace = get_schema_namespace("transform")
         valid_data = {
-            "@context": {"tr": "https://github.com/nclack/noid/schemas/transforms/"},
+            "@context": {"tr": transform_namespace},
             "tr:translation": [1, 2, 3],
         }
 
@@ -477,9 +481,10 @@ class TestRealWorldScenarios:
 
     def test_mixed_data_processing(self):
         """Test processing JSON-LD with mixed transform and non-transform data."""
+        transform_namespace = get_schema_namespace("transform")
         mixed_jsonld = {
             "@context": {
-                "tr": "https://github.com/nclack/noid/schemas/transforms/",
+                "tr": transform_namespace,
                 "meta": "https://example.com/metadata/",
             },
             "tr:translation": [1, 2, 3],

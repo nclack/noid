@@ -1,0 +1,202 @@
+{
+    "$defs": {
+        "CoordinateLookupTable": {
+            "additionalProperties": false,
+            "description": "Coordinate lookup table transform",
+            "properties": {
+                "lookup_table": {
+                    "anyOf": [
+                        {
+                            "$ref": "#/$defs/SamplerConfig"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "description": "Coordinate lookup table configuration"
+                },
+                "path": {
+                    "description": "Path to coordinate lookup table data file",
+                    "type": "string"
+                }
+            },
+            "required": [
+                "path"
+            ],
+            "title": "CoordinateLookupTable",
+            "type": "object"
+        },
+        "DisplacementLookupTable": {
+            "additionalProperties": false,
+            "description": "Displacement field lookup table transform",
+            "properties": {
+                "displacements": {
+                    "anyOf": [
+                        {
+                            "$ref": "#/$defs/SamplerConfig"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "description": "Displacement field configuration"
+                },
+                "path": {
+                    "description": "Path to displacement field data file",
+                    "type": "string"
+                }
+            },
+            "required": [
+                "path"
+            ],
+            "title": "DisplacementLookupTable",
+            "type": "object"
+        },
+        "ExtrapolationMethod": {
+            "description": "",
+            "enum": [
+                "nearest",
+                "zero",
+                "constant",
+                "reflect",
+                "wrap"
+            ],
+            "title": "ExtrapolationMethod",
+            "type": "string"
+        },
+        "Homogeneous": {
+            "additionalProperties": false,
+            "description": "Homogeneous transformation matrix (affine/projective)",
+            "properties": {
+                "homogeneous": {
+                    "description": "Homogeneous transformation matrix as 2D array",
+                    "items": {
+                        "type": "number"
+                    },
+                    "type": "array"
+                }
+            },
+            "required": [
+                "homogeneous"
+            ],
+            "title": "Homogeneous",
+            "type": "object"
+        },
+        "Identity": {
+            "additionalProperties": false,
+            "description": "Identity transform",
+            "title": "Identity",
+            "type": "object"
+        },
+        "InterpolationMethod": {
+            "description": "",
+            "enum": [
+                "linear",
+                "nearest",
+                "cubic"
+            ],
+            "title": "InterpolationMethod",
+            "type": "string"
+        },
+        "MapAxis": {
+            "additionalProperties": false,
+            "description": "Axis permutation transform",
+            "properties": {
+                "map_axis": {
+                    "description": "Permutation vector of 0-based input dimension indices. Array length equals number of output dimensions. Each value specifies which input dimension maps to the corresponding output dimension.",
+                    "items": {
+                        "minimum": 0,
+                        "type": "integer"
+                    },
+                    "type": "array"
+                }
+            },
+            "required": [
+                "map_axis"
+            ],
+            "title": "MapAxis",
+            "type": "object"
+        },
+        "SamplerConfig": {
+            "additionalProperties": false,
+            "description": "Configuration for sampling transforms (displacements and lookup tables)",
+            "properties": {
+                "extrapolation": {
+                    "anyOf": [
+                        {
+                            "$ref": "#/$defs/ExtrapolationMethod"
+                        },
+                        {
+                            "type": "string"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "description": "Extrapolation method"
+                },
+                "interpolation": {
+                    "anyOf": [
+                        {
+                            "$ref": "#/$defs/InterpolationMethod"
+                        },
+                        {
+                            "type": "string"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "description": "Interpolation method"
+                }
+            },
+            "title": "SamplerConfig",
+            "type": "object"
+        },
+        "Scale": {
+            "additionalProperties": false,
+            "description": "Scale transform",
+            "properties": {
+                "scale": {
+                    "description": "Scale factors as array of numbers",
+                    "items": {
+                        "minimum": 1,
+                        "type": "number"
+                    },
+                    "type": "array"
+                }
+            },
+            "required": [
+                "scale"
+            ],
+            "title": "Scale",
+            "type": "object"
+        },
+        "Translation": {
+            "additionalProperties": false,
+            "description": "Translation transform",
+            "properties": {
+                "translation": {
+                    "description": "Translation vector as array of numbers",
+                    "items": {
+                        "minimum": 1,
+                        "type": "number"
+                    },
+                    "type": "array"
+                }
+            },
+            "required": [
+                "translation"
+            ],
+            "title": "Translation",
+            "type": "object"
+        }
+    },
+    "$id": "https://github.com/nclack/noid/schemas/transform/v0.linkml",
+    "$schema": "https://json-schema.org/draft/2019-09/schema",
+    "additionalProperties": true,
+    "metamodel_version": "1.7.0",
+    "title": "transform",
+    "type": "object",
+    "version": "0.1.0"
+}
