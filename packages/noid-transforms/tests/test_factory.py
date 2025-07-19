@@ -185,7 +185,7 @@ class TestFromDict:
     def test_missing_path_error(self):
         """Test error on missing path in lookup table."""
         # Registry now wraps factory errors in FactoryValidationError
-        from noid_transforms.registry import FactoryValidationError
+        from noid_registry import FactoryValidationError
 
         with pytest.raises(
             FactoryValidationError,

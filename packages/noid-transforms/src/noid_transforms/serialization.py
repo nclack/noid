@@ -121,7 +121,7 @@ def to_jsonld(
     # Try enhanced processing for dictionaries
     if isinstance(transform, dict):
         try:
-            from .jsonld_processing import to_jsonld as enhanced_to_jsonld
+            from noid_registry import to_jsonld as enhanced_to_jsonld
 
             result = enhanced_to_jsonld(
                 transform, include_context=include_context, indent=indent
@@ -179,7 +179,7 @@ def from_jsonld(jsonld_str: str) -> Transform | dict[str, Any]:
         >>> trans = from_jsonld(simple_jsonld)
     """
     from .factory import from_dict
-    from .jsonld_processing import from_jsonld as enhanced_from_jsonld
+    from noid_registry import from_jsonld as enhanced_from_jsonld
 
     # Try enhanced processing first
     try:

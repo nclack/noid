@@ -21,6 +21,49 @@ A key way of testing this is to understand how geospatial data can be integrated
 into the schema, though geospatial data is not the primary focus of this
 project.
 
+## Repository Structure
+
+The noid repository is organized as a multi-package structure using uv workspaces:
+
+```
+noid/
+├── packages/
+│   ├── noid-registry/           # Generic JSON-LD registry system
+│   └── noid-transforms/         # Transform-specific functionality  
+├── pyproject.toml              # Workspace configuration
+└── uv.lock                     # Workspace lockfile
+```
+
+### Package Details
+
+**noid-registry** (generic reusable components):
+- Registry system for mapping JSON-LD IRIs to factory functions
+- Namespace abbreviation system for clean JSON-LD output
+- JSON-LD processing utilities (expand, compact, from_jsonld, to_jsonld)
+- PyLD data adapter for normalizing PyLD output
+- Dependencies: rdflib, pyld, typing-extensions
+
+**noid-transforms** (domain-specific):
+- LinkML-based coordinate transformation models
+- Factory functions for creating transforms
+- Validation utilities
+- Depends on noid-registry via workspace reference
+- Dependencies: linkml, linkml-runtime, pydantic, noid-registry
+
+### Development Setup
+
+- Use `uv sync` in root to set up workspace environment
+- All tests pass: noid-registry (33 tests), noid-transforms (99 tests)
+- Workspace dependencies automatically resolve between packages
+- Use `uv run pytest packages/{package-name}/tests/` to test individual packages
+
+### Future Package Candidates
+
+Based on project needs, potential future packages:
+- **noid-spaces**: Coordinate spaces vocabulary (CoordinateSpace, Dimension classes)
+- **noid-core**: Shared utilities and base classes
+- Other domain-specific vocabularies as needed
+
 ## Core Architecture
 
 The project is organized around several key components:
@@ -29,7 +72,7 @@ The project is organized around several key components:
 define the core data model for multidimensional arrays and relational
 model.
 
-**Transform Vocabularies**: Located in `/transforms/`, these define
+**Transform Vocabularies**: Located in `packages/noid-transforms/`, these define
 controlled vocabularies for geometric transformations.
 
 **Coordinate Space Vocabularies**: The coordinate spaces vocabulary defines

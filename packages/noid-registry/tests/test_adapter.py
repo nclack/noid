@@ -7,7 +7,7 @@ PyLD expansion output to clean Python data structures.
 
 import pytest
 
-from noid_transforms.adapter import PyLDDataAdapter
+from noid_registry.adapter import PyLDDataAdapter
 
 
 class TestPyLDDataAdapter:

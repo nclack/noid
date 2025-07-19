@@ -21,7 +21,7 @@ from .models import (
     Transform,
     Translation,
 )
-from .registry import UnknownIRIError, register, registry, set_namespace
+from noid_registry import UnknownIRIError, register, registry, set_namespace
 
 # Type aliases
 HomogeneousMatrix = Sequence[Sequence[float | int]] | Sequence[float | int]

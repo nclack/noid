@@ -1,0 +1,87 @@
+[project]
+name = "noid-registry"
+version = "0.1.0"
+description = "Generic JSON-LD registry system with namespace support"
+readme = "README.md"
+authors = [
+    { name = "Nathan Clack", email = "nclack@chanzuckerberg.com" }
+]
+requires-python = ">=3.10"
+dependencies = [
+    "rdflib>=7.0.0",
+    "pyld>=2.0.0",
+    "typing-extensions>=4.0.0",
+]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Scientific/Engineering",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0.0",
+    "pytest-cov>=4.0.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/nclack/noid"
+Repository = "https://github.com/nclack/noid"
+Issues = "https://github.com/nclack/noid/issues"
+Documentation = "https://github.com/nclack/noid/tree/main/packages/noid-registry"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/noid_registry"]
+
+[tool.hatch.build.targets.sdist]
+include = [
+    "src/noid_registry/**/*.py",
+    "README.md",
+    "LICENSE",
+]
+
+[tool.ruff]
+line-length = 88
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "W", "F", "I", "N", "UP", "C4", "B"]
+ignore = ["E501"]
+
+[tool.ruff.lint.isort]
+combine-as-imports = true
+force-single-line = false
+known-first-party = ["noid_registry"]
+force-sort-within-sections = true
+split-on-trailing-comma = false
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+skip-magic-trailing-comma = false
+line-ending = "auto"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = ["-v", "--strict-markers"]
+
+[tool.coverage.run]
+source = ["src/noid_registry"]
+omit = ["*/tests/*"]
+
+[dependency-groups]
+dev = [
+    "ruff>=0.12.4",
+]

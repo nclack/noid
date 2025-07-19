@@ -131,7 +131,7 @@ __all__ = [
 ]
 
 # Import enhanced JSON-LD processing as main API (requires PyLD)
-from .jsonld_processing import from_jsonld, to_jsonld
+from noid_registry import from_jsonld, to_jsonld
 
 # Internal registry components are imported but not exported
 # Users should use the high-level from_jsonld/to_jsonld API

@@ -1,0 +1,16 @@
+[tool.uv]
+dev-dependencies = [
+    "pytest>=7.0.0",
+    "pytest-cov>=4.0.0",
+    "ruff>=0.12.4",
+]
+
+[tool.uv.workspace]
+members = [
+    "packages/noid-registry",
+    "packages/noid-transforms",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"

@@ -8,7 +8,7 @@ factory registration, and error handling.
 import pytest
 
 # Test the registry system
-from noid_transforms.registry import (
+from noid_registry.registry import (
     FactoryValidationError,
     Registry,
     UnknownIRIError,
