@@ -25,19 +25,33 @@ classes:
   Dimension:
     description: >-
       A single axis within a coordinate space with its measurement unit and classification.
+
+      The type field is optional and can be inferred from the unit in many cases:
+      - Spatial units (m, mm, µm, nm, etc.) → "space"
+      - Temporal units (s, ms, µs, etc.) → "time"
+      - "index" unit → "index"
+      - "arbitrary" unit → "other"
+      - Other physical units → "other"
+
+      When type is provided, it overrides the inferred type. This allows for cases like
+      using "nm" for wavelength channels instead of spatial dimensions.
     attributes:
       id:
         description: Unique identifier for the dimension
         identifier: true
         required: true
         pattern: "^.+$"  # Non-empty string
+        annotations:
+          jsonld.id: "@id"
       unit:
-        description: Unit of measurement from controlled vocabulary
+        description: Unit of measurement from the noid-spaces unit vocabulary or non-physical units
         required: true
         range: UnitTerm
       type:
-        description: Dimension type classification
-        required: true
+        description: >-
+          Dimension type classification. Optional - if not provided, will be inferred
+          from the unit based on its physical dimensionality.
+        required: false
         range: DimensionType
     rules:
       - title: Index type must have index unit
@@ -119,17 +133,15 @@ classes:
         minimum_cardinality: 1
         range: DimensionSpec
 
-  UnitTerm:
-    description: Unit specification that supports special terms or UDUNITS-2 strings
-    union_of:
-      - SpecialUnits
-      - UdunitsString
-
 types:
-  UdunitsString:
-    description: UDUNITS-2 compatible unit string
+  UnitTerm:
+    description: >-
+      Unit specification from the noid-spaces unit vocabulary. This includes all Pint default units
+      plus biomedical extensions and non-physical units (index, arbitrary) defined in units.txt.
+      All units are validated via the Pint registry.
+      Extended definitions: https://github.com/nclack/noid/blob/main/packages/noid-spaces/units.txt
     typeof: string
-    pattern: "^.+$"  # Non-empty string; validation handled in Python
+    pattern: "^.+$"  # Non-empty string
 
 enums:
   DimensionType:
@@ -148,12 +160,4 @@ enums:
         description: Array index dimensions
         meaning: noid_spaces:IndexDimension
 
-  SpecialUnits:
-    description: Special unit terms not covered by UDUNITS-2
-    permissible_values:
-      index:
-        description: Array index unit
-        meaning: noid_spaces:IndexUnit
-      arbitrary:
-        description: Arbitrary or dimensionless unit
-        meaning: noid_spaces:ArbitraryUnit
+# Non-physical units (index, arbitrary) are now defined in units.txt alongside physical units

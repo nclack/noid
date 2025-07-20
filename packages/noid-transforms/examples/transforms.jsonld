@@ -1,36 +1,88 @@
 {
-  "@context": [
-    "../_out/transform.context.jsonld",
-    "../_out/sampler.context.jsonld"
-  ],
+  "@context": {
+    "tr": "https://github.com/nclack/noid/schemas/transform/",
+    "samplers": "https://github.com/nclack/noid/schemas/sampler/"
+  },
   "examples": [
     {
       "@type": "tr:Identity",
       "@value": "identity"
     },
     {
-      "tr:translation": [10.0, 20.0, 5.0]
+      "tr:translation": [
+        10.0,
+        20.0,
+        5.0
+      ]
     },
     {
-      "tr:scale": [2.0, 1.5, 0.5]
+      "tr:scale": [
+        2.0,
+        1.5,
+        0.5
+      ]
     },
     {
-      "tr:map-axis": [1, 0, 2]
-    },
-    {
-      "tr:homogeneous": [
-        [2.0, 0, 0, 10],
-        [0, 1.5, 0, 20],
-        [0, 0, 0.5, 5],
-        [0, 0, 0, 1]
+      "tr:map-axis": [
+        1,
+        0,
+        2
       ]
     },
     {
       "tr:homogeneous": [
-        [1, 0, 0, 0],
-        [0, 1, 0, 0],
-        [0, 0, 1, 0],
-        [0.001, 0.002, 0, 1]
+        [
+          2.0,
+          0,
+          0,
+          10
+        ],
+        [
+          0,
+          1.5,
+          0,
+          20
+        ],
+        [
+          0,
+          0,
+          0.5,
+          5
+        ],
+        [
+          0,
+          0,
+          0,
+          1
+        ]
+      ]
+    },
+    {
+      "tr:homogeneous": [
+        [
+          1,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          1,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          1,
+          0
+        ],
+        [
+          0.001,
+          0.002,
+          0,
+          1
+        ]
       ]
     },
     {

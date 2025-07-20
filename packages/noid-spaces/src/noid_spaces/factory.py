@@ -1,12 +1,11 @@
 """
-Factory functions for creating coordinate space objects.
+Factory functions for creating space objects.
 
-This module provides convenient factory functions for creating coordinate space
-objects from various input formats, including dictionaries, JSON, and direct parameters.
+This module provides convenient factory functions for creating space objects
+from various input formats, including dictionaries, JSON, and direct parameters.
 The factory functions are registered with the registry system for extensibility.
 """
 
-from collections.abc import Sequence
 import json
 from typing import Any
 
@@ -18,171 +17,104 @@ from noid_registry import (
     set_namespace,
 )
 
-from .models import CoordinateSystem, CoordinateTransform, Dimension
+from .models import Dimension, UnitTerm
 
 # Set namespace for spaces from LinkML schema
 set_namespace(get_schema_namespace("space"))
 
 
 # Registry-based factory functions
-@register()
-def dimension(id: str, unit: str, type: str) -> Dimension:
+@register("unit")
+def unit_term(unit: str | Any) -> UnitTerm:
+    """Create a unit term.
+
+    Args:
+        unit: Either a special unit ("index", "arbitrary") or physical unit string
+
+    Returns:
+        UnitTerm object
+
+    Raises:
+        ValueError: If unit is invalid or empty
+        pint.UndefinedUnitError: If physical unit is not recognized by Pint
+
+    Invariants:
+        - Must be either a valid SpecialUnits value or valid physical unit
+        - Physical units are validated using Pint's unit registry
+
+    Example:
+        >>> # Special units
+        >>> index_unit = unit_term("index")
+        >>> arbitrary_unit = unit_term("arbitrary")
+        >>>
+        >>> # Physical units
+        >>> meter_unit = unit_term("m")
+        >>> second_unit = unit_term("s")
+        >>> density_unit = unit_term("kg/m^3")
+    """
+    return UnitTerm(unit)
+
+
+@register("dimension")
+def dimension(id: str, unit: str, type: str | None = None) -> Dimension:
     """Create a dimension.
 
     Args:
-        id: Unique identifier for the dimension
-        unit: Unit of measurement (special units or UDUNITS-2 compatible)
-        type: Dimension type ('space', 'time', 'other', 'index')
+        id: Dimension identifier
+        unit: Unit specification
+        type: Dimension type (optional, inferred from unit if not provided)
 
     Returns:
         Dimension object
 
-    Invariants:
-        - ID must be a non-empty string
-        - Unit must be valid (special units or UDUNITS-2 compatible)
-        - Type must be one of: space, time, other, index
-        - If type is "index", unit must be "index"
-
     Example:
-        >>> dimension("x", "micrometer", "space")
-        >>> dimension("t", "second", "time")
-        >>> dimension("channel", "arbitrary", "other")
-        >>> dimension("i", "index", "index")
+        >>> # Direct call with explicit type
+        >>> dim = dimension(id="x", unit="m", type="space")
+        >>>
+        >>> # Direct call with inferred type
+        >>> dim = dimension(id="y", unit="mm")  # Infers SPACE
+        >>>
+        >>> # From registry (expands dict as kwargs)
+        >>> dim = from_data({"dimension": {"id": "x", "unit": "m"}})
     """
-    return Dimension(id=id, unit=unit, type=type)
+    data = {"id": id, "unit": unit}
+    if type is not None:
+        data["type"] = type
 
-
-# CLAUDE: I'm getting type errors for register. How to fix?
-@register("coordinate-system")  # Schema uses kebab-case, Python uses snake_case
-def coordinate_system(
-    id: str,
-    dimensions: Sequence[dict | str],
-    description: str | None = None,
-) -> CoordinateSystem:
-    """Create a coordinate system.
-
-    Args:
-        id: Unique identifier for the coordinate system
-        dimensions: List of dimensions (dicts, Dimension objects or string references)
-        description: Optional description
-
-    Returns:
-        CoordinateSystem object
-
-    Invariants:
-        - ID must be a non-empty string
-        - Must have at least one dimension
-        - All dimensions must be valid
-
-    Example:
-        >>> coordinate_system("physical", [
-        ...     {"id": "x", "unit": "micrometer", "type": "space"},
-        ...     {"id": "y", "unit": "micrometer", "type": "space"}
-        ... ])
-        >>> coordinate_system("array", ["i", "j", "k"])
-    """
-    # Convert dimension dicts to Dimension objects if needed
-    processed_dims = []
-    for dim in dimensions:
-        if isinstance(dim, dict):
-            processed_dims.append(Dimension(**dim))
-        else:
-            processed_dims.append(dim)
-
-    return CoordinateSystem(id=id, dimensions=processed_dims, description=description)
-
-
-@register("coordinate-transform")  # Schema uses kebab-case
-def coordinate_transform(
-    id: str,
-    input: str | dict | list,
-    output: str | dict | list,
-    transform: dict,
-    description: str | None = None,
-) -> CoordinateTransform:
-    """Create a coordinate transform.
-
-    Args:
-        id: Unique identifier for the transform
-        input: Input coordinate space specification
-        output: Output coordinate space specification
-        transform: Transform definition
-        description: Optional description
-
-    Returns:
-        CoordinateTransform object
-
-    Invariants:
-        - ID must be a non-empty string
-        - Must have valid input and output coordinate space specifications
-        - Must have a valid transform definition
-
-    Example:
-        >>> coordinate_transform(
-        ...     "physical_to_array",
-        ...     "physical_space",
-        ...     "array_space",
-        ...     {"scale": [0.5, 0.5, 1.0]}
-        ... )
-    """
-    return CoordinateTransform(
-        id=id,
-        input=input,
-        output=output,
-        transform=transform,
-        description=description,
-    )
+    return Dimension.from_data(data)
 
 
 # Main orchestration functions
-def from_dict(
-    data: dict[str, Any],
-) -> Dimension | CoordinateSystem | CoordinateTransform:
+def from_data(data: dict[str, Any] | str) -> Any:
     """
-    Create a space object from a dictionary representation.
+    Create a space object from a data representation.
 
-    This function uses the registry system for extensible object creation.
+    This function uses the registry system for extensible space object creation.
 
     Args:
-        data: Dictionary with object parameters
+        data: Dictionary with object parameters or string for simple types
 
     Returns:
-        Space object of appropriate type (Dimension, CoordinateSystem, or CoordinateTransform)
+        Space object of appropriate type
 
     Raises:
         ValueError: If data format is invalid or unsupported
 
     Example:
+        >>> # Unit term
+        >>> unit = from_data({"unit-term": "m"})
+        >>>
         >>> # Dimension
-        >>> dim = from_dict({
-        ...     "dimension": {
-        ...         "id": "x",
-        ...         "unit": "micrometer",
-        ...         "type": "space"
-        ...     }
-        ... })
-        >>>
-        >>> # Coordinate system
-        >>> coord_sys = from_dict({
-        ...     "coordinate-system": {
-        ...         "id": "physical",
-        ...         "dimensions": [
-        ...             {"id": "x", "unit": "micrometer", "type": "space"},
-        ...             {"id": "y", "unit": "micrometer", "type": "space"}
-        ...         ]
-        ...     }
-        ... })
-        >>>
-        >>> # Coordinate transform
-        >>> coord_transform = from_dict({
-        ...     "coordinate-transform": {
-        ...         "id": "physical_to_array",
-        ...         "input": "physical_space",
-        ...         "output": "array_space",
-        ...         "transform": {"scale": [0.5, 0.5, 1.0]}
-        ...     }
-        ... })
+        >>> dim = from_data({"dimension": {"id": "x", "unit": "m", "type": "space"}})
     """
+    # Handle simple string cases
+    if isinstance(data, str):
+        # For now, assume string inputs are unit terms
+        return unit_term(data)
+
+    if not isinstance(data, dict):
+        raise ValueError(f"Space data must be a dictionary or string, got {type(data)}")
+
     # Check for exactly one key (self-describing parameter)
     if len(data) != 1:
         raise ValueError(f"Space dictionary must have exactly one key, got {len(data)}")
@@ -201,7 +133,7 @@ def from_dict(
         raise ValueError(f"Unknown space type: '{key}'") from e
 
 
-def from_json(json_str: str) -> Dimension | CoordinateSystem | CoordinateTransform:
+def from_json(json_str: str) -> Any:
     """
     Create a space object from a JSON string.
 
@@ -215,9 +147,13 @@ def from_json(json_str: str) -> Dimension | CoordinateSystem | CoordinateTransfo
         ValueError: If JSON is invalid or space format is unsupported
 
     Example:
-        >>> dim = from_json('{"dimension": {"id": "x", "unit": "micrometer", "type": "space"}}')
-        >>> dim.to_dict()
-        {'id': 'x', 'unit': 'micrometer', 'type': 'space'}
+        >>> unit = from_json('{"unit-term": "m"}')
+        >>> unit.to_data()
+        'm'
+        >>>
+        >>> dim = from_json('{"dimension": {"id": "x", "unit": "m", "type": "space"}}')
+        >>> dim.id
+        'x'
     """
     data = json.loads(json_str)
-    return from_dict(data)
+    return from_data(data)

@@ -1,0 +1,46 @@
+{
+  "@context": {
+    "@base": "https://example.org/dimensions/",
+    "noid_spaces": "https://github.com/nclack/noid/schemas/space/",
+    "id": "@id"
+  },
+  "@graph": [
+    {
+      "@type": "noid_spaces:Dimension",
+      "id": "https://example.org/dimensions/frame",
+      "noid_spaces:unit": "index"
+    },
+    {
+      "@type": "noid_spaces:Dimension",
+      "id": "https://example.org/dimensions/x",
+      "noid_spaces:unit": "µm"
+    },
+    {
+      "@type": "noid_spaces:Dimension",
+      "id": "https://example.org/dimensions/y",
+      "noid_spaces:unit": "µm"
+    },
+    {
+      "@type": "noid_spaces:Dimension",
+      "id": "https://example.org/dimensions/z",
+      "noid_spaces:unit": "µm"
+    },
+    {
+      "@type": "noid_spaces:Dimension",
+      "id": "https://example.org/dimensions/time",
+      "noid_spaces:unit": "s"
+    },
+    {
+      "@type": "noid_spaces:Dimension",
+      "id": "https://example.org/dimensions/channel",
+      "noid_spaces:unit": "arbitrary",
+      "noid_spaces:type": "other"
+    },
+    {
+      "@type": "noid_spaces:Dimension",
+      "id": "https://example.org/dimensions/wavelength",
+      "noid_spaces:unit": "nm",
+      "noid_spaces:type": "other"
+    }
+  ]
+}

@@ -27,15 +27,22 @@ import sys
 logging.basicConfig(level=logging.INFO)
 
 
-def run_command(cmd: list[str], description: str, cwd: Path | None = None) -> subprocess.CompletedProcess[str]:
+def run_command(
+    cmd: list[str], description: str, cwd: Path | None = None
+) -> subprocess.CompletedProcess[str]:
     """Run a command and handle errors."""
     try:
-        result = subprocess.run(cmd, check=True, capture_output=True, text=True, cwd=cwd)
+        result = subprocess.run(
+            cmd, check=True, capture_output=True, text=True, cwd=cwd
+        )
         logging.info(f"✓ {description}")
         return result
     except subprocess.CalledProcessError as e:
         logging.error(f"✗ Failed to run {description}")
-        logging.error(f"Error: {e.stderr}")
+        logging.error(f"Command: {' '.join(cmd)}")
+        logging.error(f"Return code: {e.returncode}")
+        logging.error(f"STDOUT: {e.stdout}")
+        logging.error(f"STDERR: {e.stderr}")
         sys.exit(1)
 
 
@@ -44,8 +51,7 @@ def generate_artifacts(schema_file: Path, out_dir: Path, schema_name: str) -> No
     # Generate JSON Schema
     json_schema_file = out_dir / f"{schema_name}.schema.json"
     result = run_command(
-        ["gen-json-schema", str(schema_file)],
-        f"{schema_name} JSON Schema generation"
+        ["gen-json-schema", str(schema_file)], f"{schema_name} JSON Schema generation"
     )
     json_schema_file.write_text(result.stdout)
 
@@ -53,7 +59,7 @@ def generate_artifacts(schema_file: Path, out_dir: Path, schema_name: str) -> No
     jsonld_file = out_dir / f"{schema_name}.context.jsonld"
     result = run_command(
         ["gen-jsonld-context", str(schema_file)],
-        f"{schema_name} JSON-LD context generation"
+        f"{schema_name} JSON-LD context generation",
     )
     jsonld_file.write_text(result.stdout)
 
@@ -62,8 +68,7 @@ def generate_artifacts(schema_file: Path, out_dir: Path, schema_name: str) -> No
     python_dir.mkdir(exist_ok=True)
     python_file = python_dir / f"{schema_name}.py"
     result = run_command(
-        ["gen-python", str(schema_file)],
-        f"{schema_name} Python classes generation"
+        ["gen-python", str(schema_file)], f"{schema_name} Python classes generation"
     )
     python_file.write_text(result.stdout)
 
@@ -73,7 +78,7 @@ def generate_artifacts(schema_file: Path, out_dir: Path, schema_name: str) -> No
 
     run_command(
         ["gen-doc", str(schema_file), "-d", str(docs_dir)],
-        f"{schema_name} documentation generation"
+        f"{schema_name} documentation generation",
     )
 
 
@@ -98,16 +103,13 @@ def validate_examples(script_dir: Path) -> None:
     # Validate JSON-LD examples using comprehensive validator
     jsonld_files = list(examples_dir.glob("*.jsonld"))
     if jsonld_files:
-
         # Try to use the comprehensive validator if available
         project_root = script_dir.parent
         validator_script = project_root / "validate_jsonld.py"
 
         if validator_script.exists():
             # Use uv run to automatically handle dependencies
-            cmd = ["uv", "run", str(validator_script)] + [
-                str(f) for f in jsonld_files
-            ]
+            cmd = ["uv", "run", str(validator_script)] + [str(f) for f in jsonld_files]
             result = subprocess.run(
                 cmd, capture_output=True, text=True, cwd=project_root
             )
@@ -145,11 +147,11 @@ def run_tests(script_dir: Path) -> None:
         logging.info("No tests directory found, skipping tests")
         return
 
-    # Run pytest
+    # Run pytest using uv to ensure workspace dependencies are available
     run_command(
-        ["python", "-m", "pytest", str(tests_dir), "-v"],
+        ["uv", "run", "pytest", str(tests_dir), "-v"],
         "Running tests",
-        cwd=script_dir
+        cwd=script_dir,
     )
 
 
@@ -161,9 +163,7 @@ def run_examples(script_dir: Path) -> None:
 
     if usage_examples.exists():
         run_command(
-            ["python", str(usage_examples)],
-            "Running usage examples",
-            cwd=script_dir
+            ["uv", "run", str(usage_examples)], "Running usage examples", cwd=script_dir
         )
     else:
         logging.info("No usage examples found, skipping")
@@ -179,16 +179,16 @@ def lint_code(script_dir: Path) -> None:
 
     # Run ruff check (includes type annotation checking via ANN rules)
     run_command(
-        ["python", "-m", "ruff", "check", str(src_dir)],
+        ["uv", "run", "ruff", "check", str(src_dir)],
         "Code linting and type annotations check",
-        cwd=script_dir
+        cwd=script_dir,
     )
 
     # Run ruff format check
     run_command(
-        ["python", "-m", "ruff", "format", "--check", str(src_dir)],
+        ["uv", "run", "ruff", "format", "--check", str(src_dir)],
         "Code formatting check",
-        cwd=script_dir
+        cwd=script_dir,
     )
 
 
@@ -212,12 +212,12 @@ def main() -> None:
     # Generate artifacts for samplers schema
     samplers_file = schemas_root / "sampler" / "v0.linkml.yaml"
     if samplers_file.exists():
-        generate_artifacts(samplers_file, out_dir, "sampler.v0")
+        generate_artifacts(samplers_file, out_dir, "sampler_v0")
 
     # Generate artifacts for transforms schema
     transforms_file = schemas_root / "transform" / "v0.linkml.yaml"
     if transforms_file.exists():
-        generate_artifacts(transforms_file, out_dir, "transforms_v0")
+        generate_artifacts(transforms_file, out_dir, "transform_v0")
 
     logging.info(f"✓ All LinkML artifacts generated successfully! Output: {out_dir}")
 

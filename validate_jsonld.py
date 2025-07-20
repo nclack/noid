@@ -7,13 +7,7 @@
 # ]
 # ///
 """
-Comprehensive JSON-LD validation script for NOID project.
-
-This script validates JSON-LD files using multiple approaches:
-1. Basic JSON syntax validation
-2. JSON-LD processing with pyld (expansion, compaction, etc.)
-3. JSON Schema validation against known schemas
-4. Context resolution validation
+Simple JSON-LD validation script for NOID project.
 
 Usage:
     uv run validate_jsonld.py --all-transforms
@@ -24,215 +18,259 @@ import json
 import sys
 import argparse
 from pathlib import Path
-from typing import Dict, Any, Optional
+from typing import Dict, Any, List
 import logging
 
 from pyld import jsonld
 import jsonschema
 
 
-class JSONLDValidator:
-    """Comprehensive JSON-LD validator."""
+def setup_logging(verbose: bool):
+    """Setup logging configuration."""
+    level = logging.DEBUG if verbose else logging.INFO
+    logging.basicConfig(level=level, format="%(levelname)s: %(message)s")
 
-    def __init__(self, verbose: bool = False):
-        self.verbose = verbose
-        self.errors = []
-        self.warnings = []
 
-        # Setup logging
-        level = logging.DEBUG if verbose else logging.INFO
-        logging.basicConfig(level=level, format="%(levelname)s: %(message)s")
-        self.logger = logging.getLogger(__name__)
+def validate_json_syntax(file_path: Path) -> tuple[Dict[str, Any], List[str]]:
+    """Validate JSON syntax and return data or errors."""
+    try:
+        with open(file_path, "r", encoding="utf-8") as f:
+            return json.load(f), []
+    except json.JSONDecodeError as e:
+        return {}, [f"Invalid JSON syntax: {e}"]
+    except Exception as e:
+        return {}, [f"Error reading file: {e}"]
 
-    def validate_file(self, file_path: Path) -> bool:
-        """Validate a single JSON-LD file. Returns True if valid."""
-        self.logger.info(f"Validating: {file_path}")
-        self.errors.clear()
-        self.warnings.clear()
 
-        if not file_path.exists():
-            self.errors.append(f"File not found: {file_path}")
-            return False
+def create_document_loader(base_dir: Path):
+    """Create a document loader that handles relative paths and naming variations."""
 
-        # Load the file
-        try:
-            with open(file_path, "r", encoding="utf-8") as f:
-                data = json.load(f)
-        except json.JSONDecodeError as e:
-            self.errors.append(f"Invalid JSON syntax: {e}")
-            return False
-        except Exception as e:
-            self.errors.append(f"Error reading file: {e}")
-            return False
+    def document_loader(url: str, options: dict) -> dict:
+        logging.debug(f"Document loader called with URL: {url}")
 
-        # Perform validation steps
-        valid = True
-        valid &= self._validate_basic_structure(data)
-        valid &= self._validate_jsonld_processing(data)
-        valid &= self._validate_context_resolution(data)
-        valid &= self._validate_against_schema(data, file_path)
+        # Handle relative paths
+        if not url.startswith(("http://", "https://", "file://")):
+            # Resolve relative path from the JSON-LD file's directory
+            local_path = (base_dir / url).resolve()
+            logging.debug(f"Resolved path: {local_path}")
 
-        # Report results
-        self._report_results(file_path, valid)
-        return valid
+            if local_path.exists():
+                logging.debug(f"Loading local context: {local_path}")
+                with open(local_path, "r", encoding="utf-8") as f:
+                    document = json.load(f)
+                return {
+                    "contextUrl": None,
+                    "document": document,
+                    "documentUrl": f"file://{local_path.absolute()}",
+                }
 
-    def _validate_basic_structure(self, data: Dict[str, Any]) -> bool:
-        """Validate basic JSON-LD structure requirements."""
-        self.logger.debug("Validating basic JSON-LD structure...")
+            # Try common naming variations and path corrections
+            variations = []
 
-        valid = True
+            # If the URL doesn't start with ".." but we're looking at _out/, try ../_out/
+            if url.startswith("_out/") and not url.startswith(".."):
+                corrected_url = "../" + url
+                corrected_path = (base_dir / corrected_url).resolve()
+                variations.append(corrected_url)
 
-        # Check if it's a valid JSON-LD document (must be object or array)
-        if not isinstance(data, (dict, list)):
-            self.errors.append("JSON-LD document must be an object or array")
-            valid = False
+            if url.endswith(".context.jsonld"):
+                base_name = url[:-15]  # Remove '.context.jsonld'
+                # Try versioned names
+                variations.append(
+                    f"{base_name}_v0.context.jsonld"
+                )  # transform -> transform_v0
+                variations.append(
+                    f"{base_name}_v0.context.jsonld"
+                )  # sampler -> sampler_v0
 
-        # If it's an object, check for JSON-LD specific patterns
-        if isinstance(data, dict):
-            # Check for @context (recommended but not required)
-            if "@context" not in data:
-                self.warnings.append(
-                    "No @context found - consider adding one for semantic clarity"
-                )
+                # Try path-corrected versions too
+                if url.startswith("_out/"):
+                    filename = url.split("/")[-1]  # Get just the filename
+                    base_filename = filename[:-15]  # Remove '.context.jsonld'
+                    variations.append(f"../_out/{base_filename}s_v0.context.jsonld")
+                    variations.append(f"../_out/{base_filename}_v0.context.jsonld")
 
-            # Check for valid @context structure
-            if "@context" in data:
-                context = data["@context"]
-                if not isinstance(context, (dict, list, str)):
-                    self.errors.append("@context must be an object, array, or string")
-                    valid = False
+            for variation in variations:
+                variant_path = (base_dir / variation).resolve()
+                logging.debug(f"Trying variation: {variant_path}")
+                if variant_path.exists():
+                    logging.debug(f"Loading context variation: {variant_path}")
+                    with open(variant_path, "r", encoding="utf-8") as f:
+                        document = json.load(f)
+                    return {
+                        "contextUrl": None,
+                        "document": document,
+                        "documentUrl": f"file://{variant_path.absolute()}",
+                    }
 
-        return valid
+            logging.debug(f"Local context file not found: {local_path}")
 
-    def _validate_jsonld_processing(self, data: Dict[str, Any]) -> bool:
-        """Validate using pyld JSON-LD processing."""
-        self.logger.debug("Validating JSON-LD processing...")
+        # Fall back to default loader for URLs
+        logging.debug(f"Falling back to default loader for: {url}")
+        return jsonld.requests_document_loader()(url, options)
 
-        valid = True
+    return document_loader
 
-        try:
-            # Test expansion (most fundamental operation)
-            expanded = jsonld.expand(data)
-            if not isinstance(expanded, list):
-                self.errors.append("JSON-LD expansion should produce a list")
-                valid = False
-            self.logger.debug(f"Expansion successful: {len(expanded)} items")
 
-            # Test compaction (if context is available)
-            if isinstance(data, dict) and "@context" in data:
-                context = data["@context"]
-                compacted = jsonld.compact(data, context)
-                self.logger.debug("Compaction successful")
+def validate_jsonld_processing(data: Dict[str, Any], base_dir: Path) -> List[str]:
+    """Validate JSON-LD processing with pyld and check namespace resolution."""
+    errors = []
 
-            # Test flattening
-            flattened = jsonld.flatten(data)
-            if not isinstance(flattened, (dict, list)):
-                self.errors.append(
-                    "JSON-LD flattening should produce an object or array"
-                )
-                valid = False
-            self.logger.debug("Flattening successful")
+    try:
+        # Use custom document loader for relative context resolution
+        options = {"documentLoader": create_document_loader(base_dir)}
 
-        except Exception as e:
-            self.errors.append(f"JSON-LD processing error: {e}")
-            valid = False
+        # Test basic expansion - this resolves all terms to full IRIs
+        expanded = jsonld.expand(data, options)
+        if not isinstance(expanded, list):
+            errors.append("JSON-LD expansion should produce a list")
 
-        return valid
+        # Check that expansion actually resolved terms (no unresolved terms should remain)
+        if expanded:
+            errors.extend(_check_namespace_resolution(expanded))
 
-    def _validate_context_resolution(self, data: Dict[str, Any]) -> bool:
-        """Validate that contexts can be resolved."""
-        self.logger.debug("Validating context resolution...")
-
-        valid = True
-
+        # Test compaction if context exists
         if isinstance(data, dict) and "@context" in data:
-            context = data["@context"]
+            compacted = jsonld.compact(data, data["@context"], options)
+            # Verify compaction worked (should match original structure)
+            if not isinstance(compacted, dict):
+                errors.append("JSON-LD compaction should produce an object")
 
-            # Check for URL contexts that might need to be resolved
-            if isinstance(context, str):
-                if context.startswith("http"):
-                    self.warnings.append(
-                        f"External context URL found: {context} - ensure it's accessible"
-                    )
-            elif isinstance(context, list):
-                for ctx in context:
-                    if isinstance(ctx, str) and ctx.startswith("http"):
-                        self.warnings.append(
-                            f"External context URL found: {ctx} - ensure it's accessible"
-                        )
-            elif isinstance(context, dict):
-                # Check for namespace prefixes
-                for key, value in context.items():
-                    if isinstance(value, str) and value.startswith("http"):
-                        self.logger.debug(f"Found namespace: {key} -> {value}")
+        # Test flattening
+        flattened = jsonld.flatten(data, None, options)
+        if not isinstance(flattened, (dict, list)):
+            errors.append("JSON-LD flattening should produce an object or array")
 
-        return valid
+    except Exception as e:
+        errors.append(f"JSON-LD processing error: {e}")
 
-    def _validate_against_schema(self, data: Dict[str, Any], file_path: Path) -> bool:
-        """Validate against JSON Schema if available."""
+    return errors
 
-        # Try to find relevant schema based on file location/name
-        schema_file = self._find_schema_for_file(file_path)
-        if not schema_file:
-            self.logger.debug("No specific schema found for validation")
-            return True
 
-        self.logger.debug(f"Validating against schema: {schema_file}")
+def _check_namespace_resolution(expanded: List[Dict[str, Any]]) -> List[str]:
+    """Check that all terms in expanded JSON-LD are properly resolved to IRIs."""
+    errors = []
 
-        try:
-            with open(schema_file, "r") as f:
-                schema = json.load(f)
+    def check_object(obj, path=""):
+        if isinstance(obj, dict):
+            for key, value in obj.items():
+                current_path = f"{path}.{key}" if path else key
 
-            jsonschema.validate(data, schema)
-            self.logger.debug("Schema validation successful")
-            return True
+                # Keys should be IRIs (start with http/https) or JSON-LD keywords (start with @)
+                if not (key.startswith(("http://", "https://")) or key.startswith("@")):
+                    errors.append(f"Unresolved term '{key}' at {current_path}")
 
-        except jsonschema.ValidationError as e:
-            self.errors.append(f"Schema validation error: {e.message}")
-            return False
-        except Exception as e:
-            self.warnings.append(f"Could not validate against schema: {e}")
-            return True
+                check_object(value, current_path)
+        elif isinstance(obj, list):
+            for i, item in enumerate(obj):
+                check_object(item, f"{path}[{i}]")
 
-    def _find_schema_for_file(self, file_path: Path) -> Optional[Path]:
-        """Find appropriate schema file for the given JSON-LD file."""
-        # Look for schemas in the project
-        project_root = file_path
-        while project_root.parent != project_root:
-            if (project_root / "pyproject.toml").exists():
-                break
-            project_root = project_root.parent
+    for i, item in enumerate(expanded):
+        check_object(item, f"[{i}]")
 
-        # Check transforms schema
-        if "transforms" in str(file_path):
-            schema_paths = [
-                project_root
-                / "transforms"
-                / "_out"
-                / "json-schema"
-                / "transforms.schema.json",
-                project_root / "transforms" / "_out" / "transforms.schema.json",
-                project_root / "schemas" / "transforms" / "transforms.v0.schema.json",
-            ]
-            for schema_path in schema_paths:
-                if schema_path.exists():
-                    return schema_path
+    return errors
 
+
+def find_schema_file(file_path: Path) -> Path | None:
+    """Find appropriate schema file for validation."""
+    # Find project root
+    current = file_path.parent
+    while current != current.parent:
+        if (current / "pyproject.toml").exists():
+            break
+        current = current.parent
+
+    # Simple schema detection based on path
+    if "transforms" in str(file_path):
+        schema_candidates = [
+            current / "transforms" / "_out" / "json-schema" / "transforms.schema.json",
+            current
+            / "packages"
+            / "noid-transforms"
+            / "_out"
+            / "transform_v0.schema.json",
+        ]
+    elif "spaces" in str(file_path):
+        schema_candidates = [
+            current / "packages" / "noid-spaces" / "_out" / "spaces_v0.schema.json"
+        ]
+    else:
         return None
 
-    def _report_results(self, file_path: Path, valid: bool):
-        """Report validation results."""
-        if valid and not self.errors:
-            print(f"✅ {file_path}: VALID")
-        else:
-            print(f"❌ {file_path}: INVALID")
+    for schema_path in schema_candidates:
+        if schema_path.exists():
+            return schema_path
 
-        for error in self.errors:
+    return None
+
+
+def validate_against_schema(data: Dict[str, Any], file_path: Path) -> List[str]:
+    """Validate against JSON Schema if available."""
+    schema_file = find_schema_file(file_path)
+    if not schema_file:
+        return []  # No schema found, skip validation
+
+    try:
+        with open(schema_file, "r") as f:
+            schema = json.load(f)
+        jsonschema.validate(data, schema)
+        return []
+    except jsonschema.ValidationError as e:
+        return [f"Schema validation error: {e.message}"]
+    except Exception as e:
+        logging.warning(f"Could not validate against schema: {e}")
+        return []
+
+
+def validate_file(file_path: Path, verbose: bool = False) -> bool:
+    """Validate a single JSON-LD file. Returns True if valid."""
+    if not file_path.exists():
+        print(f"❌ {file_path}: File not found")
+        return False
+
+    # Load and validate JSON syntax
+    data, syntax_errors = validate_json_syntax(file_path)
+    if syntax_errors:
+        print(f"❌ {file_path}: INVALID")
+        for error in syntax_errors:
             print(f"   ERROR: {error}")
+        return False
 
-        if self.verbose or not valid:
-            for warning in self.warnings:
-                print(f"   WARNING: {warning}")
+    # Collect all validation errors
+    all_errors = []
+    all_errors.extend(validate_jsonld_processing(data, file_path.parent))
+    all_errors.extend(validate_against_schema(data, file_path))
+
+    # Report results
+    if all_errors:
+        print(f"❌ {file_path}: INVALID")
+        for error in all_errors:
+            print(f"   ERROR: {error}")
+        return False
+    else:
+        print(f"✅ {file_path}: VALID")
+        return True
+
+
+def find_all_example_files() -> List[Path]:
+    """Find all JSON-LD example files in the project."""
+    cwd = Path.cwd()
+    example_files = []
+
+    # Search common example locations
+    search_paths = [
+        cwd / "transforms" / "examples",
+        cwd / "spaces" / "examples",
+        cwd / "packages" / "noid-transforms" / "examples",
+        cwd / "packages" / "noid-spaces" / "examples",
+        cwd / "examples",
+    ]
+
+    for path in search_paths:
+        if path.exists():
+            example_files.extend(path.glob("*.jsonld"))
+
+    return example_files
 
 
 def main():
@@ -240,53 +278,28 @@ def main():
     parser = argparse.ArgumentParser(description="Validate JSON-LD files")
     parser.add_argument("files", nargs="*", type=Path, help="JSON-LD files to validate")
     parser.add_argument("-v", "--verbose", action="store_true", help="Verbose output")
-    parser.add_argument(
-        "--all-transforms",
-        action="store_true",
-        help="Validate all transform example files",
-    )
 
     args = parser.parse_args()
+    setup_logging(args.verbose)
 
-    validator = JSONLDValidator(verbose=args.verbose)
+    # Collect files to validate
+    files_to_validate = list(args.files)
 
-    files_to_validate = []
-
-    if args.all_transforms:
-        # Find transform example files
-        cwd = Path.cwd()
-
-        # Try different possible locations for transform examples
-        possible_paths = [
-            cwd / "transforms" / "examples",  # Running from project root
-            cwd / "examples",  # Running from transforms directory
-            cwd.parent / "transforms" / "examples",  # Running from subdirectory
-        ]
-
-        transform_examples = None
-        for path in possible_paths:
-            if path.exists() and list(path.glob("*.jsonld")):
-                transform_examples = path
-                break
-
-        if transform_examples:
-            files_to_validate.extend(transform_examples.glob("*.jsonld"))
-
-    files_to_validate.extend(args.files)
-
-    if not files_to_validate and not args.all_transforms:
-        print("ERROR: No files to validate. Specify files or use --all-transforms")
-        return 1
-
+    # If no specific files provided, find all example files
     if not files_to_validate:
-        print("No files found to validate")
-        return 1
+        files_to_validate = find_all_example_files()
+        if not files_to_validate:
+            print("ERROR: No JSON-LD files found to validate")
+            return 1
+        print(f"Found {len(files_to_validate)} example files to validate")
 
+    # Validate all files
     all_valid = True
     for file_path in files_to_validate:
-        valid = validator.validate_file(file_path)
+        valid = validate_file(file_path, args.verbose)
         all_valid &= valid
 
+    # Final summary
     if all_valid:
         print(f"\n🎉 All {len(files_to_validate)} files are valid JSON-LD!")
         return 0

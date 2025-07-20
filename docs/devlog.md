@@ -1,5 +1,15 @@
 # Devlog
 
+## 2025-07-19
+
+Using pint for units, with some extended units
+
+Idea: vocabulary for coordinate systems (RAS, LPS, DV/RC/ML). When setting up a
+coordinate system could inherit from one of these and get a pre-defined set of
+dimension names.
+
+Idea: vocabulary for dimension names
+
 ## 2025-07-18
 
 Reviewing the generated code. Finishing up transforms.

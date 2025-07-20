@@ -17,23 +17,37 @@ from .adapter import PyLDDataAdapter
 from .registry import registry
 
 
-def from_jsonld(jsonld_data: dict[str, Any] | str) -> dict[str, Any]:
+def from_jsonld(jsonld_data: dict[str, Any] | str) -> dict[str, Any] | Any:
     """Process JSON-LD with strict validation and registry-based object creation.
 
-    This function requires all terms to be properly mapped to IRIs in the @context.
-    It uses PyLD expansion for IRI resolution and the registry system for object creation.
+    This function supports two patterns:
+    1. Single object with @type at root: Returns the created object directly
+    2. Property-based structure: Returns dict with original keys mapped to objects
+
+    All terms must be properly mapped to IRIs in the @context.
+    Uses PyLD expansion for IRI resolution and the registry system for object creation.
 
     Args:
         jsonld_data: JSON-LD document (dict) or JSON-LD string
 
     Returns:
-        Dictionary with original keys mapped to registered objects and preserved context
+        Single object (if @type at root) or dictionary with original keys mapped to objects
 
     Raises:
         ValueError: If terms cannot be mapped to IRIs or document is empty
 
     Examples:
-        >>> # Valid JSON-LD with proper context
+        >>> # Single object with @type at root
+        >>> jsonld_doc = {
+        ...     "@context": {"spac": "https://github.com/nclack/noid/schemas/space/"},
+        ...     "@type": "spac:dimension",
+        ...     "id": "x",
+        ...     "unit": "m"
+        ... }
+        >>> result = from_jsonld(jsonld_doc)
+        >>> # Returns: Dimension(id="x", unit="m")  # if registered
+
+        >>> # Property-based structure
         >>> jsonld_doc = {
         ...     "@context": {
         ...         "example": "https://example.com/schemas/"
@@ -47,21 +61,6 @@ def from_jsonld(jsonld_data: dict[str, Any] | str) -> dict[str, Any]:
         >>> #   "example:widget": Widget(name="my_widget", value=42),  # if registered
         >>> #   "other_data": "preserved"
         >>> # }
-
-        >>> # Multi-namespace example
-        >>> jsonld_doc = {
-        ...     "@context": {
-        ...         "widgets": "https://example.com/widgets/",
-        ...         "config": "https://example.com/config/"
-        ...     },
-        ...     "widgets:button": {"label": "Click me"},
-        ...     "config:setting": "enabled"
-        ... }
-        >>> result = from_jsonld(jsonld_doc)
-
-        >>> # This will raise an error (unmappable term):
-        >>> bad_doc = {"widget": {"name": "test"}}  # No @context
-        >>> from_jsonld(bad_doc)  # ValueError: No expandable terms found...
     """
     # Parse JSON string if needed
     if isinstance(jsonld_data, str):
@@ -70,6 +69,71 @@ def from_jsonld(jsonld_data: dict[str, Any] | str) -> dict[str, Any]:
     if not isinstance(jsonld_data, dict):
         raise ValueError("JSON-LD data must be a dictionary")
 
+    # Check for single object pattern (@type at root)
+    if "@type" in jsonld_data:
+        return _handle_single_object_from_jsonld(jsonld_data)
+
+    # Property-based pattern - original logic
+    return _handle_property_based_from_jsonld(jsonld_data)
+
+
+def _handle_single_object_from_jsonld(jsonld_data: dict[str, Any]) -> Any:
+    """Handle JSON-LD document with @type at root - creates single object.
+
+    Args:
+        jsonld_data: JSON-LD document with @type field
+
+    Returns:
+        Created object from registry
+
+    Raises:
+        ValueError: If @type cannot be expanded to IRI
+    """
+    # Expand to get full IRI for @type
+    expanded = jsonld.expand(jsonld_data)
+
+    if not expanded or not isinstance(expanded[0], dict):
+        raise ValueError("Failed to expand JSON-LD document")
+
+    expanded_item = expanded[0]
+    type_iri = expanded_item.get("@type")
+
+    if not type_iri:
+        raise ValueError("No @type found in expanded document")
+
+    # Handle case where @type is a list (take first one)
+    if isinstance(type_iri, list):
+        type_iri = type_iri[0]
+
+
+    # Extract data for object creation from original document
+    # (unprefixed properties won't be in expanded form)
+    data = {}
+    for key, value in jsonld_data.items():
+        if key not in ("@context", "@type", "@id"):
+            data[key] = value
+
+    # Initialize adapter for PyLD data normalization
+    adapter = PyLDDataAdapter()
+    normalized_data = adapter.normalize(data)
+
+    # Create object using registry
+    try:
+        return registry.create(type_iri, normalized_data)
+    except Exception as e:
+        logging.warning(f"Failed to create object for type IRI '{type_iri}': {e}")
+        raise
+
+
+def _handle_property_based_from_jsonld(jsonld_data: dict[str, Any]) -> dict[str, Any]:
+    """Handle JSON-LD document with property-based structure - original logic.
+
+    Args:
+        jsonld_data: JSON-LD document with properties mapped to objects
+
+    Returns:
+        Dictionary with original keys mapped to registered objects and preserved context
+    """
     # PyLD expansion (handles @context → full IRIs)
     expanded = jsonld.expand(jsonld_data)
 
@@ -111,8 +175,11 @@ def from_jsonld(jsonld_data: dict[str, Any] | str) -> dict[str, Any]:
             short_key = _iri_to_short_key(iri, context)
             processed_original_keys.add(short_key)
 
-            # Normalize PyLD data before dispatch
-            normalized_data = adapter.normalize(raw_value)
+            # Get original data from the source document (expanded may lose unnamespaced properties)
+            original_data = jsonld_data.get(short_key, raw_value)
+
+            # Normalize data before dispatch
+            normalized_data = adapter.normalize(original_data)
 
             # Try registry dispatch with adapter
             try:

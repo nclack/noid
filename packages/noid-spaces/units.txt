@@ -1,0 +1,157 @@
+# Unit Definitions for noid-spaces
+#
+# IMPORTANT: This file defines ADDITIONAL units that extend Pint's default registry.
+# All standard SI units (meter, second, kilogram, etc.) are automatically available.
+# This file adds biomedical-specific units and aliases to the existing Pint registry.
+#
+# For the complete list of Pint's default units, see:
+# - Pint documentation: https://pint.readthedocs.io/
+# - Pint PyPI page: https://pypi.org/project/Pint/
+# - Default unit definitions: https://github.com/hgrecco/pint/blob/master/pint/default_en.txt
+#
+# Syntax: name = definition = symbol = alias1 = alias2 = ...
+# Lines starting with # are comments
+# Empty lines are ignored
+
+# ==========================================
+# MICROSCOPY SPATIAL UNITS (OME-NGFF compliant)
+# ==========================================
+
+# Primary microscopy units
+micrometer = 1e-6 * meter = µm = micron = um
+nanometer = 1e-9 * meter = nm
+angstrom = 1e-10 * meter = Å = ångström = AA
+
+# Additional spatial units for multi-scale imaging
+picometer = 1e-12 * meter = pm
+femtometer = 1e-15 * meter = fm
+attometer = 1e-18 * meter = am
+
+# ==========================================
+# CHEMISTRY & BIOCHEMISTRY UNITS
+# ==========================================
+
+# Concentration units
+molarity = mole / liter = M = molar
+millimolar = 1e-3 * molarity = mM
+micromolar = 1e-6 * molarity = µM = uM = microM
+nanomolar = 1e-9 * molarity = nM = nanoM
+picomolar = 1e-12 * molarity = pM = picoM
+
+# Mass concentration
+milligrams_per_liter = milligram / liter = mg_per_L = mg/L
+micrograms_per_liter = microgram / liter = µg_per_L = ug_per_L = µg/L = ug/L
+
+# Parts per notation
+parts_per_million = 1e-6 = ppm
+parts_per_billion = 1e-9 = ppb
+parts_per_trillion = 1e-12 = ppt
+
+# ==========================================
+# ENZYME & CATALYTIC ACTIVITY
+# ==========================================
+
+# Enzyme units
+enzyme_unit = micromole / minute = U = unit_enzyme
+international_unit = enzyme_unit = IU
+katal = mole / second = kat
+
+# ==========================================
+# CELLULAR & MOLECULAR BIOLOGY
+# ==========================================
+
+# Cell counting and density
+cells_per_milliliter = 1 / milliliter = cells_per_mL = cells/mL
+cells_per_microliter = 1 / microliter = cells_per_µL = cells/µL
+
+# Molecular quantities
+copies_per_cell = 1 = copies/cell
+molecules_per_cell = 1 = molecules/cell
+
+# ==========================================
+# IMAGING & DIGITIZATION UNITS
+# ==========================================
+
+# Digital imaging
+pixel = 1 = px = pixel_unit
+voxel = 1 = voxel_unit
+gray_level = 1 = gray_value = grayscale
+counts = 1 = count = cts
+
+# Pixel density/resolution
+pixels_per_inch = pixel / inch = ppi
+dots_per_inch = pixel / inch = dpi
+pixels_per_micrometer = pixel / micrometer = px_per_µm = px/µm
+
+# ==========================================
+# GEOSPATIAL UNITS (for compatibility)
+# ==========================================
+
+# Geographic coordinates
+degrees_east = degree = degrees_E = degree_east = degree_E = degE
+degrees_north = degree = degrees_N = degree_north = degree_N = degN
+degrees_west = degree = degrees_W = degree_west = degree_W = degW
+degrees_south = degree = degrees_S = degree_south = degree_S = degS
+
+# ==========================================
+# RADIATION & BIOPHYSICS
+# ==========================================
+
+# Standard radiological units (gray, sievert, becquerel, curie) are already
+# available in Pint's default registry.
+
+# Additional photon flux and intensity units
+photons_per_second = 1 / second = photons/s = ph/s
+photons_per_square_meter = 1 / meter**2 = photons/m² = ph/m²
+photons_per_square_centimeter = 1 / centimeter**2 = photons/cm² = ph/cm²
+
+# ==========================================
+# SPECIALIZED BIOMEDICAL UNITS
+# ==========================================
+
+# Osmolality and tonicity
+osmole = mole = osm
+osmolal = osmole / kilogram = osmolal = osm/kg
+milliosmolal = 1e-3 * osmolal = mOsm/kg
+
+# pH and ion concentration (dimensionless but with special meaning)
+ph_unit = 1 = pH
+pka_unit = 1 = pKa
+
+# Practical salinity
+practical_salinity_unit = 1 = psu = PSU
+
+# Optical density and absorbance
+optical_density_unit = 1 = OD = od
+absorbance_unit = 1 = AU = au = abs_unit
+
+# ==========================================
+# FLOW CYTOMETRY & CELL ANALYSIS
+# ==========================================
+
+# Fluorescence intensity
+mean_fluorescence_intensity = 1 = MFI = mfi
+relative_fluorescence_unit = 1 = RFU = rfu
+arbitrary_fluorescence_unit = 1 = AFU = afu
+
+# ==========================================
+# SPECIAL UNITS FOR NOID-SPACES
+# ==========================================
+
+# Non-physical units for data structure and metadata purposes
+# These map to dimensionless in Pint but retain semantic meaning
+
+# "index" represents array index positions (0, 1, 2, ...) or ordinal positions
+# Common use cases:
+# - Array dimension indices in multidimensional data
+# - Sequential ordering (first, second, third item)
+# - Discrete counting positions without physical meaning
+# - Channel numbers, frame numbers, z-slice indices
+index = 1 = dimensionless
+
+arbitrary = 1 = dimensionless
+
+# Additional dimensionless ratios common in biology
+ratio = 1 = dimensionless_ratio
+fold_change = 1 = fold = x_fold
+percent_change = percent = pct_change

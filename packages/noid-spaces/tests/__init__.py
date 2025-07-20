@@ -1,1 +1,1 @@
-"""Test suite for noid-spaces package."""
+"""Test package for noid-spaces."""

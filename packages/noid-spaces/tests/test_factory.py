@@ -1,394 +1,185 @@
-"""Tests for noid_spaces.factory module."""
+"""Tests for factory functions."""
 
 import json
 
+import pint
 import pytest
 
-from noid_spaces.factory import (
-    coordinate_system,
-    coordinate_transform,
-    dimension,
-    from_dict,
-    from_json,
-)
-from noid_spaces.models import CoordinateSystem, CoordinateTransform, Dimension
+from noid_spaces.factory import dimension, from_data, from_json, unit_term
+from noid_spaces.models import Dimension, DimensionType, UnitTerm
 
 
-class TestFactoryFunctions:
-    """Test cases for factory functions."""
+class TestUnitTermFactory:
+    """Tests for unit_term factory function."""
 
-    def test_dimension_factory(self):
-        """Test dimension factory function."""
-        dim = dimension(id="x", unit="micrometer", type="space")
-        assert isinstance(dim, Dimension)
-        assert dim.id == "x"
-        assert dim.unit == "micrometer"
-        assert dim.type == "space"
+    def test_create_special_unit(self):
+        """Test creating special unit via factory."""
+        unit = unit_term("index")
+        assert isinstance(unit, UnitTerm)
+        assert unit.is_non_physical
+        assert unit.to_data() == "index"
 
-    def test_dimension_factory_index(self):
-        """Test dimension factory for index dimensions."""
-        dim = dimension(id="i", unit="index", type="index")
-        assert isinstance(dim, Dimension)
-        assert dim.is_index
-        assert dim.unit == "index"
+    def test_create_physical_unit(self):
+        """Test creating physical unit via factory."""
+        unit = unit_term("m")
+        assert isinstance(unit, UnitTerm)
+        assert not unit.is_non_physical
+        assert unit.to_dimension_type() == DimensionType.SPACE
+        assert unit.to_data() == "m"
 
-    def test_dimension_factory_invalid(self):
-        """Test dimension factory with invalid parameters."""
-        with pytest.raises(ValueError):
-            dimension(id="", unit="meter", type="space")
+    def test_invalid_unit(self):
+        """Test that invalid unit raises error."""
+        with pytest.raises(pint.UndefinedUnitError):
+            unit_term("invalidunit12345")
 
-        with pytest.raises(ValueError):
-            dimension(id="x", unit="meter", type="invalid")
+    def test_biomedical_units_factory(self):
+        """Test creating biomedical units via factory."""
+        # Microscopy units
+        micrometer = unit_term("µm")
+        assert isinstance(micrometer, UnitTerm)
+        assert micrometer.to_dimension_type() == DimensionType.SPACE
 
-    def test_coordinate_system_factory_with_dicts(self):
-        """Test coordinate system factory with dimension dictionaries."""
-        coord_sys = coordinate_system(
-            id="physical",
-            dimensions=[
-                {"id": "x", "unit": "micrometer", "type": "space"},
-                {"id": "y", "unit": "micrometer", "type": "space"},
-            ],
-            description="Physical space",
-        )
-        assert isinstance(coord_sys, CoordinateSystem)
-        assert coord_sys.id == "physical"
-        assert len(coord_sys.dimensions) == 2
-        assert coord_sys.description == "Physical space"
-        assert all(isinstance(dim, Dimension) for dim in coord_sys.dimensions)
+        # Chemistry units
+        molarity = unit_term("M")
+        assert isinstance(molarity, UnitTerm)
+        assert molarity.to_data() == "M"
 
-    def test_coordinate_system_factory_with_strings(self):
-        """Test coordinate system factory with string references."""
-        coord_sys = coordinate_system(id="array", dimensions=["i", "j", "k"])
-        assert isinstance(coord_sys, CoordinateSystem)
-        assert coord_sys.id == "array"
-        assert len(coord_sys.dimensions) == 3
-        assert coord_sys.dimensions[0] == "i"
-
-    def test_coordinate_system_factory_mixed(self):
-        """Test coordinate system factory with mixed dimension types."""
-        coord_sys = coordinate_system(
-            id="mixed",
-            dimensions=[{"id": "x", "unit": "meter", "type": "space"}, "ref_dim"],
-        )
-        assert isinstance(coord_sys, CoordinateSystem)
-        assert len(coord_sys.dimensions) == 2
-        assert isinstance(coord_sys.dimensions[0], Dimension)
-        assert coord_sys.dimensions[1] == "ref_dim"
-
-    def test_coordinate_transform_factory(self):
-        """Test coordinate transform factory function."""
-        transform = coordinate_transform(
-            id="physical_to_array",
-            input="physical_space",
-            output="array_space",
-            transform={"scale": [0.5, 0.5, 1.0]},
-            description="Scale transform",
-        )
-        assert isinstance(transform, CoordinateTransform)
-        assert transform.id == "physical_to_array"
-        assert transform.input == "physical_space"
-        assert transform.output == "array_space"
-        assert transform.transform == {"scale": [0.5, 0.5, 1.0]}
-        assert transform.description == "Scale transform"
-
-    def test_coordinate_transform_factory_minimal(self):
-        """Test coordinate transform factory with minimal parameters."""
-        transform = coordinate_transform(
-            id="simple", input="input", output="output", transform={"identity": True}
-        )
-        assert isinstance(transform, CoordinateTransform)
-        assert transform.description is None
+        # Specialized biomedical units
+        ppm = unit_term("ppm")
+        assert isinstance(ppm, UnitTerm)
+        # ppm is dimensionless - can check via Pint
+        assert ppm.to_quantity().dimensionless
 
 
-class TestFromDict:
-    """Test cases for from_dict function."""
+class TestFromData:
+    """Tests for from_data function."""
 
-    def test_from_dict_dimension(self):
-        """Test creating dimension from dictionary."""
-        data = {"dimension": {"id": "x", "unit": "micrometer", "type": "space"}}
-        result = from_dict(data)
-        assert isinstance(result, Dimension)
-        assert result.id == "x"
-        assert result.unit == "micrometer"
-        assert result.type == "space"
+    def test_from_string(self):
+        """Test creating unit from string."""
+        unit = from_data("m")
+        assert isinstance(unit, UnitTerm)
+        assert unit.to_data() == "m"
 
-    def test_from_dict_coordinate_system(self):
-        """Test creating coordinate system from dictionary."""
-        data = {
-            "coordinate-system": {
-                "id": "physical",
-                "dimensions": [
-                    {"id": "x", "unit": "micrometer", "type": "space"},
-                    {"id": "y", "unit": "micrometer", "type": "space"},
-                ],
-                "description": "Physical coordinate system",
-            }
-        }
-        result = from_dict(data)
-        assert isinstance(result, CoordinateSystem)
-        assert result.id == "physical"
-        assert len(result.dimensions) == 2
-        assert result.description == "Physical coordinate system"
+    def test_from_dict(self):
+        """Test creating unit from dictionary."""
+        data = {"unit": "m"}
+        unit = from_data(data)
+        assert isinstance(unit, UnitTerm)
+        assert unit.to_data() == "m"
 
-    def test_from_dict_coordinate_transform(self):
-        """Test creating coordinate transform from dictionary."""
-        data = {
-            "coordinate-transform": {
-                "id": "physical_to_array",
-                "input": "physical_space",
-                "output": "array_space",
-                "transform": {"scale": [0.5, 0.5, 1.0]},
-            }
-        }
-        result = from_dict(data)
-        assert isinstance(result, CoordinateTransform)
-        assert result.id == "physical_to_array"
-        assert result.input == "physical_space"
-        assert result.output == "array_space"
-        assert result.transform == {"scale": [0.5, 0.5, 1.0]}
+    def test_invalid_dict_multiple_keys(self):
+        """Test that dict with multiple keys raises error."""
+        data = {"unit": "m", "other": "value"}
+        with pytest.raises(ValueError, match="exactly one key"):
+            from_data(data)
 
-    def test_from_dict_invalid_format(self):
-        """Test from_dict with invalid dictionary format."""
-        # Multiple keys
-        with pytest.raises(
-            ValueError, match="Space dictionary must have exactly one key"
-        ):
-            from_dict(
-                {
-                    "dimension": {"id": "x", "unit": "meter", "type": "space"},
-                    "coordinate-system": {"id": "test", "dimensions": []},
-                }
-            )
+    def test_invalid_dict_no_keys(self):
+        """Test that empty dict raises error."""
+        with pytest.raises(ValueError, match="exactly one key"):
+            from_data({})
 
-        # No keys
-        with pytest.raises(
-            ValueError, match="Space dictionary must have exactly one key"
-        ):
-            from_dict({})
-
-    def test_from_dict_unknown_type(self):
-        """Test from_dict with unknown space type."""
-        data = {"unknown-type": {"id": "test"}}
-        with pytest.raises(ValueError, match="Unknown space type: 'unknown-type'"):
-            from_dict(data)
-
-    def test_from_dict_non_dict_input(self):
-        """Test from_dict with non-dictionary input."""
-        # This should now raise an error since we removed the non-dict check
-        # in the updated factory.py
-        with pytest.raises(
-            ValueError, match="Space dictionary must have exactly one key"
-        ):
-            from_dict("not a dict")
+    def test_unknown_type(self):
+        """Test that unknown type raises error."""
+        data = {"unknown-type": "value"}
+        with pytest.raises(ValueError, match="Unknown space type"):
+            from_data(data)
 
 
 class TestFromJson:
-    """Test cases for from_json function."""
+    """Tests for from_json function."""
 
-    def test_from_json_dimension(self):
-        """Test creating dimension from JSON string."""
-        json_str = json.dumps(
-            {"dimension": {"id": "x", "unit": "micrometer", "type": "space"}}
-        )
-        result = from_json(json_str)
-        assert isinstance(result, Dimension)
-        assert result.id == "x"
-        assert result.unit == "micrometer"
-        assert result.type == "space"
+    def test_from_json_string(self):
+        """Test creating unit from JSON string."""
+        json_str = '"m"'
+        unit = from_json(json_str)
+        assert isinstance(unit, UnitTerm)
+        assert unit.to_data() == "m"
 
-    def test_from_json_coordinate_system(self):
-        """Test creating coordinate system from JSON string."""
-        json_str = json.dumps(
-            {
-                "coordinate-system": {
-                    "id": "physical",
-                    "dimensions": [
-                        {"id": "x", "unit": "meter", "type": "space"},
-                        {"id": "y", "unit": "meter", "type": "space"},
-                    ],
-                }
-            }
-        )
-        result = from_json(json_str)
-        assert isinstance(result, CoordinateSystem)
-        assert result.id == "physical"
-        assert len(result.dimensions) == 2
+    def test_from_json_dict(self):
+        """Test creating unit from JSON dictionary."""
+        data = {"unit": "m"}
+        json_str = json.dumps(data)
+        unit = from_json(json_str)
+        assert isinstance(unit, UnitTerm)
+        assert unit.to_data() == "m"
 
-    def test_from_json_coordinate_transform(self):
-        """Test creating coordinate transform from JSON string."""
-        json_str = json.dumps(
-            {
-                "coordinate-transform": {
-                    "id": "test_transform",
-                    "input": "input_space",
-                    "output": "output_space",
-                    "transform": {"translation": [10, 20, 5]},
-                }
-            }
-        )
-        result = from_json(json_str)
-        assert isinstance(result, CoordinateTransform)
-        assert result.id == "test_transform"
-        assert result.transform == {"translation": [10, 20, 5]}
-
-    def test_from_json_invalid_json(self):
-        """Test from_json with invalid JSON string."""
+    def test_invalid_json(self):
+        """Test that invalid JSON raises error."""
         with pytest.raises(json.JSONDecodeError):
-            from_json("invalid json {")
-
-    def test_from_json_invalid_content(self):
-        """Test from_json with invalid content structure."""
-        json_str = json.dumps({"unknown-type": {"id": "test"}})
-        with pytest.raises(ValueError, match="Unknown space type"):
-            from_json(json_str)
+            from_json("invalid json")
 
 
-class TestRegistryIntegration:
-    """Test cases for registry integration."""
+class TestDimensionFactory:
+    """Tests for dimension factory function."""
 
-    def test_registry_dimension_creation(self):
-        """Test that dimension factory is properly registered."""
-        # This tests that the @register decorator worked
-        from noid_registry import get_schema_namespace, registry
+    def test_create_dimension_with_type(self):
+        """Test creating dimension with explicit type."""
+        dim = dimension(id="x", unit="m", type="space")
+        assert isinstance(dim, Dimension)
+        assert dim.id == "x"
+        assert dim.unit.value == "m"
+        assert dim.type == DimensionType.SPACE
 
-        namespace = get_schema_namespace("space")
-        namespace = namespace.rstrip("/") + "/"
-        full_iri = f"{namespace}dimension"
+    def test_create_dimension_type_inference(self):
+        """Test creating dimension with inferred type."""
+        # Spatial unit
+        dim_m = dimension(id="x", unit="m")
+        assert dim_m.type == DimensionType.SPACE
 
-        # Should be able to create through registry
-        result = registry.create(
-            full_iri, {"id": "test", "unit": "meter", "type": "space"}
-        )
-        assert isinstance(result, Dimension)
-        assert result.id == "test"
+        # Temporal unit
+        dim_s = dimension(id="time", unit="s")
+        assert dim_s.type == DimensionType.TIME
 
-    def test_registry_coordinate_system_creation(self):
-        """Test that coordinate system factory is properly registered."""
-        from noid_registry import get_schema_namespace, registry
+        # Index unit
+        dim_idx = dimension(id="idx", unit="index")
+        assert dim_idx.type == DimensionType.INDEX
 
-        namespace = get_schema_namespace("space")
-        namespace = namespace.rstrip("/") + "/"
-        full_iri = f"{namespace}coordinate-system"
+        # Arbitrary unit
+        dim_arb = dimension(id="channel", unit="arbitrary")
+        assert dim_arb.type == DimensionType.OTHER
 
-        result = registry.create(
-            full_iri,
-            {
-                "id": "test_system",
-                "dimensions": [{"id": "x", "unit": "meter", "type": "space"}],
-            },
-        )
-        assert isinstance(result, CoordinateSystem)
-        assert result.id == "test_system"
+    def test_dimension_from_data(self):
+        """Test creating dimension via from_data."""
+        # With explicit type
+        data = {"dimension": {"id": "x", "unit": "m", "type": "space"}}
+        dim = from_data(data)
+        assert isinstance(dim, Dimension)
+        assert dim.id == "x"
+        assert dim.unit.value == "m"
+        assert dim.type == DimensionType.SPACE
 
-    def test_registry_coordinate_transform_creation(self):
-        """Test that coordinate transform factory is properly registered."""
-        from noid_registry import get_schema_namespace, registry
+        # With type inference
+        data_no_type = {"dimension": {"id": "y", "unit": "mm"}}
+        dim2 = from_data(data_no_type)
+        assert dim2.id == "y"
+        assert dim2.unit.value == "mm"
+        assert dim2.type == DimensionType.SPACE  # Inferred
 
-        namespace = get_schema_namespace("space")
-        namespace = namespace.rstrip("/") + "/"
-        full_iri = f"{namespace}coordinate-transform"
+    def test_dimension_from_json(self):
+        """Test creating dimension from JSON."""
+        # With explicit type
+        json_str = '{"dimension": {"id": "time", "unit": "ms", "type": "time"}}'
+        dim = from_json(json_str)
+        assert isinstance(dim, Dimension)
+        assert dim.id == "time"
+        assert dim.unit.value == "ms"
+        assert dim.type == DimensionType.TIME
 
-        result = registry.create(
-            full_iri,
-            {
-                "id": "test_transform",
-                "input": "input",
-                "output": "output",
-                "transform": {"identity": True},
-            },
-        )
-        assert isinstance(result, CoordinateTransform)
-        assert result.id == "test_transform"
+        # With type inference
+        json_str_no_type = '{"dimension": {"id": "z", "unit": "µm"}}'
+        dim2 = from_json(json_str_no_type)
+        assert dim2.id == "z"
+        assert dim2.unit.value == "µm"
+        assert dim2.type == DimensionType.SPACE  # Inferred
 
+    def test_dimension_invalid_data(self):
+        """Test dimension factory with invalid data."""
+        # Invalid dimension type
+        with pytest.raises(
+            ValueError, match="'invalid_type' is not a valid DimensionType"
+        ):
+            dimension(id="x", unit="m", type="invalid_type")
 
-class TestComplexExamples:
-    """Test cases with complex, realistic examples."""
-
-    def test_complete_bioimaging_workflow(self):
-        """Test a complete bioimaging coordinate space workflow."""
-        # Create physical coordinate system
-        physical_data = {
-            "coordinate-system": {
-                "id": "physical_space",
-                "dimensions": [
-                    {"id": "x", "unit": "micrometer", "type": "space"},
-                    {"id": "y", "unit": "micrometer", "type": "space"},
-                    {"id": "z", "unit": "micrometer", "type": "space"},
-                    {"id": "t", "unit": "second", "type": "time"},
-                    {"id": "c", "unit": "arbitrary", "type": "other"},
-                ],
-                "description": "5D microscopy coordinate system",
-            }
-        }
-        physical_cs = from_dict(physical_data)
-        assert isinstance(physical_cs, CoordinateSystem)
-        assert physical_cs.dimension_count == 5
-
-        # Create array coordinate system
-        array_data = {
-            "coordinate-system": {
-                "id": "array_space",
-                "dimensions": [
-                    {"id": "i", "unit": "index", "type": "index"},
-                    {"id": "j", "unit": "index", "type": "index"},
-                    {"id": "k", "unit": "index", "type": "index"},
-                    {"id": "t_idx", "unit": "index", "type": "index"},
-                    {"id": "c_idx", "unit": "index", "type": "index"},
-                ],
-                "description": "Array index coordinate system",
-            }
-        }
-        array_cs = from_dict(array_data)
-        assert isinstance(array_cs, CoordinateSystem)
-        assert array_cs.dimension_count == 5
-
-        # Create coordinate transform
-        transform_data = {
-            "coordinate-transform": {
-                "id": "physical_to_array",
-                "input": "physical_space",
-                "output": "array_space",
-                "transform": {
-                    "scale": [0.1, 0.1, 0.5, 1.0, 1.0],
-                    "translation": [0, 0, 0, 0, 0],
-                },
-                "description": "Physical to array coordinate transform",
-            }
-        }
-        transform = from_dict(transform_data)
-        assert isinstance(transform, CoordinateTransform)
-        assert transform.id == "physical_to_array"
-
-    def test_geospatial_integration_example(self):
-        """Test geospatial coordinate system example."""
-        # Geographic coordinate system
-        geo_data = {
-            "coordinate-system": {
-                "id": "wgs84",
-                "dimensions": [
-                    {"id": "longitude", "unit": "degree", "type": "space"},
-                    {"id": "latitude", "unit": "degree", "type": "space"},
-                    {"id": "elevation", "unit": "meter", "type": "space"},
-                ],
-                "description": "WGS84 geographic coordinate system",
-            }
-        }
-        geo_cs = from_dict(geo_data)
-        assert isinstance(geo_cs, CoordinateSystem)
-        assert len(geo_cs.spatial_dimensions) == 3
-
-        # UTM projected coordinate system
-        utm_data = {
-            "coordinate-system": {
-                "id": "utm_zone_10n",
-                "dimensions": [
-                    {"id": "easting", "unit": "meter", "type": "space"},
-                    {"id": "northing", "unit": "meter", "type": "space"},
-                    {"id": "elevation", "unit": "meter", "type": "space"},
-                ],
-                "description": "UTM Zone 10N projected coordinate system",
-            }
-        }
-        utm_cs = from_dict(utm_data)
-        assert isinstance(utm_cs, CoordinateSystem)
-        assert len(utm_cs.spatial_dimensions) == 3
+        # Invalid unit
+        with pytest.raises(pint.UndefinedUnitError):
+            dimension(id="x", unit="invalid_unit_xyz")

@@ -1,327 +1,436 @@
-"""Tests for noid_spaces.models module."""
+"""Tests for space model classes."""
 
+import pint
 import pytest
 
-from noid_spaces.models import CoordinateSystem, CoordinateTransform, Dimension
+from noid_spaces.models import Dimension, DimensionType, UnitTerm
+
+
+class TestUnitTerm:
+    """Tests for UnitTerm class."""
+
+    def test_non_physical_unit_index(self):
+        """Test creating index non-physical unit."""
+        unit = UnitTerm("index")
+        assert unit.is_non_physical
+        assert unit.to_dimension_type() == DimensionType.INDEX
+        assert unit.dimensionality == "index"
+        assert unit.to_data() == "index"
+        assert str(unit) == "index"
+        assert repr(unit) == "UnitTerm('index')"
+        # Non-physical units should still have Pint representation
+        assert unit.pint_unit is not None
+        assert unit.pint_unit.dimensionless
+
+    def test_non_physical_unit_arbitrary(self):
+        """Test creating arbitrary non-physical unit."""
+        unit = UnitTerm("arbitrary")
+        assert unit.is_non_physical
+        assert unit.to_dimension_type() == DimensionType.OTHER
+        assert unit.dimensionality == "arbitrary"
+        assert unit.to_data() == "arbitrary"
+        # Non-physical units should still have Pint representation
+        assert unit.pint_unit is not None
+        assert unit.pint_unit.dimensionless
+
+    def test_physical_unit_meter(self):
+        """Test creating meter physical unit."""
+        unit = UnitTerm("m")
+        assert not unit.is_non_physical
+        assert unit.to_data() == "m"
+        assert unit.pint_unit is not None
+
+    def test_physical_unit_second(self):
+        """Test creating second physical unit."""
+        unit = UnitTerm("s")
+        assert not unit.is_non_physical
+        assert unit.to_data() == "s"
+
+    def test_physical_unit_dimensionless(self):
+        """Test creating dimensionless physical unit."""
+        unit = UnitTerm("1")
+        assert not unit.is_non_physical
+        assert unit.to_data() == "1"
+
+    def test_physical_unit_complex(self):
+        """Test creating complex physical unit."""
+        unit = UnitTerm("kg/m^3")
+        assert not unit.is_non_physical
+        assert unit.to_data() == "kg/m^3"
+
+    def test_invalid_unit_empty(self):
+        """Test that empty unit raises error."""
+        with pytest.raises(ValueError, match="Unit must be a non-empty string"):
+            UnitTerm("")
+
+    def test_invalid_physical_unit(self):
+        """Test that invalid physical unit raises error."""
+        with pytest.raises(pint.UndefinedUnitError):
+            UnitTerm("invalidunit12345")
+
+    def test_invalid_unit_with_magnitude(self):
+        """Test that unit strings with magnitudes raise error."""
+        with pytest.raises(ValueError, match="contains a magnitude"):
+            UnitTerm("5 m")
+
+        with pytest.raises(ValueError, match="contains a magnitude"):
+            UnitTerm("2.5 seconds")
+
+    def test_equality(self):
+        """Test unit equality."""
+        unit1 = UnitTerm("m")
+        unit2 = UnitTerm("m")
+        unit3 = UnitTerm("s")
+
+        assert unit1 == unit2
+        assert unit1 != unit3
+        assert unit1 != "m"  # Different type
+
+    def test_hash(self):
+        """Test unit hashing."""
+        unit1 = UnitTerm("m")
+        unit2 = UnitTerm("m")
+        unit3 = UnitTerm("s")
+
+        assert hash(unit1) == hash(unit2)
+        assert hash(unit1) != hash(unit3)
+
+        # Test in set
+        unit_set = {unit1, unit2, unit3}
+        assert len(unit_set) == 2  # unit1 and unit2 are the same
+
+    def test_to_dimension_type(self):
+        """Test projecting units to dimension types."""
+        # Spatial units
+        meter = UnitTerm("m")
+        assert meter.to_dimension_type() == DimensionType.SPACE
+
+        micrometer = UnitTerm("µm")
+        assert micrometer.to_dimension_type() == DimensionType.SPACE
+
+        # Temporal units
+        second = UnitTerm("s")
+        assert second.to_dimension_type() == DimensionType.TIME
+
+        # Special index unit
+        index = UnitTerm("index")
+        assert index.to_dimension_type() == DimensionType.INDEX
+
+        # Non-physical arbitrary unit
+        arbitrary = UnitTerm("arbitrary")
+        assert arbitrary.to_dimension_type() == DimensionType.OTHER
+
+        # Other physical units (chemistry, etc.)
+        molarity = UnitTerm("M")
+        assert molarity.to_dimension_type() == DimensionType.OTHER
+
+    def test_to_quantity_method(self):
+        """Test converting units to Pint quantities."""
+        # Physical units
+        meter = UnitTerm("m")
+        quantity = meter.to_quantity(5.0)
+        assert quantity.magnitude == 5.0
+        assert str(quantity.units) == "meter"
+
+        # Non-physical units map to dimensionless
+        index = UnitTerm("index")
+        quantity = index.to_quantity(3)
+        assert quantity.magnitude == 3
+        assert quantity.dimensionless
+
+        arbitrary = UnitTerm("arbitrary")
+        quantity = arbitrary.to_quantity(1.5)
+        assert quantity.magnitude == 1.5
+        assert quantity.dimensionless
+
+    def test_biomedical_units(self):
+        """Test biomedical-specific units."""
+        # Microscopy units
+        micrometer = UnitTerm("µm")
+        assert micrometer.to_dimension_type() == DimensionType.SPACE
+        assert micrometer.to_data() == "µm"
+
+        nanometer = UnitTerm("nm")
+        assert nanometer.to_dimension_type() == DimensionType.SPACE
+        assert nanometer.to_data() == "nm"
+
+        # Chemistry units
+        molarity = UnitTerm("M")
+        assert molarity.to_dimension_type() == DimensionType.OTHER
+        assert molarity.to_data() == "M"
+
+        # Test aliases
+        micron = UnitTerm("micron")
+        assert micron.to_dimension_type() == DimensionType.SPACE
+        assert micron.to_data() == "micron"
+
+    def test_list_units(self):
+        """Test listing units by category."""
+        # Test getting all units
+        all_units = UnitTerm.list_units()
+        assert len(all_units) > 0
+        assert "micrometer" in all_units or "µm" in all_units
+
+        # Test spatial units
+        spatial_units = UnitTerm.list_units("spatial")
+        assert len(spatial_units) > 0
+        # Should contain microscopy units
+        spatial_unit_names = " ".join(spatial_units)
+        assert any(
+            unit in spatial_unit_names for unit in ["micrometer", "nanometer", "meter"]
+        )
+
+        # Test temporal units
+        temporal_units = UnitTerm.list_units("temporal")
+        assert len(temporal_units) > 0
+
+        # Test chemistry units
+        chemistry_units = UnitTerm.list_units("chemistry")
+        assert len(chemistry_units) > 0
+
+
+class TestDimensionType:
+    """Tests for DimensionType enum."""
+
+    def test_enum_members(self):
+        """Test enum members and their values."""
+        assert DimensionType.SPACE.value == "space"
+        assert DimensionType.TIME.value == "time"
+        assert DimensionType.OTHER.value == "other"
+        assert DimensionType.INDEX.value == "index"
+
+    def test_enum_values(self):
+        """Test enum values and basic functionality."""
+        space = DimensionType.SPACE
+        time = DimensionType.TIME
+        other = DimensionType.OTHER
+        index = DimensionType.INDEX
+
+        # Test they are different
+        assert space != time
+        assert space != other
+        assert space != index
+        assert time != other
+
+    def test_from_string(self):
+        """Test creating enum from string value."""
+        space = DimensionType("space")
+        assert space == DimensionType.SPACE
+
+        time = DimensionType("time")
+        assert time == DimensionType.TIME
+
+    def test_invalid_string(self):
+        """Test that invalid string raises ValueError."""
+        with pytest.raises(ValueError):
+            DimensionType("invalid")
+
+    def test_to_data(self):
+        """Test serialization method."""
+        assert DimensionType.SPACE.to_data() == "space"
+        assert DimensionType.TIME.to_data() == "time"
+        assert DimensionType.OTHER.to_data() == "other"
+        assert DimensionType.INDEX.to_data() == "index"
+
+    def test_string_representation(self):
+        """Test string representation."""
+        space = DimensionType.SPACE
+        assert str(space) == "DimensionType.SPACE"
+        assert repr(space) == "<DimensionType.SPACE: 'space'>"
+
+    def test_equality(self):
+        """Test equality comparison."""
+        space1 = DimensionType.SPACE
+        space2 = DimensionType("space")
+        time1 = DimensionType.TIME
+
+        assert space1 == space2
+        assert space1 != time1
+
+        # Enum values don't equal strings by default
+        assert space1.value == "space"
+
+    def test_membership(self):
+        """Test membership in containers."""
+        space = DimensionType.SPACE
+        time = DimensionType.TIME
+
+        # Test in set
+        type_set = {space, time}
+        assert len(type_set) == 2
+        assert space in type_set
+        assert time in type_set
+
+        # Test in list
+        type_list = list(DimensionType)
+        assert len(type_list) == 4
+        assert DimensionType.SPACE in type_list
 
 
 class TestDimension:
-    """Test cases for the Dimension class."""
+    """Tests for Dimension class."""
 
-    def test_dimension_creation_valid(self):
-        """Test creating valid dimensions."""
-        # Spatial dimension
-        dim = Dimension(id="x", unit="micrometer", type="space")
+    def test_basic_creation(self):
+        """Test creating dimension with explicit type."""
+        dim = Dimension(id="x", unit="m", kind=DimensionType.SPACE)
         assert dim.id == "x"
-        assert dim.unit == "micrometer"
-        assert dim.type == "space"
-        assert dim.is_spatial
-        assert not dim.is_temporal
-        assert not dim.is_index
-        assert not dim.is_other
+        assert dim.unit.value == "m"
+        assert dim.type == DimensionType.SPACE
 
-        # Temporal dimension
-        time_dim = Dimension(id="t", unit="second", type="time")
-        assert time_dim.is_temporal
-        assert not time_dim.is_spatial
+    def test_type_inference_spatial(self):
+        """Test type inference for spatial units."""
+        # Meter
+        dim_m = Dimension(id="x", unit="m")
+        assert dim_m.type == DimensionType.SPACE
 
-        # Index dimension
-        index_dim = Dimension(id="i", unit="index", type="index")
-        assert index_dim.is_index
-        assert not index_dim.is_spatial
+        # Millimeter
+        dim_mm = Dimension(id="y", unit="mm")
+        assert dim_mm.type == DimensionType.SPACE
 
-        # Other dimension
-        other_dim = Dimension(id="channel", unit="arbitrary", type="other")
-        assert other_dim.is_other
-        assert not other_dim.is_spatial
+        # Micrometer
+        dim_um = Dimension(id="z", unit="µm")
+        assert dim_um.type == DimensionType.SPACE
 
-    def test_dimension_creation_invalid_id(self):
-        """Test dimension creation with invalid ID."""
-        with pytest.raises(ValueError, match="Dimension ID must be a non-empty string"):
-            Dimension(id="", unit="meter", type="space")
+        # Nanometer
+        dim_nm = Dimension(id="w", unit="nm")
+        assert dim_nm.type == DimensionType.SPACE
 
-        with pytest.raises(ValueError, match="Dimension ID must be a non-empty string"):
-            Dimension(id=None, unit="meter", type="space")
+    def test_type_inference_temporal(self):
+        """Test type inference for temporal units."""
+        # Second
+        dim_s = Dimension(id="time", unit="s")
+        assert dim_s.type == DimensionType.TIME
 
-    def test_dimension_creation_invalid_unit(self):
-        """Test dimension creation with invalid unit."""
-        with pytest.raises(ValueError, match="Unit must be a non-empty string"):
-            Dimension(id="x", unit="", type="space")
+        # Millisecond
+        dim_ms = Dimension(id="time2", unit="ms")
+        assert dim_ms.type == DimensionType.TIME
 
-        with pytest.raises(ValueError, match="Unit must be a non-empty string"):
-            Dimension(id="x", unit=None, type="space")
+        # Microsecond
+        dim_us = Dimension(id="time3", unit="µs")
+        assert dim_us.type == DimensionType.TIME
 
-    def test_dimension_creation_invalid_type(self):
-        """Test dimension creation with invalid type."""
-        with pytest.raises(ValueError, match="Type must be one of: space, time, other, index"):
-            Dimension(id="x", unit="meter", type="invalid")
+    def test_type_inference_special(self):
+        """Test type inference for special units."""
+        # Index
+        dim_idx = Dimension(id="idx", unit="index")
+        assert dim_idx.type == DimensionType.INDEX
 
-        with pytest.raises(ValueError, match="Type must be one of: space, time, other, index"):
-            Dimension(id="x", unit="meter", type="")
+        # Arbitrary
+        dim_arb = Dimension(id="channel", unit="arbitrary")
+        assert dim_arb.type == DimensionType.OTHER
 
-    def test_index_dimension_constraint(self):
-        """Test that index dimensions must have 'index' unit."""
-        # Valid index dimension
-        Dimension(id="i", unit="index", type="index")
+    def test_type_inference_other(self):
+        """Test type inference for other physical units."""
+        # Molarity (chemistry)
+        dim_M = Dimension(id="concentration", unit="M")
+        assert dim_M.type == DimensionType.OTHER
 
-        # Invalid index dimension
-        with pytest.raises(ValueError, match="Index type dimensions must have 'index' unit"):
-            Dimension(id="i", unit="meter", type="index")
+        # Kelvin (temperature)
+        dim_K = Dimension(id="temperature", unit="K")
+        assert dim_K.type == DimensionType.OTHER
 
-    def test_dimension_to_dict(self):
-        """Test dimension serialization to dict."""
-        dim = Dimension(id="x", unit="micrometer", type="space")
-        expected = {
-            "id": "x",
-            "unit": "micrometer",
-            "type": "space",
-        }
-        assert dim.to_dict() == expected
+    def test_type_override(self):
+        """Test overriding inferred type."""
+        # Override spatial unit to OTHER (e.g., wavelength)
+        dim = Dimension(id="wavelength", unit="nm", kind=DimensionType.OTHER)
+        assert dim.type == DimensionType.OTHER
 
-    def test_dimension_string_representations(self):
-        """Test string representations of dimension."""
-        dim = Dimension(id="x", unit="micrometer", type="space")
-        assert str(dim) == "x (micrometer, space)"
-        assert repr(dim) == "Dimension(id='x', unit='micrometer', type='space')"
+        # Override arbitrary unit to SPACE
+        dim2 = Dimension(id="custom", unit="arbitrary", kind=DimensionType.SPACE)
+        assert dim2.type == DimensionType.SPACE
 
-    def test_dimension_properties(self):
-        """Test dimension property methods."""
-        spatial_dim = Dimension(id="x", unit="meter", type="space")
-        temporal_dim = Dimension(id="t", unit="second", type="time")
-        index_dim = Dimension(id="i", unit="index", type="index")
-        other_dim = Dimension(id="c", unit="arbitrary", type="other")
+        # Override temporal unit to OTHER
+        dim3 = Dimension(id="duration", unit="ms", kind=DimensionType.OTHER)
+        assert dim3.type == DimensionType.OTHER
 
-        # Test spatial
-        assert spatial_dim.is_spatial
-        assert not spatial_dim.is_temporal
-        assert not spatial_dim.is_index
-        assert not spatial_dim.is_other
+    def test_index_type_validation(self):
+        """Test that index type must have index unit."""
+        with pytest.raises(ValueError, match="Dimension type 'index' requires unit 'index'"):
+            Dimension(id="bad", unit="m", kind=DimensionType.INDEX)
 
-        # Test temporal
-        assert temporal_dim.is_temporal
-        assert not temporal_dim.is_spatial
-        assert not temporal_dim.is_index
-        assert not temporal_dim.is_other
+    def test_dimension_creation_shortcuts(self):
+        """Test creating dimensions with common patterns."""
+        # Spatial with inferred type
+        x = Dimension(id="x", unit="mm")
+        assert x.id == "x"
+        assert x.unit.value == "mm"
+        assert x.type == DimensionType.SPACE
 
-        # Test index
-        assert index_dim.is_index
-        assert not index_dim.is_spatial
-        assert not index_dim.is_temporal
-        assert not index_dim.is_other
+        # Temporal with inferred type
+        t = Dimension(id="time", unit="ms")
+        assert t.id == "time"
+        assert t.unit.value == "ms"
+        assert t.type == DimensionType.TIME
 
-        # Test other
-        assert other_dim.is_other
-        assert not other_dim.is_spatial
-        assert not other_dim.is_temporal
-        assert not other_dim.is_index
+        # Index with inferred type
+        idx = Dimension(id="array_idx", unit="index")
+        assert idx.id == "array_idx"
+        assert idx.unit.value == "index"
+        assert idx.type == DimensionType.INDEX
 
+        # Channel with explicit type override (no warning expected)
+        ch = Dimension(id="wavelength", unit="nm", kind=DimensionType.OTHER)
+        assert ch.id == "wavelength"
+        assert ch.unit.value == "nm"
+        assert ch.type == DimensionType.OTHER
 
-class TestCoordinateSystem:
-    """Test cases for the CoordinateSystem class."""
+    def test_serialization(self):
+        """Test dimension serialization."""
+        dim = Dimension(id="x", unit="m", kind=DimensionType.SPACE)
+        data = dim.to_data()
 
-    def test_coordinate_system_creation_valid(self, sample_dimensions):
-        """Test creating valid coordinate systems."""
-        coord_sys = CoordinateSystem(
-            id="physical",
-            dimensions=sample_dimensions,
-            description="Physical coordinate system"
-        )
-        assert coord_sys.id == "physical"
-        assert len(coord_sys.dimensions) == 3
-        assert coord_sys.description == "Physical coordinate system"
-        assert coord_sys.dimension_count == 3
+        assert data == {"id": "x", "unit": "m", "type": "space"}
 
-    def test_coordinate_system_creation_minimal(self, sample_dimension):
-        """Test creating coordinate system with minimal parameters."""
-        coord_sys = CoordinateSystem(id="simple", dimensions=[sample_dimension])
-        assert coord_sys.id == "simple"
-        assert len(coord_sys.dimensions) == 1
-        assert coord_sys.description is None
+        # Round trip
+        dim2 = Dimension.from_data(data)
+        assert dim == dim2
 
-    def test_coordinate_system_creation_invalid_id(self, sample_dimensions):
-        """Test coordinate system creation with invalid ID."""
-        with pytest.raises(ValueError, match="CoordinateSystem ID must be a non-empty string"):
-            CoordinateSystem(id="", dimensions=sample_dimensions)
+    def test_deserialization_with_type_inference(self):
+        """Test deserializing dimension without explicit type."""
+        # Without type field
+        data = {"id": "y", "unit": "mm"}
+        dim = Dimension.from_data(data)
+        assert dim.id == "y"
+        assert dim.unit.value == "mm"
+        assert dim.type == DimensionType.SPACE  # Inferred
 
-        with pytest.raises(ValueError, match="CoordinateSystem ID must be a non-empty string"):
-            CoordinateSystem(id=None, dimensions=sample_dimensions)
+        # With type field
+        data_with_type = {"id": "z", "unit": "s", "type": "time"}
+        dim2 = Dimension.from_data(data_with_type)
+        assert dim2.id == "z"
+        assert dim2.unit.value == "s"
+        assert dim2.type == DimensionType.TIME
 
-    def test_coordinate_system_creation_no_dimensions(self):
-        """Test coordinate system creation with no dimensions."""
-        with pytest.raises(ValueError, match="CoordinateSystem must have at least one dimension"):
-            CoordinateSystem(id="empty", dimensions=[])
+    def test_equality(self):
+        """Test dimension equality."""
+        dim1 = Dimension(id="x", unit="m")
+        dim2 = Dimension(id="x", unit="m", kind=DimensionType.SPACE)
+        dim3 = Dimension(id="y", unit="m")
 
-        with pytest.raises(ValueError, match="CoordinateSystem must have at least one dimension"):
-            CoordinateSystem(id="none", dimensions=None)
+        assert dim1 == dim2  # Same, type inferred
+        assert dim1 != dim3  # Different ID
+        assert dim1 != "not a dimension"
 
-    def test_coordinate_system_with_string_references(self):
-        """Test coordinate system with string dimension references."""
-        coord_sys = CoordinateSystem(id="array", dimensions=["i", "j", "k"])
-        assert coord_sys.id == "array"
-        assert len(coord_sys.dimensions) == 3
-        assert coord_sys.dimensions[0] == "i"
+    def test_string_representations(self):
+        """Test string representations."""
+        dim = Dimension(id="time", unit="ms", kind=DimensionType.TIME)
 
-    def test_coordinate_system_mixed_dimensions(self, sample_dimension):
-        """Test coordinate system with mixed dimension types."""
-        coord_sys = CoordinateSystem(
-            id="mixed",
-            dimensions=[sample_dimension, "ref_dim"]
-        )
-        assert len(coord_sys.dimensions) == 2
-        assert isinstance(coord_sys.dimensions[0], Dimension)
-        assert coord_sys.dimensions[1] == "ref_dim"
+        # User-friendly
+        assert str(dim) == "time [ms] (time)"
 
-    def test_coordinate_system_invalid_dimension_type(self):
-        """Test coordinate system with invalid dimension types."""
-        with pytest.raises(ValueError, match="Dimensions must be Dimension objects or strings"):
-            CoordinateSystem(id="invalid", dimensions=[123])
+        # Developer-friendly
+        assert repr(dim) == "Dimension(id='time', unit='ms', type='time')"
 
-    def test_coordinate_system_to_dict(self, sample_dimensions):
-        """Test coordinate system serialization to dict."""
-        coord_sys = CoordinateSystem(
-            id="physical",
-            dimensions=sample_dimensions,
-            description="Test system"
-        )
-        result = coord_sys.to_dict()
+    def test_invalid_inputs(self):
+        """Test invalid input handling."""
+        # Empty ID
+        with pytest.raises(ValueError, match="Dimension id must be a non-empty string"):
+            Dimension(id="", unit="m")
 
-        assert result["id"] == "physical"
-        assert result["description"] == "Test system"
-        assert len(result["dimensions"]) == 3
-        assert all("id" in dim for dim in result["dimensions"])
+        # Invalid unit
+        with pytest.raises(pint.UndefinedUnitError):
+            Dimension(id="x", unit="invalid_unit_xyz")
 
-    def test_coordinate_system_string_representations(self, sample_dimensions):
-        """Test string representations of coordinate system."""
-        coord_sys = CoordinateSystem(id="physical", dimensions=sample_dimensions)
-        str_repr = str(coord_sys)
-        assert "physical:" in str_repr
-        assert "x (micrometer, space)" in str_repr
-
-        repr_str = repr(coord_sys)
-        assert "CoordinateSystem(id='physical'" in repr_str
-
-    def test_get_dimension_by_id(self, sample_dimensions):
-        """Test getting dimensions by ID."""
-        coord_sys = CoordinateSystem(id="test", dimensions=sample_dimensions)
-
-        x_dim = coord_sys.get_dimension_by_id("x")
-        assert x_dim is not None
-        assert x_dim.id == "x"
-        assert x_dim.unit == "micrometer"
-
-        missing_dim = coord_sys.get_dimension_by_id("missing")
-        assert missing_dim is None
-
-    def test_dimension_filtering_properties(self, sample_dimensions, sample_index_dimensions):
-        """Test dimension filtering properties."""
-        # Mix of different dimension types
-        all_dims = sample_dimensions + sample_index_dimensions
-        coord_sys = CoordinateSystem(id="mixed", dimensions=all_dims)
-
-        spatial_dims = coord_sys.spatial_dimensions
-        assert len(spatial_dims) == 2
-        assert all(dim.is_spatial for dim in spatial_dims)
-
-        temporal_dims = coord_sys.temporal_dimensions
-        assert len(temporal_dims) == 1
-        assert all(dim.is_temporal for dim in temporal_dims)
-
-        index_dims = coord_sys.index_dimensions
-        assert len(index_dims) == 3
-        assert all(dim.is_index for dim in index_dims)
-
-
-class TestCoordinateTransform:
-    """Test cases for the CoordinateTransform class."""
-
-    def test_coordinate_transform_creation_valid(self):
-        """Test creating valid coordinate transforms."""
-        transform = CoordinateTransform(
-            id="physical_to_array",
-            input="physical_space",
-            output="array_space",
-            transform={"scale": [0.5, 0.5, 1.0]},
-            description="Scale transform"
-        )
-        assert transform.id == "physical_to_array"
-        assert transform.input == "physical_space"
-        assert transform.output == "array_space"
-        assert transform.transform == {"scale": [0.5, 0.5, 1.0]}
-        assert transform.description == "Scale transform"
-
-    def test_coordinate_transform_creation_minimal(self):
-        """Test creating coordinate transform with minimal parameters."""
-        transform = CoordinateTransform(
-            id="simple",
-            input="input_space",
-            output="output_space",
-            transform={"identity": True}
-        )
-        assert transform.id == "simple"
-        assert transform.description is None
-
-    def test_coordinate_transform_invalid_id(self):
-        """Test coordinate transform creation with invalid ID."""
-        with pytest.raises(ValueError, match="CoordinateTransform ID must be a non-empty string"):
-            CoordinateTransform(
-                id="",
-                input="input",
-                output="output",
-                transform={"identity": True}
-            )
-
-    def test_coordinate_transform_with_coordinate_system(self, sample_coordinate_system):
-        """Test coordinate transform with CoordinateSystem objects."""
-        transform = CoordinateTransform(
-            id="cs_transform",
-            input=sample_coordinate_system,
-            output=sample_coordinate_system,
-            transform={"identity": True}
-        )
-        assert transform.id == "cs_transform"
-        assert transform.input == sample_coordinate_system
-
-    def test_coordinate_transform_with_dimension_lists(self, sample_dimensions):
-        """Test coordinate transform with dimension lists."""
-        transform = CoordinateTransform(
-            id="list_transform",
-            input=sample_dimensions,
-            output=["i", "j", "k"],
-            transform={"scale": [1.0, 1.0, 1.0]}
-        )
-        assert transform.id == "list_transform"
-        # Dimension lists should be converted to proper format
-        assert isinstance(transform.input, dict)
-        assert "dimensions" in transform.input
-
-    def test_coordinate_transform_to_dict(self):
-        """Test coordinate transform serialization to dict."""
-        transform = CoordinateTransform(
-            id="test_transform",
-            input="input_space",
-            output="output_space",
-            transform={"translation": [10, 20, 5]},
-            description="Test transform"
-        )
-        result = transform.to_dict()
-
-        assert result["id"] == "test_transform"
-        assert result["input"] == "input_space"
-        assert result["output"] == "output_space"
-        assert result["transform"] == {"translation": [10, 20, 5]}
-        assert result["description"] == "Test transform"
-
-    def test_coordinate_transform_string_representations(self):
-        """Test string representations of coordinate transform."""
-        transform = CoordinateTransform(
-            id="test",
-            input="input",
-            output="output",
-            transform={"identity": True}
-        )
-
-        str_repr = str(transform)
-        assert "test: input -> output" in str_repr
-
-        repr_str = repr(transform)
-        assert "CoordinateTransform(id='test'" in repr_str
+        # Invalid type string
+        with pytest.raises(ValueError, match="'invalid_type' is not a valid DimensionType"):
+            Dimension(id="x", unit="m", kind="invalid_type")

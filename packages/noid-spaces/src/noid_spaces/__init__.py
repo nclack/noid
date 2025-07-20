@@ -1,70 +1,31 @@
 """
 NOID Spaces - A LinkML-based Python library for coordinate spaces and dimensions.
 
-This library provides a user-friendly API for working with coordinate spaces,
-dimensions, and coordinate transforms defined by the LinkML space schema.
-It offers enhanced functionality including UDUNITS-2 validation, factory methods,
-and JSON-LD serialization.
+This library provides a user-friendly API for working with coordinate spaces and dimensions
+defined by the LinkML space schema. It offers enhanced functionality on top of
+the generated LinkML classes including validation, serialization, and factory methods.
 
 ## Quick Start
 
 ```python
 import noid_spaces
 
-# Create dimensions
-x_dim = noid_spaces.dimension("x", "micrometer", "space")
-y_dim = noid_spaces.dimension("y", "micrometer", "space")
-time_dim = noid_spaces.dimension("t", "second", "time")
-
-# Create coordinate system
-physical_space = noid_spaces.coordinate_system(
-    "physical",
-    [x_dim, y_dim, time_dim],
-    "Physical coordinate system"
-)
-
-# Create from dictionaries
-array_space = noid_spaces.from_dict({
-    "coordinate-system": {
-        "id": "array",
-        "dimensions": [
-            {"id": "i", "unit": "index", "type": "index"},
-            {"id": "j", "unit": "index", "type": "index"},
-            {"id": "k", "unit": "index", "type": "index"}
-        ]
-    }
-})
-
-# Create coordinate transform
-transform = noid_spaces.coordinate_transform(
-    "physical_to_array",
-    "physical",
-    "array",
-    {"scale": [0.5, 0.5, 1.0]}
-)
+# Create unit terms
+arbitrary_unit = noid_spaces.unit_term("arbitrary")
+meter_unit = noid_spaces.unit_term("m")
 
 # Serialize to JSON-LD
-json_ld = noid_spaces.to_jsonld(physical_space)
+json_ld = noid_spaces.to_jsonld(x_dim)
 
-# Validate units with UDUNITS-2
-noid_spaces.validate_dimension_unit("meter", "space")
+# Validate dimensions
+noid_spaces.validate(x_dim)
 ```
 
-## Core Classes
+## Types
 
-The library provides enhanced versions of the LinkML-generated classes:
+The library supports unit term functionality from the LinkML schema:
 
-- **Dimension**: Individual axis with unit and type classification
-- **CoordinateSystem**: Collection of dimensions defining a coordinate space
-- **CoordinateTransform**: Mapping between coordinate spaces with transform definition
-
-## Validation
-
-Built-in UDUNITS-2 validation for unit strings:
-
-- Validates spatial and temporal units against UDUNITS-2 standard
-- Supports special units: "index", "arbitrary"
-- Enforces type-specific constraints (e.g., index dimensions must use "index" unit)
+- **UnitTerm**: Non-physical units (index, arbitrary) or physical units via Pint
 
 ## API Reference
 
@@ -72,67 +33,37 @@ See individual modules for detailed documentation:
 
 - `models`: Enhanced space model classes
 - `factory`: Factory functions for creating space objects
-- `validation`: UDUNITS-2 validation utilities
+- `serialization`: JSON-LD serialization support
+- `validation`: Validation utilities
 """
 
-from .factory import (
-    coordinate_system,
-    coordinate_transform,
-    dimension,
-    from_dict,
-    from_json,
-)
-from .models import (
-    CoordinateSystem,
-    CoordinateTransform,
-    Dimension,
-    DimensionType,
-    SpecialUnits,
-    UnitTerm,
-)
-from .validation import (
-    UdunitsValidationError,
-    get_udunits_info,
-    is_valid_dimension_unit,
-    is_valid_udunits_string,
-    validate_dimension_unit,
-    validate_udunits_string,
-)
+from .factory import from_data, from_json, unit_term
+from .models import DimensionType, UnitTerm
+from .serialization import to_data, to_json
+from .validation import ValidationError, validate
 
 __version__ = "0.1.0"
 
 __all__ = [
     # Models
-    "Dimension",
-    "CoordinateSystem",
-    "CoordinateTransform",
-    "DimensionType",
-    "SpecialUnits",
     "UnitTerm",
+    "DimensionType",
     # Factory functions
-    "dimension",
-    "coordinate_system",
-    "coordinate_transform",
-    "from_dict",
+    "unit_term",
+    "from_data",
     "from_json",
-    # Validation
-    "validate_udunits_string",
-    "is_valid_udunits_string",
-    "validate_dimension_unit",
-    "is_valid_dimension_unit",
-    "get_udunits_info",
-    "UdunitsValidationError",
-    # JSON-LD functions (imported from noid-registry)
+    # Serialization
+    "to_data",
+    "to_json",
     "to_jsonld",
     "from_jsonld",
+    # Validation
+    "validate",
+    "ValidationError",
 ]
 
-# Import enhanced JSON-LD processing as main API (requires noid-registry)
+# Import enhanced JSON-LD processing as main API (requires PyLD)
 from noid_registry import from_jsonld, to_jsonld
 
-# Import factory functions to ensure they get registered
-try:
-    from . import factory
-except ImportError:
-    # Registry not available - skip registration
-    pass
+# Internal registry components are imported but not exported
+# Users should use the high-level from_jsonld/to_jsonld API
