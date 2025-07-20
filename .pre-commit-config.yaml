@@ -6,12 +6,12 @@ repos:
       # Run the linter (includes type checking via ANN rules)
       - id: ruff
         name: ruff check (linting + type checking)
-        args: [--fix, packages/noid-transforms/src/, packages/noid-transforms/tests/]
+        args: [--fix, packages/]
         pass_filenames: false
       # Run the formatter
       - id: ruff-format
         name: ruff format (code formatting)
-        args: [packages/noid-transforms/src/, packages/noid-transforms/tests/]
+        args: [packages/]
         pass_filenames: false
 
   # Basic file checks
@@ -30,8 +30,8 @@ repos:
     hooks:
       - id: pytest
         name: pytest (run tests)
-        entry: bash -c 'cd packages/noid-transforms && python -m pytest tests/ -v'
+        entry: bash -c 'cd packages/noid-registry && uv run pytest tests/ -v && cd ../noid-transforms && uv run pytest tests/ -v && cd ../noid-spaces && uv run pytest tests/ -v'
         language: system
         pass_filenames: false
         always_run: true
-        files: ^(src/|tests/)
+        files: ^packages/

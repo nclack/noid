@@ -70,16 +70,19 @@ classes:
       Collection of dimensions that together define a coordinate space for positioning data elements.
     attributes:
       id:
-        description: Unique identifier for the coordinate system
-        identifier: true
-        required: true
+        description: Optional identifier for the coordinate system
+        required: false
         pattern: "^.+$"  # Non-empty string
+        annotations:
+          jsonld.id: "@id"
       dimensions:
         description: List of dimension specifications
         required: true
         multivalued: true
         minimum_cardinality: 1
-        range: DimensionSpec
+        range: Dimension
+        annotations:
+          jsonld.type: "@id"
       description:
         description: Optional description of the coordinate system
         pattern: "^.+$"  # Non-empty string if present
@@ -89,18 +92,23 @@ classes:
       Mathematical mapping between input and output coordinate spaces with transform definition.
     attributes:
       id:
-        description: Unique identifier for the coordinate transform
-        identifier: true
-        required: true
+        description: Optional identifier for the coordinate transform
+        required: false
         pattern: "^.+$"  # Non-empty string
+        annotations:
+          jsonld.id: "@id"
       input:
-        description: Input coordinate space specification
+        description: Input coordinate space
         required: true
-        range: CoordinateSpaceSpec
+        range: CoordinateSystem
+        annotations:
+          jsonld.type: "@id"
       output:
-        description: Output coordinate space specification
+        description: Output coordinate space
         required: true
-        range: CoordinateSpaceSpec
+        range: CoordinateSystem
+        annotations:
+          jsonld.type: "@id"
       transform:
         description: Transform definition from noid_transform schema
         required: true
@@ -108,30 +116,6 @@ classes:
       description:
         description: Optional description of the coordinate transform
         pattern: "^.+$"  # Non-empty string if present
-
-  # Union types for flexible specifications
-  DimensionSpec:
-    description: >-
-      Dimension specification that can be either a string reference or inline Dimension object.
-    union_of:
-      - string
-      - Dimension
-
-  CoordinateSpaceSpec:
-    description: >-
-      Coordinate space specification that can be a string reference, dimension array, or inline CoordinateSystem.
-    union_of:
-      - string
-      - DimensionArray
-      - CoordinateSystem
-
-  DimensionArray:
-    description: Array of dimension specifications
-    attributes:
-      dimensions:
-        multivalued: true
-        minimum_cardinality: 1
-        range: DimensionSpec
 
 types:
   UnitTerm:

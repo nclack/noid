@@ -105,7 +105,6 @@ def _handle_single_object_from_jsonld(jsonld_data: dict[str, Any]) -> Any:
     if isinstance(type_iri, list):
         type_iri = type_iri[0]
 
-
     # Extract data for object creation from original document
     # (unprefixed properties won't be in expanded form)
     data = {}

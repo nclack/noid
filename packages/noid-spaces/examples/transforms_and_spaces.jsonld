@@ -1,0 +1,252 @@
+{
+  "@context": {
+    "@base": "https://example.org/",
+    "noid_spaces": "https://github.com/nclack/noid/schemas/space/",
+    "noid_transform": "https://github.com/nclack/noid/schemas/transform/",
+    "id": "@id"
+  },
+  "@graph": [
+    {
+      "@type": "noid_spaces:Dimension",
+      "id": "x",
+      "noid_spaces:unit": "mm"
+    },
+    {
+      "@type": "noid_spaces:Dimension",
+      "id": "y",
+      "noid_spaces:unit": "mm"
+    },
+    {
+      "@type": "noid_spaces:Dimension",
+      "id": "z",
+      "noid_spaces:unit": "mm"
+    },
+    {
+      "@type": "noid_spaces:CoordinateSystem",
+      "id": "image_space",
+      "noid_spaces:dimensions": ["x", "y", "z"]
+    },
+    {
+      "@type": "noid_spaces:CoordinateSystem",
+      "id": "world_space",
+      "noid_spaces:dimensions": ["x", "y", "z"]
+    },
+    {
+      "@type": "noid_spaces:CoordinateTransform",
+      "id": "transform_with_references",
+      "noid_spaces:input": "image_space",
+      "noid_spaces:output": "world_space",
+      "noid_transform:transform": {
+        "noid_transform:translation": [10.0, 20.0, 0.0]
+      }
+    },
+    {
+      "@type": "noid_spaces:CoordinateTransform",
+      "id": "transform_with_inline_systems",
+      "noid_spaces:input": {
+        "id": "input_space",
+        "noid_spaces:dimensions": ["x", "y"]
+      },
+      "noid_spaces:output": {
+        "noid_spaces:dimensions": [
+          {
+            "id": "out_x",
+            "noid_spaces:unit": "µm"
+          },
+          "y"
+        ]
+      },
+      "noid_transform:transform": {
+        "@type": "noid_transform:Scale",
+        "noid_transform:scale": [1000.0, 1.0]
+      }
+    },
+    {
+      "@type": "noid_spaces:CoordinateTransform",
+      "noid_spaces:input": {
+        "noid_spaces:dimensions": [
+          {
+            "id": "temp_x",
+            "noid_spaces:unit": "pixel"
+          }
+        ]
+      },
+      "noid_spaces:output": {
+        "noid_spaces:dimensions": [
+          {
+            "id": "world_x",
+            "noid_spaces:unit": "mm"
+          }
+        ]
+      },
+      "noid_transform:transform": {
+        "noid_transform:translation": [5.0]
+      },
+      "noid_spaces:description": "Anonymous transform from pixels to world coordinates"
+    },
+    {
+      "@type": "noid_spaces:CoordinateTransform",
+      "noid_spaces:input": {
+        "noid_spaces:dimensions": [
+          {
+            "noid_spaces:unit": "index"
+          },
+          {
+            "noid_spaces:unit": "index"
+          }
+        ]
+      },
+      "noid_spaces:output": {
+        "noid_spaces:dimensions": [
+          {
+            "noid_spaces:unit": "mm"
+          },
+          {
+            "noid_spaces:unit": "mm"
+          }
+        ]
+      },
+      "noid_transform:transform": {
+        "noid_transform:homogeneous": [
+          [0.1, 0.0, 5.0],
+          [0.0, 0.1, 10.0],
+          [0.0, 0.0, 1.0]
+        ]
+      }
+    },
+    {
+      "@type": "noid_spaces:CoordinateTransform",
+      "noid_spaces:input": {
+        "noid_spaces:dimensions": [
+          {
+            "noid_spaces:unit": "index",
+            "noid_spaces:type": "index"
+          }
+        ]
+      },
+      "noid_spaces:output": {
+        "noid_spaces:dimensions": [
+          {
+            "noid_spaces:unit": "s",
+            "noid_spaces:type": "time"
+          }
+        ]
+      },
+      "noid_transform:transform": {
+        "@type": "noid_transform:Scale",
+        "noid_transform:scale": [0.1]
+      },
+      "noid_spaces:description": "Time series: frame index to temporal coordinates (10 FPS)"
+    },
+    {
+      "@type": "noid_spaces:CoordinateTransform",
+      "noid_spaces:input": {
+        "noid_spaces:dimensions": [
+          {
+            "id": "y_input",
+            "noid_spaces:unit": "mm"
+          },
+          {
+            "id": "x_input",
+            "noid_spaces:unit": "mm"
+          },
+          {
+            "id": "z_input",
+            "noid_spaces:unit": "mm"
+          }
+        ]
+      },
+      "noid_spaces:output": {
+        "noid_spaces:dimensions": [
+          {
+            "id": "x_output",
+            "noid_spaces:unit": "mm"
+          },
+          {
+            "id": "y_output",
+            "noid_spaces:unit": "mm"
+          },
+          {
+            "id": "z_output",
+            "noid_spaces:unit": "mm"
+          }
+        ]
+      },
+      "noid_transform:transform": {
+        "noid_transform:map_axis": [1, 0, 2]
+      },
+      "noid_spaces:description": "Axis permutation: YXZ → XYZ reordering"
+    },
+    {
+      "@type": "noid_spaces:CoordinateTransform",
+      "noid_spaces:input": {
+        "noid_spaces:dimensions": [
+          {
+            "noid_spaces:unit": "index"
+          }
+        ]
+      },
+      "noid_spaces:output": {
+        "noid_spaces:dimensions": [
+          {
+            "noid_spaces:unit": "nm",
+            "noid_spaces:type": "other"
+          }
+        ]
+      },
+      "noid_transform:transform": {
+        "noid_transform:translation": [400.0]
+      },
+      "noid_spaces:description": "Spectral mapping: channel index to wavelength (starting at 400nm)"
+    },
+    {
+      "@type": "noid_spaces:CoordinateTransform",
+      "noid_spaces:input": {
+        "noid_spaces:dimensions": [
+          {
+            "noid_spaces:unit": "index"
+          }
+        ]
+      },
+      "noid_spaces:output": {
+        "noid_spaces:dimensions": [
+          {
+            "noid_spaces:unit": "mm"
+          }
+        ]
+      },
+      "noid_transform:transform": {
+        "noid_transform:displacements": {
+          "noid_sampler:path": "/path/to/irregular_positions.zarr",
+          "noid_sampler:interpolation": "linear",
+          "noid_sampler:extrapolation": "nearest"
+        }
+      },
+      "noid_spaces:description": "Lookup table: irregular grid positions from external file"
+    },
+    {
+      "@type": "noid_spaces:CoordinateTransform",
+      "noid_spaces:input": "world_space",
+      "noid_spaces:output": {
+        "noid_spaces:dimensions": [
+          {
+            "id": "x_micron",
+            "noid_spaces:unit": "µm"
+          },
+          {
+            "id": "y_micron",
+            "noid_spaces:unit": "µm"
+          },
+          {
+            "id": "z_micron",
+            "noid_spaces:unit": "µm"
+          }
+        ]
+      },
+      "noid_transform:transform": {
+        "noid_transform:scale": [1000.0, 1000.0, 1000.0]
+      },
+      "noid_spaces:description": "Unit conversion: mm to µm scaling"
+    }
+  ]
+}

@@ -14,7 +14,11 @@ _python_dir = Path(__file__).parent.parent.parent / "_out" / "python"
 sys.path.insert(0, str(_python_dir))
 
 try:
-    from spaces_v0 import Dimension as _Dimension, DimensionType as _DimensionType
+    from spaces_v0 import (
+        CoordinateSystem as _CoordinateSystem,
+        Dimension as _Dimension,
+        DimensionType as _DimensionType,
+    )
 except ImportError as e:
     raise ImportError(
         f"Could not import LinkML-generated classes from {_python_dir}. "
@@ -477,4 +481,170 @@ class Dimension:
             self.id == other.id
             and self._inner.unit == other._inner.unit
             and self._inner.type == other._inner.type
+        )
+
+
+class CoordinateSystem:
+    """
+    Collection of dimensions that together define a coordinate space for positioning data elements.
+
+    This class provides:
+    - Management of multiple dimensions with validation
+    - Optional identification and description
+    - Dictionary serialization support
+    - JSON-LD compatibility through the underlying LinkML model
+
+    Example:
+        >>> # Create a 2D spatial coordinate system
+        >>> x_dim = Dimension(id="x", unit="m")
+        >>> y_dim = Dimension(id="y", unit="m")
+        >>> coord_sys = CoordinateSystem(dimensions=[x_dim, y_dim])
+        >>>
+        >>> # Create with identification
+        >>> coord_sys = CoordinateSystem(
+        ...     id="image_coords",
+        ...     dimensions=[x_dim, y_dim],
+        ...     description="2D image coordinate system"
+        ... )
+    """
+
+    def __init__(
+        self,
+        dimensions: list[Dimension],
+        id: str | None = None,
+        description: str | None = None,
+    ) -> None:
+        """
+        Create a coordinate system with validation.
+
+        Args:
+            dimensions: List of dimension specifications (minimum 1)
+            id: Optional identifier for the coordinate system
+            description: Optional description of the coordinate system
+
+        Raises:
+            ValueError: If parameters are invalid
+        """
+        # Validate inputs
+        if not dimensions:
+            raise ValueError("CoordinateSystem must have at least one dimension")
+
+        if not all(isinstance(dim, Dimension) for dim in dimensions):
+            raise ValueError("All dimensions must be Dimension instances")
+
+        if id is not None and (not isinstance(id, str) or not id.strip()):
+            raise ValueError(
+                "CoordinateSystem id must be a non-empty string if provided"
+            )
+
+        if description is not None and (
+            not isinstance(description, str) or not description.strip()
+        ):
+            raise ValueError(
+                "CoordinateSystem description must be a non-empty string if provided"
+            )
+
+        # Convert Dimension objects to their internal representations for LinkML
+        dimension_data = [dim._inner for dim in dimensions]
+
+        # Create internal representation
+        self._inner = _CoordinateSystem(
+            dimensions=dimension_data,
+            id=id,
+            description=description,
+        )
+
+        # Store original Dimension objects for property access
+        self._dimensions = dimensions
+
+    @property
+    def id(self) -> str | None:
+        """Optional identifier for the coordinate system."""
+        return self._inner.id
+
+    @property
+    def dimensions(self) -> list[Dimension]:
+        """List of dimension specifications."""
+        return self._dimensions
+
+    @property
+    def description(self) -> str | None:
+        """Optional description of the coordinate system."""
+        return self._inner.description
+
+    def to_data(self) -> dict:
+        """
+        Convert to dictionary representation for serialization.
+
+        Returns:
+            Dictionary with dimensions and optional id/description fields
+        """
+        data = {"dimensions": [dim.to_data() for dim in self.dimensions]}
+
+        if self.id is not None:
+            data["id"] = self.id
+
+        if self.description is not None:
+            data["description"] = self.description
+
+        return data
+
+    @classmethod
+    def from_data(cls, data: dict) -> "CoordinateSystem":
+        """
+        Create from dictionary representation.
+
+        Args:
+            data: Dictionary with dimensions field and optional id/description
+
+        Returns:
+            CoordinateSystem instance
+
+        Raises:
+            ValueError: If required fields are missing or invalid
+        """
+        try:
+            dimensions_data = data["dimensions"]
+        except KeyError as e:
+            raise ValueError(f"Missing required field: {e}") from e
+
+        if not isinstance(dimensions_data, list) or not dimensions_data:
+            raise ValueError("Dimensions must be a non-empty list")
+
+        # Convert dimension data to Dimension objects
+        dimensions = [Dimension.from_data(dim_data) for dim_data in dimensions_data]
+
+        return cls(
+            dimensions=dimensions,
+            id=data.get("id"),
+            description=data.get("description"),
+        )
+
+    def __repr__(self) -> str:
+        """Developer representation."""
+        parts = [f"dimensions={len(self.dimensions)} dims"]
+        if self.id:
+            parts.insert(0, f"id={self.id!r}")
+        if self.description:
+            parts.append(f"description={self.description!r}")
+        return f"CoordinateSystem({', '.join(parts)})"
+
+    def __str__(self) -> str:
+        """User-friendly representation."""
+        dim_summary = ", ".join(
+            f"{dim.id}[{dim.unit.value}]" for dim in self.dimensions
+        )
+        base = f"CoordinateSystem({dim_summary})"
+        if self.id:
+            base = f"{self.id}: {base}"
+        return base
+
+    def __eq__(self, other) -> bool:
+        """Equality comparison."""
+        if not isinstance(other, CoordinateSystem):
+            return False
+        return (
+            self.id == other.id
+            and self.dimensions == other.dimensions
+            and self.description == other.description
         )

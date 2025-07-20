@@ -3,7 +3,7 @@
 import pytest
 
 from noid_spaces.models import UnitTerm
-from noid_spaces.validation import validate, ValidationError
+from noid_spaces.validation import ValidationError, validate
 
 
 class TestValidation:
@@ -26,6 +26,7 @@ class TestValidation:
 
     def test_validate_broken_object(self):
         """Test validating an object that fails serialization."""
+
         class BrokenObject:
             def to_data(self):
                 raise RuntimeError("Broken!")

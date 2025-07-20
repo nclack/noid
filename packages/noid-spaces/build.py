@@ -132,7 +132,11 @@ def _basic_jsonld_validation(jsonld_files: Sequence[Path]) -> None:
             if isinstance(data, dict):
                 if "@context" not in data:
                     logging.warning(f"  ⚠ {jsonld_file.name}: No @context found")
-                if "@type" not in data and "examples" not in data:
+                if (
+                    "@type" not in data
+                    and "@graph" not in data
+                    and "examples" not in data
+                ):
                     logging.warning(f"  ⚠ {jsonld_file.name}: No @type found")
             logging.info(f"✓ {jsonld_file.name} validated")
         except json.JSONDecodeError as e:

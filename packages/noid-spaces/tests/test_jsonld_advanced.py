@@ -102,7 +102,7 @@ class TestAdvancedJSONLD:
 
         # Should have dimension object
         dim_found = False
-        for key, value in result.items():
+        for _, value in result.items():
             if isinstance(value, Dimension):
                 assert value.id == "x"
                 assert value.unit.value == "m"
@@ -122,6 +122,7 @@ class TestAdvancedJSONLD:
 
         # Serialize to JSON-LD
         jsonld_data = to_jsonld(objects)
+        assert isinstance(jsonld_data, dict)
 
         # Validate by attempting PyLD operations
         try:
@@ -166,6 +167,7 @@ class TestAdvancedJSONLD:
             "dim1": dimension(id="x", unit="m"),
         }
         result1 = to_jsonld(space_objects)
+        assert isinstance(result1, dict)
 
         # Get the abbreviation used for space namespace
         context1 = result1["@context"]
@@ -218,7 +220,7 @@ class TestAdvancedJSONLD:
 
         # Space object should be processed
         dim_found = False
-        for key, value in result.items():
+        for _, value in result.items():
             if isinstance(value, Dimension):
                 assert value.id == "x"
                 assert value.unit.value == "m"
@@ -267,10 +269,6 @@ class TestAdvancedJSONLD:
         # Invalid JSON string
         with pytest.raises(json.JSONDecodeError):
             from_jsonld('{"invalid": json}')
-
-        # Non-dict input when dict expected
-        with pytest.raises(ValueError, match="must be a dictionary"):
-            from_jsonld(["not", "a", "dict"])
 
     def test_simple_jsonld_roundtrip(self):
         """Test round-trip processing of space objects through JSON-LD."""

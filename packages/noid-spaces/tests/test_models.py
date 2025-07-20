@@ -322,12 +322,12 @@ class TestDimension:
     def test_type_inference_other(self):
         """Test type inference for other physical units."""
         # Molarity (chemistry)
-        dim_M = Dimension(id="concentration", unit="M")
-        assert dim_M.type == DimensionType.OTHER
+        dim_m = Dimension(id="concentration", unit="M")
+        assert dim_m.type == DimensionType.OTHER
 
         # Kelvin (temperature)
-        dim_K = Dimension(id="temperature", unit="K")
-        assert dim_K.type == DimensionType.OTHER
+        dim_k = Dimension(id="temperature", unit="K")
+        assert dim_k.type == DimensionType.OTHER
 
     def test_type_override(self):
         """Test overriding inferred type."""
@@ -345,7 +345,9 @@ class TestDimension:
 
     def test_index_type_validation(self):
         """Test that index type must have index unit."""
-        with pytest.raises(ValueError, match="Dimension type 'index' requires unit 'index'"):
+        with pytest.raises(
+            ValueError, match="Dimension type 'index' requires unit 'index'"
+        ):
             Dimension(id="bad", unit="m", kind=DimensionType.INDEX)
 
     def test_dimension_creation_shortcuts(self):
@@ -432,5 +434,7 @@ class TestDimension:
             Dimension(id="x", unit="invalid_unit_xyz")
 
         # Invalid type string
-        with pytest.raises(ValueError, match="'invalid_type' is not a valid DimensionType"):
+        with pytest.raises(
+            ValueError, match="'invalid_type' is not a valid DimensionType"
+        ):
             Dimension(id="x", unit="m", kind="invalid_type")

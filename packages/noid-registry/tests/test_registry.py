@@ -45,7 +45,7 @@ class TestNamespaceContext:
         # Test that we can register a function
         test_registry = Registry()
 
-        @test_registry.register
+        @test_registry.register()
         def test_transform(data: list[float]) -> MockTransform:
             return MockTransform(data)
 
@@ -59,7 +59,7 @@ class TestNamespaceContext:
 
         test_registry = Registry()
 
-        @test_registry.register
+        @test_registry.register()
         def another_transform(data: str) -> MockTransform:
             return MockTransform(data)
 
@@ -73,7 +73,7 @@ class TestNamespaceContext:
         test_registry = Registry()
 
         # Register first function
-        @test_registry.register
+        @test_registry.register()
         def transform1(data) -> MockTransform:
             return MockTransform(data)
 
@@ -100,21 +100,21 @@ class TestNamespaceContext:
         registry2 = Registry()
 
         # Both registries can register the same name independently
-        @registry1.register
-        def shared_transform(data) -> MockTransform:
+        @registry1.register("shared")
+        def shared_transform1(data) -> MockTransform:
             return MockTransform(f"registry1_{data}")
 
-        @registry2.register
-        def shared_transform(data) -> MockTransform:
+        @registry2.register("shared")
+        def shared_transform2(data) -> MockTransform:
             return MockTransform(f"registry2_{data}")
 
         # Both should be registered in their respective registries
-        assert "https://shared.test/shared_transform" in registry1.get_registered_iris()
-        assert "https://shared.test/shared_transform" in registry2.get_registered_iris()
+        assert "https://shared.test/shared" in registry1.get_registered_iris()
+        assert "https://shared.test/shared" in registry2.get_registered_iris()
 
         # But they should create different objects
-        obj1 = registry1.create("https://shared.test/shared_transform", "test")
-        obj2 = registry2.create("https://shared.test/shared_transform", "test")
+        obj1 = registry1.create("https://shared.test/shared", "test")
+        obj2 = registry2.create("https://shared.test/shared", "test")
 
         assert obj1.data == "registry1_test"
         assert obj2.data == "registry2_test"
@@ -127,7 +127,7 @@ class TestNamespaceContext:
         # Test setting a custom namespace
         set_namespace("https://custom.test/schemas/")
 
-        @test_registry.register
+        @test_registry.register()
         def custom_transform(data) -> MockTransform:
             return MockTransform(data)
 
@@ -138,7 +138,7 @@ class TestNamespaceContext:
         # Test different namespace
         set_namespace("https://example.com/schemas/widgets/")
 
-        @test_registry.register
+        @test_registry.register()
         def widget_transform(data) -> MockTransform:
             return MockTransform(data)
 
@@ -158,7 +158,7 @@ class TestFactoryRegistration:
     def test_basic_registration(self):
         """Test basic factory registration."""
 
-        @self.registry.register
+        @self.registry.register()
         def translation(data: list[float]) -> MockTranslation:
             return MockTranslation(data)
 
@@ -183,7 +183,7 @@ class TestFactoryRegistration:
         """Test different decorator syntax variants."""
 
         # @register (no parentheses)
-        @self.registry.register
+        @self.registry.register()
         def variant1(data) -> MockTransform:
             return MockTransform(data)
 
@@ -207,7 +207,7 @@ class TestFactoryRegistration:
     def test_type_to_iri_mapping(self):
         """Test type to IRI mapping for serialization."""
 
-        @self.registry.register
+        @self.registry.register()
         def translation(data: list[float]) -> MockTranslation:
             return MockTranslation(data)
 
@@ -227,11 +227,11 @@ class TestErrorHandling:
         self.registry = Registry()
 
         # Register some transforms for testing
-        @self.registry.register
+        @self.registry.register()
         def translation(data) -> MockTranslation:
             return MockTranslation(data)
 
-        @self.registry.register
+        @self.registry.register()
         def scale(data) -> MockScale:
             return MockScale(data)
 
@@ -260,7 +260,7 @@ class TestErrorHandling:
     def test_factory_validation_error(self):
         """Test error when factory function fails."""
 
-        @self.registry.register
+        @self.registry.register()
         def failing_transform(data) -> MockTransform:
             raise ValueError("Factory failed!")
 
@@ -291,7 +291,7 @@ class TestRegistryIntegration:
         # Register something in global registry
         set_namespace("https://global.test/")
 
-        @register
+        @register()
         def persistent_transform(data: str) -> MockTransform:
             return MockTransform(data)
 
@@ -315,11 +315,11 @@ class TestRegistryInspection:
         set_namespace("https://inspect.test/")
         self.registry = Registry()
 
-        @self.registry.register
+        @self.registry.register()
         def transform1(data) -> MockTranslation:
             return MockTranslation(data)
 
-        @self.registry.register
+        @self.registry.register()
         def transform2(data) -> MockScale:
             return MockScale(data)
 

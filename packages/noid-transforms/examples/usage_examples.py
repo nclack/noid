@@ -19,7 +19,7 @@ except ImportError:
     import noid_transforms as transforms
 
 
-def basic_usage():
+def basic_usage() -> None:
     """Demonstrate basic transform creation and usage."""
     print("=== Basic Transform Creation ===")
 
@@ -53,7 +53,7 @@ def basic_usage():
     print()
 
 
-def factory_usage():
+def factory_usage() -> None:
     """Demonstrate factory function usage."""
     print("=== Factory Function Usage ===")
 
@@ -106,7 +106,7 @@ def factory_usage():
     print()
 
 
-def serialization_usage():
+def serialization_usage() -> None:
     """Demonstrate serialization capabilities."""
     print("=== Serialization Usage ===")
 
@@ -150,7 +150,7 @@ def serialization_usage():
     print()
 
 
-def validation_usage():
+def validation_usage() -> None:
     """Demonstrate validation capabilities."""
     print("=== Validation Usage ===")
 
@@ -186,7 +186,7 @@ def validation_usage():
     print()
 
 
-def jsonld_examples():
+def jsonld_examples() -> None:
     """Demonstrate JSON-LD specific features with enhanced PyLD processing."""
     print("=== JSON-LD Examples ===")
 
@@ -265,7 +265,7 @@ def jsonld_examples():
     print()
 
 
-def advanced_usage():
+def advanced_usage() -> None:
     """Demonstrate advanced features."""
     print("=== Advanced Usage ===")
 
@@ -297,7 +297,7 @@ def advanced_usage():
     print()
 
 
-def main():
+def main() -> None:
     """Run all examples."""
     print("Transforms Library Usage Examples")
     print("=" * 50)
