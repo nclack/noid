@@ -5,8 +5,10 @@ Coordinat space model classes.
 from enum import Enum
 from pathlib import Path
 import sys
-from typing import cast
+from typing import Any, cast
 
+import noid_transforms
+from noid_transforms import Transform
 import pint
 
 # Add the _out/python directory to sys.path to import generated classes
@@ -16,6 +18,7 @@ sys.path.insert(0, str(_python_dir))
 try:
     from spaces_v0 import (
         CoordinateSystem as _CoordinateSystem,
+        CoordinateTransform as _CoordinateTransform,
         Dimension as _Dimension,
         DimensionType as _DimensionType,
     )
@@ -71,7 +74,7 @@ def _create_unit_registry() -> pint.UnitRegistry:
 _ureg = _create_unit_registry()
 
 
-class UnitTerm:
+class Unit:
     """
     Unit specification that supports non-physical terms or physical units.
     """
@@ -298,7 +301,7 @@ class UnitTerm:
 
     def __eq__(self, other) -> bool:
         """Equality comparison."""
-        if not isinstance(other, UnitTerm):
+        if not isinstance(other, Unit):
             return False
         return self.to_data() == other.to_data()
 
@@ -348,12 +351,6 @@ class Dimension:
     """
     A single axis within a coordinate space with its measurement unit and classification.
 
-    This class provides:
-    - Automatic validation of unit-type consistency (e.g., index type must have index unit)
-    - Integration with UnitTerm for unit validation via Pint
-    - Convenient factory methods for common dimension types
-    - Dictionary serialization support
-
     Example:
         >>> # Create a spatial dimension with explicit type
         >>> x_dim = Dimension(id="x", unit="m", type=DimensionType.SPACE)
@@ -368,7 +365,7 @@ class Dimension:
     """
 
     def __init__(
-        self, id: str, unit: str | UnitTerm, kind: str | DimensionType | None = None
+        self, id: str, unit: str | Unit, kind: str | DimensionType | None = None
     ) -> None:
         """
         Create a dimension with validation.
@@ -385,7 +382,7 @@ class Dimension:
         if not id or not isinstance(id, str):
             raise ValueError("Dimension id must be a non-empty string")
 
-        unit = unit if isinstance(unit, UnitTerm) else UnitTerm(unit)
+        unit = unit if isinstance(unit, Unit) else Unit(unit)
 
         # Infer type from unit if not provided
         if kind is None:
@@ -399,7 +396,7 @@ class Dimension:
         self._inner = _Dimension(id=id, unit=unit.value, type=kind.value)
 
     @staticmethod
-    def _validate_unit_type_consistency(unit: UnitTerm, type: DimensionType) -> None:
+    def _validate_unit_type_consistency(unit: Unit, type: DimensionType) -> None:
         """Validate that unit and type are consistent."""
         # Rule: If type is "index", then unit MUST be "index"
         if type == DimensionType.INDEX and unit.value != "index":
@@ -413,9 +410,9 @@ class Dimension:
         return self._inner.id
 
     @property
-    def unit(self) -> UnitTerm:
+    def unit(self) -> Unit:
         """Unit of measurement."""
-        return UnitTerm(self._inner.unit)
+        return Unit(self._inner.unit)
 
     @property
     def type(self) -> DimensionType:
@@ -487,12 +484,6 @@ class Dimension:
 class CoordinateSystem:
     """
     Collection of dimensions that together define a coordinate space for positioning data elements.
-
-    This class provides:
-    - Management of multiple dimensions with validation
-    - Optional identification and description
-    - Dictionary serialization support
-    - JSON-LD compatibility through the underlying LinkML model
 
     Example:
         >>> # Create a 2D spatial coordinate system
@@ -572,14 +563,16 @@ class CoordinateSystem:
         """Optional description of the coordinate system."""
         return self._inner.description
 
-    def to_data(self) -> dict:
+    def to_data(self) -> dict[str, str | list[dict[str, str]]]:
         """
         Convert to dictionary representation for serialization.
 
         Returns:
             Dictionary with dimensions and optional id/description fields
         """
-        data = {"dimensions": [dim.to_data() for dim in self.dimensions]}
+        data: dict[str, Any] = {
+            "dimensions": [dim.to_data() for dim in self.dimensions]
+        }
 
         if self.id is not None:
             data["id"] = self.id
@@ -647,4 +640,220 @@ class CoordinateSystem:
             self.id == other.id
             and self.dimensions == other.dimensions
             and self.description == other.description
+        )
+
+
+class CoordinateTransform:
+    """
+    Mathematical mapping between input and output coordinate spaces with transform definition.
+
+    This class provides a bridge between coordinate spaces using transformations from the
+    noid_transforms package. It handles both referenced and inline coordinate systems.
+
+    Example:
+        >>> from noid_transforms import translation
+        >>> from noid_spaces import coordinate_system
+        >>>
+        >>> # Create coordinate systems
+        >>> input_cs = coordinate_system([{"id": "x", "unit": "pixel"}, {"id": "y", "unit": "pixel"}])
+        >>> output_cs = coordinate_system([{"id": "x", "unit": "mm"}, {"id": "y", "unit": "mm"}])
+        >>>
+        >>> # Create transform with objects
+        >>> transform = CoordinateTransform(
+        ...     input=input_cs,
+        ...     output=output_cs,
+        ...     transform=translation([0.1, 0.1])  # 0.1mm per pixel
+        ... )
+    """
+
+    def __init__(
+        self,
+        input: CoordinateSystem,
+        output: CoordinateSystem,
+        transform: Transform,
+        id: str | None = None,
+        description: str | None = None,
+    ) -> None:
+        """
+        Create a coordinate transform with validation.
+
+        Args:
+            input: Input coordinate system
+            output: Output coordinate system
+            transform: Transform definition from noid_transforms
+            id: Optional identifier for the coordinate transform
+            description: Optional description of the coordinate transform
+
+        Raises:
+            ValueError: If parameters are invalid
+            TypeError: If transform is not a valid Transform instance
+        """
+        # Validate inputs
+        if not isinstance(input, CoordinateSystem):
+            raise TypeError("input must be a CoordinateSystem instance")
+
+        if not isinstance(output, CoordinateSystem):
+            raise TypeError("output must be a CoordinateSystem instance")
+
+        if not isinstance(transform, Transform):
+            raise TypeError(
+                f"transform must be a noid_transforms.Transform instance, got {type(transform)}"
+            )
+
+        if id is not None and (not isinstance(id, str) or not id.strip()):
+            raise ValueError(
+                "CoordinateTransform id must be a non-empty string if provided"
+            )
+
+        if description is not None and (
+            not isinstance(description, str) or not description.strip()
+        ):
+            raise ValueError(
+                "CoordinateTransform description must be a non-empty string if provided"
+            )
+
+        # Create internal representation for LinkML compatibility
+        # Note: For now, we store the transform data as a dict since the generated
+        # LinkML classes expect dict format for cross-schema references
+        self._inner = _CoordinateTransform(
+            input=input._inner,
+            output=output._inner,
+            transform=transform.to_data(),  # Convert to dict for LinkML
+            id=id,
+            description=description,
+        )
+
+        # Store the enhanced objects for property access (similar to CoordinateSystem._dimensions)
+        self._input = input
+        self._output = output
+        self._transform = transform
+
+    @property
+    def id(self) -> str | None:
+        """Optional identifier for the coordinate transform."""
+        return self._inner.id
+
+    @property
+    def input(self) -> CoordinateSystem:
+        """Input coordinate space."""
+        return self._input
+
+    @property
+    def output(self) -> CoordinateSystem:
+        """Output coordinate space."""
+        return self._output
+
+    @property
+    def transform(self) -> Transform:
+        """Transform definition from noid_transforms."""
+        return self._transform
+
+    @property
+    def description(self) -> str | None:
+        """Optional description of the coordinate transform."""
+        return self._inner.description
+
+    def to_data(self) -> dict[str, Any]:
+        """
+        Convert to dictionary representation for serialization.
+
+        Returns:
+            Dictionary with input, output, transform and optional id/description fields
+        """
+        data: dict[str, Any] = {
+            "input": self.input.to_data(),
+            "output": self.output.to_data(),
+            "transform": self.transform.to_data(),  # Get dict from stored transform object
+        }
+
+        if self._inner.id is not None:
+            data["id"] = self._inner.id
+
+        if self._inner.description is not None:
+            data["description"] = self._inner.description
+
+        return data
+
+    @classmethod
+    def from_data(cls, data: dict) -> "CoordinateTransform":
+        """
+        Create from dictionary representation.
+
+        Args:
+            data: Dictionary with input, output, transform fields and optional id/description
+
+        Returns:
+            CoordinateTransform instance
+
+        Raises:
+            ValueError: If required fields are missing or invalid
+            ImportError: If noid_transforms is not available for transform creation
+        """
+        try:
+            input_data = data["input"]
+            output_data = data["output"]
+            transform_data = data["transform"]
+        except KeyError as e:
+            raise ValueError(f"Missing required field: {e}") from e
+
+        # Convert coordinate system data
+        input_cs = CoordinateSystem.from_data(input_data)
+        output_cs = CoordinateSystem.from_data(output_data)
+
+        try:
+            transform_obj = noid_transforms.from_data(transform_data)
+        except Exception as e:
+            raise ValueError(f"Failed to create transform from data: {e}") from e
+
+        return cls(
+            input=input_cs,
+            output=output_cs,
+            transform=transform_obj,
+            id=data.get("id"),
+            description=data.get("description"),
+        )
+
+    def __repr__(self) -> str:
+        """Developer representation."""
+        parts = []
+        if self.id:
+            parts.append(f"id={self.id!r}")
+
+        # Show input/output dimensions summary
+        input_dims = f"{len(self.input.dimensions)} dims"
+        output_dims = f"{len(self.output.dimensions)} dims"
+        parts.append(f"input={input_dims}")
+        parts.append(f"output={output_dims}")
+        parts.append(f"transform={type(self.transform).__name__}")
+
+        if self.description:
+            parts.append(f"description={self.description!r}")
+
+        return f"CoordinateTransform({', '.join(parts)})"
+
+    def __str__(self) -> str:
+        """User-friendly representation."""
+        input_summary = " → ".join(
+            f"{dim.id}[{dim.unit.value}]" for dim in self.input.dimensions
+        )
+        output_summary = " → ".join(
+            f"{dim.id}[{dim.unit.value}]" for dim in self.output.dimensions
+        )
+
+        base = f"({input_summary}) → ({output_summary}) via {type(self.transform).__name__}"
+        if self.id:
+            base = f"{self.id}: {base}"
+        return base
+
+    def __eq__(self, other) -> bool:
+        """Equality comparison."""
+        if not isinstance(other, CoordinateTransform):
+            return False
+        return (
+            self._inner.id == other._inner.id
+            and self._input == other._input
+            and self._output == other._output
+            and self._transform.to_data()
+            == other._transform.to_data()  # Compare transform data
+            and self._inner.description == other._inner.description
         )

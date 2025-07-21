@@ -6,17 +6,7 @@ This script demonstrates how to use the transforms library to create,
 validate, and serialize coordinate transformations.
 """
 
-from pathlib import Path
-
-# Try importing noid_transforms directly first
-try:
-    import noid_transforms as transforms
-except ImportError:
-    # If that fails, add src to path and try again
-    import sys
-
-    sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
-    import noid_transforms as transforms
+import noid_transforms as transforms
 
 
 def basic_usage() -> None:

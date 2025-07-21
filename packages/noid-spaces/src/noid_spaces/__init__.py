@@ -37,8 +37,8 @@ See individual modules for detailed documentation:
 - `validation`: Validation utilities
 """
 
-from .factory import from_data, from_json, unit_term
-from .models import DimensionType, UnitTerm
+from .factory import coordinate_system, coordinate_transform, from_data, from_json, unit
+from .models import CoordinateTransform, DimensionType, Unit
 from .serialization import to_data, to_json
 from .validation import ValidationError, validate
 
@@ -46,10 +46,13 @@ __version__ = "0.1.0"
 
 __all__ = [
     # Models
-    "UnitTerm",
+    "Unit",
     "DimensionType",
+    "CoordinateTransform",
     # Factory functions
-    "unit_term",
+    "unit",
+    "coordinate_system",
+    "coordinate_transform",
     "from_data",
     "from_json",
     # Serialization

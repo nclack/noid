@@ -3,7 +3,7 @@
 import pytest
 
 from noid_spaces import from_data
-from noid_spaces.models import Dimension, DimensionType, UnitTerm
+from noid_spaces.models import Dimension, DimensionType, Unit
 
 
 class TestRegistryIntegration:
@@ -14,7 +14,7 @@ class TestRegistryIntegration:
         # Test unit (registered factory name)
         unit_data = {"unit": "m/s"}
         unit = from_data(unit_data)
-        assert isinstance(unit, UnitTerm)
+        assert isinstance(unit, Unit)
         assert unit.value == "m/s"
 
     def test_registry_integration_dimension(self):

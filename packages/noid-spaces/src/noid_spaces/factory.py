@@ -16,8 +16,9 @@ from noid_registry import (
     registry,
     set_namespace,
 )
+import noid_transforms
 
-from .models import Dimension, UnitTerm
+from .models import CoordinateSystem, CoordinateTransform, Dimension, Unit
 
 # Set namespace for spaces from LinkML schema
 set_namespace(get_schema_namespace("space"))
@@ -25,7 +26,7 @@ set_namespace(get_schema_namespace("space"))
 
 # Registry-based factory functions
 @register("unit")
-def unit_term(unit: str | Any) -> UnitTerm:
+def unit(unit: str | Any) -> Unit:
     """Create a unit term.
 
     Args:
@@ -52,7 +53,7 @@ def unit_term(unit: str | Any) -> UnitTerm:
         >>> second_unit = unit_term("s")
         >>> density_unit = unit_term("kg/m^3")
     """
-    return UnitTerm(unit)
+    return Unit(unit)
 
 
 @register("dimension")
@@ -84,6 +85,106 @@ def dimension(id: str, unit: str, type: str | None = None) -> Dimension:
     return Dimension.from_data(data)
 
 
+@register("coordinate-system")
+def coordinate_system(
+    dimensions: list[dict[str, Any]],
+    id: str | None = None,
+    description: str | None = None,
+) -> CoordinateSystem:
+    """Create a coordinate system.
+
+    Args:
+        dimensions: List of dimension specifications as dictionaries
+        id: Optional identifier for the coordinate system
+        description: Optional description of the coordinate system
+
+    Returns:
+        CoordinateSystem object
+
+    Example:
+        >>> # Direct call
+        >>> cs = coordinate_system(
+        ...     dimensions=[
+        ...         {"id": "x", "unit": "m", "type": "space"},
+        ...         {"id": "y", "unit": "m", "type": "space"}
+        ...     ]
+        ... )
+        >>>
+        >>> # From registry (expands dict as kwargs)
+        >>> cs = from_data({
+        ...     "coordinate-system": {
+        ...         "dimensions": [
+        ...             {"id": "x", "unit": "m", "type": "space"},
+        ...             {"id": "y", "unit": "m", "type": "space"}
+        ...         ]
+        ...     }
+        ... })
+    """
+    # Build data dict for CoordinateSystem - let from_data handle dimension conversion
+    data: dict[str, Any] = {"dimensions": dimensions}
+    if id is not None:
+        data["id"] = id
+    if description is not None:
+        data["description"] = description
+
+    return CoordinateSystem.from_data(data)
+
+
+@register("coordinate-transform")
+def coordinate_transform(
+    input: dict[str, Any],
+    output: dict[str, Any],
+    transform: dict[str, Any],
+    id: str | None = None,
+    description: str | None = None,
+) -> CoordinateTransform:
+    """Create a coordinate transform.
+
+    Args:
+        input: Input coordinate system specification as dictionary
+        output: Output coordinate system specification as dictionary
+        transform: Transform definition as dictionary
+        id: Optional identifier for the coordinate transform
+        description: Optional description of the coordinate transform
+
+    Returns:
+        CoordinateTransform object
+
+    Example:
+        >>> # Direct call
+        >>> ct = coordinate_transform(
+        ...     input={"dimensions": [{"id": "x", "unit": "pixel"}]},
+        ...     output={"dimensions": [{"id": "x", "unit": "mm"}]},
+        ...     transform={"translation": [0.1]}
+        ... )
+        >>>
+        >>> # From registry (expands dict as kwargs)
+        >>> ct = from_data({
+        ...     "coordinate-transform": {
+        ...         "input": {"dimensions": [{"id": "x", "unit": "pixel"}]},
+        ...         "output": {"dimensions": [{"id": "x", "unit": "mm"}]},
+        ...         "transform": {"translation": [0.1]}
+        ...     }
+        ... })
+    """
+    # Convert coordinate system data to CoordinateSystem objects
+    input_cs = CoordinateSystem.from_data(input)
+    output_cs = CoordinateSystem.from_data(output)
+
+    try:
+        transform_obj = noid_transforms.from_data(transform)
+    except Exception as e:
+        raise ValueError(f"Failed to create transform from data: {e}") from e
+
+    return CoordinateTransform(
+        input=input_cs,
+        output=output_cs,
+        transform=transform_obj,
+        id=id,
+        description=description,
+    )
+
+
 # Main orchestration functions
 def from_data(data: dict[str, Any] | str) -> Any:
     """
@@ -110,10 +211,7 @@ def from_data(data: dict[str, Any] | str) -> Any:
     # Handle simple string cases
     if isinstance(data, str):
         # For now, assume string inputs are unit terms
-        return unit_term(data)
-
-    if not isinstance(data, dict):
-        raise ValueError(f"Space data must be a dictionary or string, got {type(data)}")
+        return unit(data)
 
     # Check for exactly one key (self-describing parameter)
     if len(data) != 1:

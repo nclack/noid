@@ -2,7 +2,7 @@
 
 import pytest
 
-from noid_spaces.models import UnitTerm
+from noid_spaces.models import Unit
 from noid_spaces.validation import ValidationError, validate
 
 
@@ -11,12 +11,12 @@ class TestValidation:
 
     def test_validate_unit_term(self):
         """Test validating a unit term."""
-        unit = UnitTerm("m")
+        unit = Unit("m")
         validate(unit)  # Should not raise
 
     def test_validate_special_unit(self):
         """Test validating a special unit."""
-        unit = UnitTerm("index")
+        unit = Unit("index")
         validate(unit)  # Should not raise
 
     def test_validate_simple_object(self):

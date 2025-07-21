@@ -6,9 +6,9 @@ from noid_registry import from_jsonld, get_schema_namespace, to_jsonld
 from pyld import jsonld
 import pytest
 
-from noid_spaces import unit_term
+from noid_spaces import unit
 from noid_spaces.factory import dimension
-from noid_spaces.models import Dimension, DimensionType, UnitTerm
+from noid_spaces.models import Dimension, DimensionType, Unit
 
 
 class TestAdvancedJSONLD:
@@ -40,7 +40,7 @@ class TestAdvancedJSONLD:
     def test_mixed_space_objects_jsonld(self):
         """Test JSON-LD with mixed space object types."""
         # Test individual objects since to_jsonld handles single objects
-        unit_obj = unit_term("m")
+        unit_obj = unit("m")
         dim_obj = dimension(id="x", unit="m")
 
         unit_result = to_jsonld(unit_obj)
@@ -116,7 +116,7 @@ class TestAdvancedJSONLD:
         """Test that generated JSON-LD is valid according to PyLD."""
         # Create some space objects
         objects = {
-            "unit": unit_term("kg/m^3"),
+            "unit": unit("kg/m^3"),
             "density_dim": dimension(id="density", unit="kg/m^3", type="other"),
         }
 
@@ -163,7 +163,7 @@ class TestAdvancedJSONLD:
         """Test that namespace abbreviations are optimized per call."""
         # First call with space objects
         space_objects = {
-            "unit1": unit_term("m"),
+            "unit1": unit("m"),
             "dim1": dimension(id="x", unit="m"),
         }
         result1 = to_jsonld(space_objects)
@@ -257,7 +257,7 @@ class TestAdvancedJSONLD:
         if isinstance(unit_value, str):
             assert unit_value == "µs"
         else:
-            assert isinstance(unit_value, UnitTerm)
+            assert isinstance(unit_value, Unit)
             assert unit_value.value == "µs"
 
     def test_from_jsonld_error_handling(self):
@@ -273,11 +273,10 @@ class TestAdvancedJSONLD:
     def test_simple_jsonld_roundtrip(self):
         """Test round-trip processing of space objects through JSON-LD."""
         # First create objects and serialize them to get proper JSON-LD structure
-        unit = unit_term("nm")
         dim = dimension(id="wavelength", unit="nm", type="other")
 
         # Create a dict with these objects
-        objects = {"my_unit": unit, "my_dimension": dim}
+        objects = {"my_unit": unit("nm"), "my_dimension": dim}
 
         # Serialize to JSON-LD
         jsonld_data = to_jsonld(objects)
@@ -298,7 +297,7 @@ class TestAdvancedJSONLD:
 
         for key, value in result.items():
             if key != "@context":
-                if isinstance(value, UnitTerm) and value.value == "nm":
+                if isinstance(value, Unit) and value.value == "nm":
                     unit_found = True
                 elif isinstance(value, Dimension):
                     assert value.id == "wavelength"

@@ -4,7 +4,7 @@ import json
 
 from noid_registry import from_jsonld, to_jsonld
 
-from noid_spaces.models import Dimension, DimensionType, UnitTerm
+from noid_spaces.models import Dimension, DimensionType, Unit
 
 
 class TestUnitTermJsonLD:
@@ -13,7 +13,7 @@ class TestUnitTermJsonLD:
     def test_unit_term_to_jsonld(self):
         """Test converting UnitTerm to JSON-LD."""
         # Physical unit
-        unit = UnitTerm("m")
+        unit = Unit("m")
         jsonld = to_jsonld(unit)
 
         # Check that it's a JSON-LD object with the unit term
@@ -38,7 +38,7 @@ class TestUnitTermJsonLD:
 
         result = from_jsonld(jsonld)
         assert "sp:unit" in result
-        assert isinstance(result["sp:unit"], UnitTerm)
+        assert isinstance(result["sp:unit"], Unit)
         assert result["sp:unit"].value == "m"
 
     def test_unit_term_roundtrip(self):
@@ -46,7 +46,7 @@ class TestUnitTermJsonLD:
         # Physical units
         units = ["m", "s", "kg/m^3", "µm", "ms"]
         for unit_str in units:
-            original = UnitTerm(unit_str)
+            original = Unit(unit_str)
             jsonld = to_jsonld(original)
 
             # from_jsonld returns a dict, extract the unit term
@@ -55,19 +55,19 @@ class TestUnitTermJsonLD:
             assert "spac" in result["@context"]  # expected namespace
             unit_key = "spac:unit"
             restored = result[unit_key]
-            assert isinstance(restored, UnitTerm)
+            assert isinstance(restored, Unit)
             assert restored == original
 
         # Non-physical units
         for unit_str in ["index", "arbitrary"]:
-            original = UnitTerm(unit_str)
+            original = Unit(unit_str)
             jsonld = to_jsonld(original)
             result = from_jsonld(jsonld)
 
             assert "spac" in result["@context"]  # expected namespace
             unit_key = "spac:unit"
             restored = result[unit_key]
-            assert isinstance(restored, UnitTerm)
+            assert isinstance(restored, Unit)
             assert restored == original
 
     def test_unit_term_in_context(self):

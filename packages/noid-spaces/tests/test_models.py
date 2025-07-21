@@ -3,7 +3,13 @@
 import pint
 import pytest
 
-from noid_spaces.models import Dimension, DimensionType, UnitTerm
+from noid_spaces.models import (
+    CoordinateSystem,
+    CoordinateTransform,
+    Dimension,
+    DimensionType,
+    Unit,
+)
 
 
 class TestUnitTerm:
@@ -11,7 +17,7 @@ class TestUnitTerm:
 
     def test_non_physical_unit_index(self):
         """Test creating index non-physical unit."""
-        unit = UnitTerm("index")
+        unit = Unit("index")
         assert unit.is_non_physical
         assert unit.to_dimension_type() == DimensionType.INDEX
         assert unit.dimensionality == "index"
@@ -24,7 +30,7 @@ class TestUnitTerm:
 
     def test_non_physical_unit_arbitrary(self):
         """Test creating arbitrary non-physical unit."""
-        unit = UnitTerm("arbitrary")
+        unit = Unit("arbitrary")
         assert unit.is_non_physical
         assert unit.to_dimension_type() == DimensionType.OTHER
         assert unit.dimensionality == "arbitrary"
@@ -35,52 +41,52 @@ class TestUnitTerm:
 
     def test_physical_unit_meter(self):
         """Test creating meter physical unit."""
-        unit = UnitTerm("m")
+        unit = Unit("m")
         assert not unit.is_non_physical
         assert unit.to_data() == "m"
         assert unit.pint_unit is not None
 
     def test_physical_unit_second(self):
         """Test creating second physical unit."""
-        unit = UnitTerm("s")
+        unit = Unit("s")
         assert not unit.is_non_physical
         assert unit.to_data() == "s"
 
     def test_physical_unit_dimensionless(self):
         """Test creating dimensionless physical unit."""
-        unit = UnitTerm("1")
+        unit = Unit("1")
         assert not unit.is_non_physical
         assert unit.to_data() == "1"
 
     def test_physical_unit_complex(self):
         """Test creating complex physical unit."""
-        unit = UnitTerm("kg/m^3")
+        unit = Unit("kg/m^3")
         assert not unit.is_non_physical
         assert unit.to_data() == "kg/m^3"
 
     def test_invalid_unit_empty(self):
         """Test that empty unit raises error."""
         with pytest.raises(ValueError, match="Unit must be a non-empty string"):
-            UnitTerm("")
+            Unit("")
 
     def test_invalid_physical_unit(self):
         """Test that invalid physical unit raises error."""
         with pytest.raises(pint.UndefinedUnitError):
-            UnitTerm("invalidunit12345")
+            Unit("invalidunit12345")
 
     def test_invalid_unit_with_magnitude(self):
         """Test that unit strings with magnitudes raise error."""
         with pytest.raises(ValueError, match="contains a magnitude"):
-            UnitTerm("5 m")
+            Unit("5 m")
 
         with pytest.raises(ValueError, match="contains a magnitude"):
-            UnitTerm("2.5 seconds")
+            Unit("2.5 seconds")
 
     def test_equality(self):
         """Test unit equality."""
-        unit1 = UnitTerm("m")
-        unit2 = UnitTerm("m")
-        unit3 = UnitTerm("s")
+        unit1 = Unit("m")
+        unit2 = Unit("m")
+        unit3 = Unit("s")
 
         assert unit1 == unit2
         assert unit1 != unit3
@@ -88,9 +94,9 @@ class TestUnitTerm:
 
     def test_hash(self):
         """Test unit hashing."""
-        unit1 = UnitTerm("m")
-        unit2 = UnitTerm("m")
-        unit3 = UnitTerm("s")
+        unit1 = Unit("m")
+        unit2 = Unit("m")
+        unit3 = Unit("s")
 
         assert hash(unit1) == hash(unit2)
         assert hash(unit1) != hash(unit3)
@@ -102,43 +108,43 @@ class TestUnitTerm:
     def test_to_dimension_type(self):
         """Test projecting units to dimension types."""
         # Spatial units
-        meter = UnitTerm("m")
+        meter = Unit("m")
         assert meter.to_dimension_type() == DimensionType.SPACE
 
-        micrometer = UnitTerm("µm")
+        micrometer = Unit("µm")
         assert micrometer.to_dimension_type() == DimensionType.SPACE
 
         # Temporal units
-        second = UnitTerm("s")
+        second = Unit("s")
         assert second.to_dimension_type() == DimensionType.TIME
 
         # Special index unit
-        index = UnitTerm("index")
+        index = Unit("index")
         assert index.to_dimension_type() == DimensionType.INDEX
 
         # Non-physical arbitrary unit
-        arbitrary = UnitTerm("arbitrary")
+        arbitrary = Unit("arbitrary")
         assert arbitrary.to_dimension_type() == DimensionType.OTHER
 
         # Other physical units (chemistry, etc.)
-        molarity = UnitTerm("M")
+        molarity = Unit("M")
         assert molarity.to_dimension_type() == DimensionType.OTHER
 
     def test_to_quantity_method(self):
         """Test converting units to Pint quantities."""
         # Physical units
-        meter = UnitTerm("m")
+        meter = Unit("m")
         quantity = meter.to_quantity(5.0)
         assert quantity.magnitude == 5.0
         assert str(quantity.units) == "meter"
 
         # Non-physical units map to dimensionless
-        index = UnitTerm("index")
+        index = Unit("index")
         quantity = index.to_quantity(3)
         assert quantity.magnitude == 3
         assert quantity.dimensionless
 
-        arbitrary = UnitTerm("arbitrary")
+        arbitrary = Unit("arbitrary")
         quantity = arbitrary.to_quantity(1.5)
         assert quantity.magnitude == 1.5
         assert quantity.dimensionless
@@ -146,33 +152,33 @@ class TestUnitTerm:
     def test_biomedical_units(self):
         """Test biomedical-specific units."""
         # Microscopy units
-        micrometer = UnitTerm("µm")
+        micrometer = Unit("µm")
         assert micrometer.to_dimension_type() == DimensionType.SPACE
         assert micrometer.to_data() == "µm"
 
-        nanometer = UnitTerm("nm")
+        nanometer = Unit("nm")
         assert nanometer.to_dimension_type() == DimensionType.SPACE
         assert nanometer.to_data() == "nm"
 
         # Chemistry units
-        molarity = UnitTerm("M")
+        molarity = Unit("M")
         assert molarity.to_dimension_type() == DimensionType.OTHER
         assert molarity.to_data() == "M"
 
         # Test aliases
-        micron = UnitTerm("micron")
+        micron = Unit("micron")
         assert micron.to_dimension_type() == DimensionType.SPACE
         assert micron.to_data() == "micron"
 
     def test_list_units(self):
         """Test listing units by category."""
         # Test getting all units
-        all_units = UnitTerm.list_units()
+        all_units = Unit.list_units()
         assert len(all_units) > 0
         assert "micrometer" in all_units or "µm" in all_units
 
         # Test spatial units
-        spatial_units = UnitTerm.list_units("spatial")
+        spatial_units = Unit.list_units("spatial")
         assert len(spatial_units) > 0
         # Should contain microscopy units
         spatial_unit_names = " ".join(spatial_units)
@@ -181,11 +187,11 @@ class TestUnitTerm:
         )
 
         # Test temporal units
-        temporal_units = UnitTerm.list_units("temporal")
+        temporal_units = Unit.list_units("temporal")
         assert len(temporal_units) > 0
 
         # Test chemistry units
-        chemistry_units = UnitTerm.list_units("chemistry")
+        chemistry_units = Unit.list_units("chemistry")
         assert len(chemistry_units) > 0
 
 
@@ -438,3 +444,229 @@ class TestDimension:
             ValueError, match="'invalid_type' is not a valid DimensionType"
         ):
             Dimension(id="x", unit="m", kind="invalid_type")
+
+
+class TestCoordinateTransform:
+    """Tests for CoordinateTransform class."""
+
+    @pytest.fixture
+    def sample_coordinate_systems(self):
+        """Create sample coordinate systems for testing."""
+        input_dims = [Dimension(id="x", unit="pixel"), Dimension(id="y", unit="pixel")]
+        output_dims = [Dimension(id="x", unit="mm"), Dimension(id="y", unit="mm")]
+
+        input_cs = CoordinateSystem(dimensions=input_dims)
+        output_cs = CoordinateSystem(dimensions=output_dims)
+
+        return input_cs, output_cs
+
+    @pytest.fixture
+    def sample_transform(self):
+        """Create sample transform for testing."""
+        try:
+            import noid_transforms
+
+            return noid_transforms.translation([0.1, 0.1])
+        except ImportError:
+            pytest.skip("noid_transforms not available")
+
+    def test_basic_creation(self, sample_coordinate_systems, sample_transform):
+        """Test creating coordinate transform with required parameters."""
+        input_cs, output_cs = sample_coordinate_systems
+
+        coord_transform = CoordinateTransform(
+            input=input_cs, output=output_cs, transform=sample_transform
+        )
+
+        assert coord_transform.input == input_cs
+        assert coord_transform.output == output_cs
+        assert coord_transform.transform == sample_transform
+        assert coord_transform.id is None
+        assert coord_transform.description is None
+
+    def test_creation_with_optional_params(
+        self, sample_coordinate_systems, sample_transform
+    ):
+        """Test creating coordinate transform with optional parameters."""
+        input_cs, output_cs = sample_coordinate_systems
+
+        coord_transform = CoordinateTransform(
+            input=input_cs,
+            output=output_cs,
+            transform=sample_transform,
+            id="test-transform",
+            description="Test coordinate transform",
+        )
+
+        assert coord_transform.id == "test-transform"
+        assert coord_transform.description == "Test coordinate transform"
+
+    def test_type_validation(self, sample_coordinate_systems, sample_transform):
+        """Test type validation for inputs."""
+        input_cs, output_cs = sample_coordinate_systems
+
+        # Invalid input type
+        with pytest.raises(
+            TypeError, match="input must be a CoordinateSystem instance"
+        ):
+            CoordinateTransform(
+                input="not_a_coordinate_system",
+                output=output_cs,
+                transform=sample_transform,
+            )
+
+        # Invalid output type
+        with pytest.raises(
+            TypeError, match="output must be a CoordinateSystem instance"
+        ):
+            CoordinateTransform(
+                input=input_cs,
+                output="not_a_coordinate_system",
+                transform=sample_transform,
+            )
+
+        # Invalid transform type
+        with pytest.raises(
+            TypeError, match="transform must be a noid_transforms.Transform instance"
+        ):
+            CoordinateTransform(
+                input=input_cs, output=output_cs, transform="not_a_transform"
+            )
+
+    def test_optional_param_validation(
+        self, sample_coordinate_systems, sample_transform
+    ):
+        """Test validation of optional parameters."""
+        input_cs, output_cs = sample_coordinate_systems
+
+        # Invalid id (empty string)
+        with pytest.raises(
+            ValueError, match="CoordinateTransform id must be a non-empty string"
+        ):
+            CoordinateTransform(
+                input=input_cs, output=output_cs, transform=sample_transform, id=""
+            )
+
+        # Invalid description (empty string)
+        with pytest.raises(
+            ValueError,
+            match="CoordinateTransform description must be a non-empty string",
+        ):
+            CoordinateTransform(
+                input=input_cs,
+                output=output_cs,
+                transform=sample_transform,
+                description="",
+            )
+
+    def test_serialization(self, sample_coordinate_systems, sample_transform):
+        """Test serialization to dictionary."""
+        input_cs, output_cs = sample_coordinate_systems
+
+        coord_transform = CoordinateTransform(
+            input=input_cs,
+            output=output_cs,
+            transform=sample_transform,
+            id="test-transform",
+            description="Test transform",
+        )
+
+        data = coord_transform.to_data()
+
+        assert "input" in data
+        assert "output" in data
+        assert "transform" in data
+        assert "id" in data
+        assert "description" in data
+
+        assert data["id"] == "test-transform"
+        assert data["description"] == "Test transform"
+
+    def test_deserialization(self, sample_coordinate_systems, sample_transform):
+        """Test deserialization from dictionary."""
+        input_cs, output_cs = sample_coordinate_systems
+
+        # Create original transform
+        original = CoordinateTransform(
+            input=input_cs,
+            output=output_cs,
+            transform=sample_transform,
+            id="test-transform",
+        )
+
+        # Serialize and deserialize
+        data = original.to_data()
+        deserialized = CoordinateTransform.from_data(data)
+
+        # Check equality
+        assert deserialized == original
+        assert deserialized.id == original.id
+        assert deserialized.input == original.input
+        assert deserialized.output == original.output
+
+    def test_string_representations(self, sample_coordinate_systems, sample_transform):
+        """Test string representations."""
+        input_cs, output_cs = sample_coordinate_systems
+
+        coord_transform = CoordinateTransform(
+            input=input_cs,
+            output=output_cs,
+            transform=sample_transform,
+            id="test-transform",
+            description="Test transform",
+        )
+
+        # User-friendly representation
+        str_repr = str(coord_transform)
+        assert "test-transform:" in str_repr
+        assert "pixel" in str_repr
+        assert "mm" in str_repr
+        assert "Translation" in str_repr
+
+        # Developer representation
+        repr_str = repr(coord_transform)
+        assert "CoordinateTransform(" in repr_str
+        assert "id='test-transform'" in repr_str
+        assert "transform=Translation" in repr_str
+
+    def test_equality(self, sample_coordinate_systems, sample_transform):
+        """Test equality comparison."""
+        input_cs, output_cs = sample_coordinate_systems
+
+        coord_transform1 = CoordinateTransform(
+            input=input_cs, output=output_cs, transform=sample_transform, id="test"
+        )
+
+        coord_transform2 = CoordinateTransform(
+            input=input_cs, output=output_cs, transform=sample_transform, id="test"
+        )
+
+        # Same parameters
+        assert coord_transform1 == coord_transform2
+
+        # Different id
+        coord_transform3 = CoordinateTransform(
+            input=input_cs, output=output_cs, transform=sample_transform, id="different"
+        )
+        assert coord_transform1 != coord_transform3
+
+        # Not a CoordinateTransform
+        assert coord_transform1 != "not_a_coordinate_transform"
+
+    def test_deserialization_error_handling(self):
+        """Test error handling during deserialization."""
+        # Missing required field
+        with pytest.raises(ValueError, match="Missing required field"):
+            CoordinateTransform.from_data(
+                {"input": {}, "output": {}}
+            )  # Missing transform
+
+        # Invalid transform data
+        with pytest.raises(ValueError, match="Failed to create transform from data"):
+            CoordinateTransform.from_data(
+                {
+                    "input": {"dimensions": [{"id": "x", "unit": "m"}]},
+                    "output": {"dimensions": [{"id": "x", "unit": "mm"}]},
+                    "transform": {"invalid_transform_type": "data"},
+                }
+            )
