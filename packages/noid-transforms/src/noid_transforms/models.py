@@ -11,6 +11,8 @@ from pathlib import Path
 import sys
 from typing import Any
 
+import numpy as np
+
 # Add the _out/python directory to sys.path to import generated classes
 _python_dir = Path(__file__).parent.parent.parent / "_out" / "python"
 sys.path.insert(0, str(_python_dir))
@@ -311,14 +313,10 @@ class Homogeneous(_Homogeneous, Transform):
         """Shape of the matrix as (rows, cols)."""
         return (self._rows, self._cols)
 
-    def get_matrix(self) -> list[list[float]]:
-        """Get the matrix in 2D format."""
+    def get_matrix(self) -> np.ndarray:
+        """Get the matrix as a 2D numpy array."""
         rows, cols = self.matrix_shape
-        matrix = []
-        for i in range(rows):
-            row = self.homogeneous[i * cols : (i + 1) * cols]
-            matrix.append(row)
-        return matrix
+        return np.array(self.homogeneous).reshape(rows, cols)
 
 
 class DisplacementLookupTable(_DisplacementLookupTable, Transform):

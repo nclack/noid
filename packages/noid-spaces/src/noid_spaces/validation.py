@@ -89,6 +89,11 @@ def validate_coordinate_transform(
     # 3. Unit compatibility validation (can be warning in non-strict mode)
     _validate_unit_compatibility(transform, strict=strict)
 
+    # 4. Dimension reuse validation (ALWAYS CRITICAL)
+    validate_dimension_reuse_across_coordinate_systems(
+        [transform.input, transform.output], strict=True
+    )
+
 
 def validate_coordinate_system(
     coord_system: "CoordinateSystem", strict: bool = True
@@ -106,6 +111,9 @@ def validate_coordinate_system(
     # Validate each dimension
     for dim in coord_system.dimensions:
         validate_dimension(dim, strict=strict)
+
+    # Check for dimension object reuse within the coordinate system (do this first)
+    _validate_dimension_reuse_within_coordinate_system(coord_system, strict=strict)
 
     # Check for duplicate dimension IDs
     dim_ids = [dim.id for dim in coord_system.dimensions]
@@ -132,6 +140,88 @@ def validate_dimension(dimension: "Dimension", strict: bool = True) -> None:
         raise ValidationError(
             f"Dimension type 'index' requires unit 'index', got '{dimension.unit.value}'"
         )
+
+
+def _validate_dimension_reuse_within_coordinate_system(
+    coord_system: "CoordinateSystem", strict: bool = True
+) -> None:
+    """
+    Validate that dimension objects are not reused within a coordinate system.
+
+    This checks for the same dimension object instance appearing multiple times
+    in the coordinate system's dimension list, which could indicate an error
+    in coordinate system construction.
+
+    Args:
+        coord_system: CoordinateSystem to validate
+        strict: If True, all issues raise errors. If False, some may warn.
+
+    Raises:
+        ValidationError: If dimension objects are reused
+    """
+    dimension_objects = coord_system.dimensions
+
+    # Check for object reuse by comparing object identities
+    seen_objects = set()
+    reused_objects = []
+
+    for dim in dimension_objects:
+        if id(dim) in seen_objects:
+            reused_objects.append(dim)
+        else:
+            seen_objects.add(id(dim))
+
+    if reused_objects:
+        reused_ids = [dim.id for dim in reused_objects]
+        error_msg = (
+            f"Dimension objects are reused within coordinate system: {reused_ids}"
+        )
+        if strict:
+            raise ValidationError(error_msg)
+        else:
+            warnings.warn(ValidationWarning(error_msg), stacklevel=2)
+
+
+def validate_dimension_reuse_across_coordinate_systems(
+    coord_systems: list["CoordinateSystem"], strict: bool = True
+) -> None:
+    """
+    Validate that dimension objects are not reused across coordinate systems.
+
+    This is particularly important for coordinate transforms where the same
+    dimension object should not appear in both input and output coordinate systems,
+    as this could lead to data integrity issues.
+
+    Args:
+        coord_systems: List of coordinate systems to check for dimension reuse
+        strict: If True, all issues raise errors. If False, some may warn.
+
+    Raises:
+        ValidationError: If dimension objects are shared between coordinate systems
+    """
+    if len(coord_systems) < 2:
+        return  # Nothing to validate with fewer than 2 coordinate systems
+
+    # Collect all dimensions with their coordinate system context
+    dimension_map = {}  # dimension object id -> (coordinate_system, dimension)
+
+    for cs in coord_systems:
+        for dim in cs.dimensions:
+            dim_obj_id = id(dim)
+            if dim_obj_id in dimension_map:
+                # Found reuse across coordinate systems
+                original_cs, original_dim = dimension_map[dim_obj_id]
+                error_msg = (
+                    f"Dimension object '{dim.id}' is reused across coordinate systems "
+                    f"('{original_cs.id}' and '{cs.id}'). Each coordinate system should "
+                    f"have its own dimension instances."
+                )
+                if strict:
+                    raise ValidationError(error_msg)
+                else:
+                    warnings.warn(ValidationWarning(error_msg), stacklevel=2)
+            else:
+                dimension_map[dim_obj_id] = (cs, dim)
 
 
 def _validate_dimensional_compatibility(transform: "CoordinateTransform") -> None:
@@ -176,6 +266,10 @@ def _validate_dimensional_compatibility(transform: "CoordinateTransform") -> Non
                 f"{transform_type} transform expects {expected_output} output dimensions, "
                 f"but output coordinate system has {output_dims}"
             )
+    elif transform_type == "Homogeneous":
+        # For homogeneous transforms, matrix dimensions define the transform requirements
+        # This will be validated in _validate_transform_parameters
+        pass
     else:
         # For generic transforms, assume input/output dimensions should match
         if input_dims != output_dims:
@@ -231,9 +325,11 @@ def _validate_transform_parameters(transform: "CoordinateTransform") -> None:
         matrix = transform_obj.get_matrix()
         expected_rows = output_dims + 1  # +1 for homogeneous coordinates
         expected_cols = input_dims + 1
-        if matrix.shape != (expected_rows, expected_cols):
+        actual_shape = matrix.shape
+
+        if actual_shape != (expected_rows, expected_cols):
             raise ValidationError(
-                f"Homogeneous matrix has shape {matrix.shape} but expected "
+                f"Homogeneous matrix has shape {actual_shape} but expected "
                 f"({expected_rows}, {expected_cols}) for {input_dims}D→{output_dims}D transform"
             )
 
@@ -318,6 +414,7 @@ def validate_transform_chain(
         for j, (out_dim, in_dim) in enumerate(
             zip(current_output.dimensions, next_input.dimensions, strict=False)
         ):
+            # Check unit compatibility
             if out_dim.unit.value != in_dim.unit.value:
                 message = (
                     f"Transform chain break at step {i}→{i + 1}, dimension {j}: "
@@ -331,3 +428,86 @@ def validate_transform_chain(
                         ValidationWarning,
                         stacklevel=2,
                     )
+
+            # Check dimension ID compatibility with new dimension identity system
+            _validate_dimension_id_compatibility_in_chain(
+                out_dim, in_dim, i, j, strict=strict
+            )
+
+
+def _validate_dimension_id_compatibility_in_chain(
+    output_dim: "Dimension",
+    input_dim: "Dimension",
+    transform_index: int,
+    dimension_index: int,
+    strict: bool = True,
+) -> None:
+    """
+    Validate dimension ID compatibility between transforms in a chain.
+
+    This function implements validation logic for the new dimension identity system,
+    ensuring that transforms in a chain have compatible dimension IDs.
+
+    Args:
+        output_dim: Output dimension from previous transform
+        input_dim: Input dimension for next transform
+        transform_index: Index of current transform in chain
+        dimension_index: Index of dimension being compared
+        strict: If True, all issues raise errors. If False, some may warn.
+
+    Raises:
+        ValidationError: If dimension IDs are incompatible
+    """
+    # For transform chains to be valid, we have several scenarios to consider:
+
+    # 1. IDEAL: Same global dimension ID - perfect match
+    if output_dim.id == input_dim.id:
+        return  # Perfect match - no issues
+
+    # 2. COMPATIBLE: Same local ID with compatible coordinate systems
+    # This handles cases where dimensions have the same local meaning but come from different coordinate systems
+    if output_dim.local_id == input_dim.local_id:
+        # If both are namespaced, we expect them to be from different coordinate systems in a chain
+        if (
+            output_dim.coordinate_system_id is not None
+            and input_dim.coordinate_system_id is not None
+        ):
+            return  # Compatible - same local meaning, different coordinate systems (expected in chains)
+
+        # If one is namespaced and one isn't, that's also compatible
+        if (output_dim.coordinate_system_id is None) != (
+            input_dim.coordinate_system_id is None
+        ):
+            return  # Compatible - mixed namespacing is allowed
+
+    # 3. COMPATIBLE: Different local IDs but same semantic meaning
+    # Transforms are explicitly designed to relate dimensions with different names
+    # (e.g., "x" -> "width", "time" -> "t") - this is a valid use case
+
+    # Check if dimensions represent the same type and unit (but different IDs)
+    if (
+        output_dim.type == input_dim.type
+        and output_dim.unit.value == input_dim.unit.value
+    ):
+        # Same semantic meaning - this is compatible, no warning needed
+        # The transform explicitly defines the relationship between these dimensions
+        return
+
+    # 4. INCOMPATIBLE: Completely different dimensions
+    if (
+        output_dim.type != input_dim.type
+        or output_dim.unit.value != input_dim.unit.value
+    ):
+        error_message = (
+            f"Transform chain break at step {transform_index}→{transform_index + 1}, dimension {dimension_index}: "
+            f"incompatible dimensions ('{output_dim.id}' [{output_dim.unit.value}, {output_dim.type.value}] → "
+            f"'{input_dim.id}' [{input_dim.unit.value}, {input_dim.type.value}])"
+        )
+        if strict:
+            raise ValidationError(error_message)
+        else:
+            warnings.warn(
+                f"Chain dimension incompatibility: {error_message}",
+                ValidationWarning,
+                stacklevel=3,
+            )

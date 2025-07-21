@@ -7,29 +7,60 @@
   },
   "@graph": [
     {
-      "@type": "noid_spaces:Dimension",
-      "id": "x",
-      "noid_spaces:unit": "mm"
-    },
-    {
-      "@type": "noid_spaces:Dimension",
-      "id": "y",
-      "noid_spaces:unit": "mm"
-    },
-    {
-      "@type": "noid_spaces:Dimension",
-      "id": "z",
-      "noid_spaces:unit": "mm"
-    },
-    {
       "@type": "noid_spaces:CoordinateSystem",
       "id": "image_space",
-      "noid_spaces:dimensions": ["x", "y", "z"]
+      "noid_spaces:dimensions": [
+        "image_space#x",
+        "image_space#y",
+        "image_space#z"
+      ],
+      "noid_spaces:description": "Image coordinate system in millimeters"
     },
     {
       "@type": "noid_spaces:CoordinateSystem",
       "id": "world_space",
-      "noid_spaces:dimensions": ["x", "y", "z"]
+      "noid_spaces:dimensions": [
+        "world_space#x",
+        "world_space#y",
+        "world_space#z"
+      ],
+      "noid_spaces:description": "World coordinate system in millimeters"
+    },
+    {
+      "@type": "noid_spaces:Dimension",
+      "id": "image_space#x",
+      "noid_spaces:unit": "mm",
+      "noid_spaces:type": "space"
+    },
+    {
+      "@type": "noid_spaces:Dimension",
+      "id": "image_space#y",
+      "noid_spaces:unit": "mm",
+      "noid_spaces:type": "space"
+    },
+    {
+      "@type": "noid_spaces:Dimension",
+      "id": "image_space#z",
+      "noid_spaces:unit": "mm",
+      "noid_spaces:type": "space"
+    },
+    {
+      "@type": "noid_spaces:Dimension",
+      "id": "world_space#x",
+      "noid_spaces:unit": "mm",
+      "noid_spaces:type": "space"
+    },
+    {
+      "@type": "noid_spaces:Dimension",
+      "id": "world_space#y",
+      "noid_spaces:unit": "mm",
+      "noid_spaces:type": "space"
+    },
+    {
+      "@type": "noid_spaces:Dimension",
+      "id": "world_space#z",
+      "noid_spaces:unit": "mm",
+      "noid_spaces:type": "space"
     },
     {
       "@type": "noid_spaces:CoordinateTransform",
@@ -45,15 +76,16 @@
       "id": "transform_with_inline_systems",
       "noid_spaces:input": {
         "id": "input_space",
-        "noid_spaces:dimensions": ["x", "y"]
+        "noid_spaces:dimensions": [
+          "input_space#x",
+          "input_space#y"
+        ]
       },
       "noid_spaces:output": {
+        "id": "output_space",
         "noid_spaces:dimensions": [
-          {
-            "id": "out_x",
-            "noid_spaces:unit": "µm"
-          },
-          "y"
+          "output_space#x",
+          "output_space#y"
         ]
       },
       "noid_transform:transform": {
@@ -62,47 +94,89 @@
       }
     },
     {
+      "@type": "noid_spaces:Dimension",
+      "id": "input_space#x",
+      "noid_spaces:unit": "mm",
+      "noid_spaces:type": "space"
+    },
+    {
+      "@type": "noid_spaces:Dimension",
+      "id": "input_space#y",
+      "noid_spaces:unit": "mm",
+      "noid_spaces:type": "space"
+    },
+    {
+      "@type": "noid_spaces:Dimension",
+      "id": "output_space#x",
+      "noid_spaces:unit": "µm",
+      "noid_spaces:type": "space"
+    },
+    {
+      "@type": "noid_spaces:Dimension",
+      "id": "output_space#y",
+      "noid_spaces:unit": "mm",
+      "noid_spaces:type": "space"
+    },
+    {
       "@type": "noid_spaces:CoordinateTransform",
+      "id": "pixel_to_world_transform",
       "noid_spaces:input": {
+        "id": "pixel_space",
         "noid_spaces:dimensions": [
-          {
-            "id": "temp_x",
-            "noid_spaces:unit": "pixel"
-          }
+          "pixel_space#x"
         ]
       },
       "noid_spaces:output": {
+        "id": "world_1d_space",
         "noid_spaces:dimensions": [
-          {
-            "id": "world_x",
-            "noid_spaces:unit": "mm"
-          }
+          "world_1d_space#x"
         ]
       },
       "noid_transform:transform": {
         "noid_transform:translation": [5.0]
       },
-      "noid_spaces:description": "Anonymous transform from pixels to world coordinates"
+      "noid_spaces:description": "Transform from pixels to world coordinates"
+    },
+    {
+      "@type": "noid_spaces:Dimension",
+      "id": "pixel_space#x",
+      "noid_spaces:unit": "pixel",
+      "noid_spaces:type": "space"
+    },
+    {
+      "@type": "noid_spaces:Dimension",
+      "id": "world_1d_space#x",
+      "noid_spaces:unit": "mm",
+      "noid_spaces:type": "space"
     },
     {
       "@type": "noid_spaces:CoordinateTransform",
+      "id": "simple_index_to_spatial",
       "noid_spaces:input": {
         "noid_spaces:dimensions": [
           {
-            "noid_spaces:unit": "index"
+            "id": "i",
+            "noid_spaces:unit": "index",
+            "noid_spaces:type": "index"
           },
           {
-            "noid_spaces:unit": "index"
+            "id": "j",
+            "noid_spaces:unit": "index",
+            "noid_spaces:type": "index"
           }
         ]
       },
       "noid_spaces:output": {
         "noid_spaces:dimensions": [
           {
-            "noid_spaces:unit": "mm"
+            "id": "x",
+            "noid_spaces:unit": "mm",
+            "noid_spaces:type": "space"
           },
           {
-            "noid_spaces:unit": "mm"
+            "id": "y",
+            "noid_spaces:unit": "mm",
+            "noid_spaces:type": "space"
           }
         ]
       },
@@ -112,7 +186,8 @@
           [0.0, 0.1, 10.0],
           [0.0, 0.0, 1.0]
         ]
-      }
+      },
+      "noid_spaces:description": "Simple array indices to spatial coordinates"
     },
     {
       "@type": "noid_spaces:CoordinateTransform",
@@ -140,42 +215,63 @@
     },
     {
       "@type": "noid_spaces:CoordinateTransform",
+      "id": "axis_permutation_transform",
       "noid_spaces:input": {
+        "id": "yxz_space",
         "noid_spaces:dimensions": [
-          {
-            "id": "y_input",
-            "noid_spaces:unit": "mm"
-          },
-          {
-            "id": "x_input",
-            "noid_spaces:unit": "mm"
-          },
-          {
-            "id": "z_input",
-            "noid_spaces:unit": "mm"
-          }
+          "yxz_space#AP",
+          "yxz_space#ML",
+          "yxz_space#DV"
         ]
       },
       "noid_spaces:output": {
+        "id": "xyz_space",
         "noid_spaces:dimensions": [
-          {
-            "id": "x_output",
-            "noid_spaces:unit": "mm"
-          },
-          {
-            "id": "y_output",
-            "noid_spaces:unit": "mm"
-          },
-          {
-            "id": "z_output",
-            "noid_spaces:unit": "mm"
-          }
+          "xyz_space#ML",
+          "xyz_space#AP",
+          "xyz_space#DV"
         ]
       },
       "noid_transform:transform": {
         "noid_transform:map_axis": [1, 0, 2]
       },
-      "noid_spaces:description": "Axis permutation: YXZ → XYZ reordering"
+      "noid_spaces:description": "Axis permutation: AP-ML-DV → ML-AP-DV reordering"
+    },
+    {
+      "@type": "noid_spaces:Dimension",
+      "id": "yxz_space#AP",
+      "noid_spaces:unit": "mm",
+      "noid_spaces:type": "space"
+    },
+    {
+      "@type": "noid_spaces:Dimension",
+      "id": "yxz_space#ML",
+      "noid_spaces:unit": "mm",
+      "noid_spaces:type": "space"
+    },
+    {
+      "@type": "noid_spaces:Dimension",
+      "id": "yxz_space#DV",
+      "noid_spaces:unit": "mm",
+      "noid_spaces:type": "space"
+    },
+    {
+      "@type": "noid_spaces:Dimension",
+      "id": "xyz_space#ML",
+      "noid_spaces:unit": "mm",
+      "noid_spaces:type": "space"
+    },
+    {
+      "@type": "noid_spaces:Dimension",
+      "id": "xyz_space#AP",
+      "noid_spaces:unit": "mm",
+      "noid_spaces:type": "space"
+    },
+    {
+      "@type": "noid_spaces:Dimension",
+      "id": "xyz_space#DV",
+      "noid_spaces:unit": "mm",
+      "noid_spaces:type": "space"
     },
     {
       "@type": "noid_spaces:CoordinateTransform",
@@ -226,27 +322,38 @@
     },
     {
       "@type": "noid_spaces:CoordinateTransform",
+      "id": "mm_to_micron_transform",
       "noid_spaces:input": "world_space",
       "noid_spaces:output": {
+        "id": "micron_space",
         "noid_spaces:dimensions": [
-          {
-            "id": "x_micron",
-            "noid_spaces:unit": "µm"
-          },
-          {
-            "id": "y_micron",
-            "noid_spaces:unit": "µm"
-          },
-          {
-            "id": "z_micron",
-            "noid_spaces:unit": "µm"
-          }
+          "micron_space#x",
+          "micron_space#y",
+          "micron_space#z"
         ]
       },
       "noid_transform:transform": {
         "noid_transform:scale": [1000.0, 1000.0, 1000.0]
       },
       "noid_spaces:description": "Unit conversion: mm to µm scaling"
+    },
+    {
+      "@type": "noid_spaces:Dimension",
+      "id": "micron_space#x",
+      "noid_spaces:unit": "µm",
+      "noid_spaces:type": "space"
+    },
+    {
+      "@type": "noid_spaces:Dimension",
+      "id": "micron_space#y",
+      "noid_spaces:unit": "µm",
+      "noid_spaces:type": "space"
+    },
+    {
+      "@type": "noid_spaces:Dimension",
+      "id": "micron_space#z",
+      "noid_spaces:unit": "µm",
+      "noid_spaces:type": "space"
     }
   ]
 }

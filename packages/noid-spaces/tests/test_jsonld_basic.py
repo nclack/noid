@@ -88,7 +88,7 @@ class TestDimensionJsonLD:
 
     def test_dimension_to_jsonld_basic(self):
         """Test converting Dimension to JSON-LD."""
-        dim = Dimension(id="x", unit="m", kind=DimensionType.SPACE)
+        dim = Dimension(dimension_id="x", unit="m", kind=DimensionType.SPACE)
         jsonld = to_jsonld(dim)
 
         # Check structure
@@ -101,7 +101,7 @@ class TestDimensionJsonLD:
 
     def test_dimension_to_jsonld_inferred_type(self):
         """Test Dimension with inferred type to JSON-LD."""
-        dim = Dimension(id="y", unit="mm")  # Type inferred as SPACE
+        dim = Dimension(dimension_id="y", unit="mm")  # Type inferred as SPACE
         jsonld = to_jsonld(dim)
 
         # Check structure
@@ -148,15 +148,15 @@ class TestDimensionJsonLD:
         # Test various dimension configurations
         test_cases = [
             # Explicit type
-            Dimension(id="x", unit="m", kind=DimensionType.SPACE),
+            Dimension(dimension_id="x", unit="m", kind=DimensionType.SPACE),
             # Inferred spatial
-            Dimension(id="y", unit="mm"),
+            Dimension(dimension_id="y", unit="mm"),
             # Inferred temporal
-            Dimension(id="time", unit="ms"),
+            Dimension(dimension_id="time", unit="ms"),
             # Inferred index
-            Dimension(id="idx", unit="index"),
+            Dimension(dimension_id="idx", unit="index"),
             # Type override
-            Dimension(id="wavelength", unit="nm", kind=DimensionType.OTHER),
+            Dimension(dimension_id="wavelength", unit="nm", kind=DimensionType.OTHER),
         ]
 
         for original in test_cases:
@@ -189,7 +189,7 @@ class TestDimensionJsonLD:
 
     def test_dimension_json_string(self):
         """Test full JSON string serialization."""
-        dim = Dimension(id="x", unit="m")
+        dim = Dimension(dimension_id="x", unit="m")
 
         # Convert to JSON-LD then to JSON string
         jsonld = to_jsonld(dim)

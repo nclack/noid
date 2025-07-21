@@ -62,7 +62,7 @@ class TestValidateDimension:
         with pytest.raises(
             ValueError, match="Dimension type 'index' requires unit 'index'"
         ):
-            _ = Dimension(id="bad", unit="m", kind="index")
+            _ = Dimension(dimension_id="bad", unit="m", kind="index")
 
 
 class TestValidateCoordinateSystem:
@@ -84,8 +84,8 @@ class TestValidateCoordinateSystem:
             # This will be caught during validation, not construction
             _ = CoordinateSystem(
                 dimensions=[
-                    Dimension("x", "m", "space"),
-                    Dimension("x", "mm", "space"),  # Same ID
+                    Dimension(dimension_id="x", unit="m", kind="space"),
+                    Dimension(dimension_id="x", unit="mm", kind="space"),  # Same ID
                 ]
             )
 
@@ -153,11 +153,15 @@ class TestValidateCoordinateTransform:
     def test_validate_coordinate_transform_unit_compatibility_strict(self):
         """Test unit compatibility validation in strict mode."""
         # Space to time conversion should fail in strict mode when explicitly validated
-        ct = coordinate_transform(
-            input={"dimensions": [{"id": "x", "unit": "m", "type": "space"}]},
-            output={"dimensions": [{"id": "t", "unit": "s", "type": "time"}]},
-            transform={"translation": [1.0]},
-        )
+        with warnings.catch_warnings(record=True):
+            warnings.simplefilter("always")
+            # Constructor will generate a warning in non-strict mode, which we expect
+            ct = coordinate_transform(
+                input={"dimensions": [{"id": "x", "unit": "m", "type": "space"}]},
+                output={"dimensions": [{"id": "t", "unit": "s", "type": "time"}]},
+                transform={"translation": [1.0]},
+            )
+
         # The constructor uses non-strict mode, but explicit validation should fail in strict mode
         with pytest.raises(ValidationError, match="transforms from space.*to time"):
             validate_coordinate_transform(ct, strict=True)

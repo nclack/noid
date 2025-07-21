@@ -1,45 +1,70 @@
 {
   "@context": {
-    "@base": "https://example.org/dimensions/",
+    "@base": "https://example.org/",
     "noid_spaces": "https://github.com/nclack/noid/schemas/space/",
     "id": "@id"
   },
   "@graph": [
     {
-      "@type": "noid_spaces:Dimension",
-      "id": "https://example.org/dimensions/frame",
-      "noid_spaces:unit": "index"
+      "@type": "noid_spaces:CoordinateSystem",
+      "id": "microscopy_acquisition",
+      "noid_spaces:dimensions": [
+        "microscopy_acquisition#time",
+        "microscopy_acquisition#x",
+        "microscopy_acquisition#y",
+        "microscopy_acquisition#z",
+        "microscopy_acquisition#channel"
+      ],
+      "noid_spaces:description": "5D microscopy acquisition coordinate system"
+    },
+    {
+      "@type": "noid_spaces:CoordinateSystem",
+      "id": "spectral_analysis",
+      "noid_spaces:dimensions": [
+        "spectral_analysis#wavelength"
+      ],
+      "noid_spaces:description": "Spectral analysis coordinate system"
     },
     {
       "@type": "noid_spaces:Dimension",
-      "id": "https://example.org/dimensions/x",
-      "noid_spaces:unit": "µm"
+      "id": "microscopy_acquisition#time",
+      "noid_spaces:unit": "s",
+      "noid_spaces:type": "time"
     },
     {
       "@type": "noid_spaces:Dimension",
-      "id": "https://example.org/dimensions/y",
-      "noid_spaces:unit": "µm"
+      "id": "microscopy_acquisition#x",
+      "noid_spaces:unit": "µm",
+      "noid_spaces:type": "space"
     },
     {
       "@type": "noid_spaces:Dimension",
-      "id": "https://example.org/dimensions/z",
-      "noid_spaces:unit": "µm"
+      "id": "microscopy_acquisition#y",
+      "noid_spaces:unit": "µm",
+      "noid_spaces:type": "space"
     },
     {
       "@type": "noid_spaces:Dimension",
-      "id": "https://example.org/dimensions/time",
-      "noid_spaces:unit": "s"
+      "id": "microscopy_acquisition#z",
+      "noid_spaces:unit": "µm",
+      "noid_spaces:type": "space"
     },
     {
       "@type": "noid_spaces:Dimension",
-      "id": "https://example.org/dimensions/channel",
-      "noid_spaces:unit": "arbitrary",
+      "id": "microscopy_acquisition#channel",
+      "noid_spaces:unit": "index",
+      "noid_spaces:type": "index"
+    },
+    {
+      "@type": "noid_spaces:Dimension",
+      "id": "spectral_analysis#wavelength",
+      "noid_spaces:unit": "nm",
       "noid_spaces:type": "other"
     },
     {
       "@type": "noid_spaces:Dimension",
-      "id": "https://example.org/dimensions/wavelength",
-      "noid_spaces:unit": "nm",
+      "id": "temp_processing",
+      "noid_spaces:unit": "arbitrary",
       "noid_spaces:type": "other"
     }
   ]

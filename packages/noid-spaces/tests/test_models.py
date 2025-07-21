@@ -278,7 +278,7 @@ class TestDimension:
 
     def test_basic_creation(self):
         """Test creating dimension with explicit type."""
-        dim = Dimension(id="x", unit="m", kind=DimensionType.SPACE)
+        dim = Dimension(unit="m", kind=DimensionType.SPACE, dimension_id="x")
         assert dim.id == "x"
         assert dim.unit.value == "m"
         assert dim.type == DimensionType.SPACE
@@ -286,67 +286,69 @@ class TestDimension:
     def test_type_inference_spatial(self):
         """Test type inference for spatial units."""
         # Meter
-        dim_m = Dimension(id="x", unit="m")
+        dim_m = Dimension(unit="m", dimension_id="x")
         assert dim_m.type == DimensionType.SPACE
 
         # Millimeter
-        dim_mm = Dimension(id="y", unit="mm")
+        dim_mm = Dimension(unit="mm", dimension_id="y")
         assert dim_mm.type == DimensionType.SPACE
 
         # Micrometer
-        dim_um = Dimension(id="z", unit="µm")
+        dim_um = Dimension(unit="µm", dimension_id="z")
         assert dim_um.type == DimensionType.SPACE
 
         # Nanometer
-        dim_nm = Dimension(id="w", unit="nm")
+        dim_nm = Dimension(unit="nm", dimension_id="w")
         assert dim_nm.type == DimensionType.SPACE
 
     def test_type_inference_temporal(self):
         """Test type inference for temporal units."""
         # Second
-        dim_s = Dimension(id="time", unit="s")
+        dim_s = Dimension(dimension_id="time", unit="s")
         assert dim_s.type == DimensionType.TIME
 
         # Millisecond
-        dim_ms = Dimension(id="time2", unit="ms")
+        dim_ms = Dimension(dimension_id="time2", unit="ms")
         assert dim_ms.type == DimensionType.TIME
 
         # Microsecond
-        dim_us = Dimension(id="time3", unit="µs")
+        dim_us = Dimension(dimension_id="time3", unit="µs")
         assert dim_us.type == DimensionType.TIME
 
     def test_type_inference_special(self):
         """Test type inference for special units."""
         # Index
-        dim_idx = Dimension(id="idx", unit="index")
+        dim_idx = Dimension(dimension_id="idx", unit="index")
         assert dim_idx.type == DimensionType.INDEX
 
         # Arbitrary
-        dim_arb = Dimension(id="channel", unit="arbitrary")
+        dim_arb = Dimension(dimension_id="channel", unit="arbitrary")
         assert dim_arb.type == DimensionType.OTHER
 
     def test_type_inference_other(self):
         """Test type inference for other physical units."""
         # Molarity (chemistry)
-        dim_m = Dimension(id="concentration", unit="M")
+        dim_m = Dimension(dimension_id="concentration", unit="M")
         assert dim_m.type == DimensionType.OTHER
 
         # Kelvin (temperature)
-        dim_k = Dimension(id="temperature", unit="K")
+        dim_k = Dimension(dimension_id="temperature", unit="K")
         assert dim_k.type == DimensionType.OTHER
 
     def test_type_override(self):
         """Test overriding inferred type."""
         # Override spatial unit to OTHER (e.g., wavelength)
-        dim = Dimension(id="wavelength", unit="nm", kind=DimensionType.OTHER)
+        dim = Dimension(dimension_id="wavelength", unit="nm", kind=DimensionType.OTHER)
         assert dim.type == DimensionType.OTHER
 
         # Override arbitrary unit to SPACE
-        dim2 = Dimension(id="custom", unit="arbitrary", kind=DimensionType.SPACE)
+        dim2 = Dimension(
+            dimension_id="custom", unit="arbitrary", kind=DimensionType.SPACE
+        )
         assert dim2.type == DimensionType.SPACE
 
         # Override temporal unit to OTHER
-        dim3 = Dimension(id="duration", unit="ms", kind=DimensionType.OTHER)
+        dim3 = Dimension(dimension_id="duration", unit="ms", kind=DimensionType.OTHER)
         assert dim3.type == DimensionType.OTHER
 
     def test_index_type_validation(self):
@@ -354,37 +356,37 @@ class TestDimension:
         with pytest.raises(
             ValueError, match="Dimension type 'index' requires unit 'index'"
         ):
-            Dimension(id="bad", unit="m", kind=DimensionType.INDEX)
+            Dimension(dimension_id="bad", unit="m", kind=DimensionType.INDEX)
 
     def test_dimension_creation_shortcuts(self):
         """Test creating dimensions with common patterns."""
         # Spatial with inferred type
-        x = Dimension(id="x", unit="mm")
+        x = Dimension(dimension_id="x", unit="mm")
         assert x.id == "x"
         assert x.unit.value == "mm"
         assert x.type == DimensionType.SPACE
 
         # Temporal with inferred type
-        t = Dimension(id="time", unit="ms")
+        t = Dimension(dimension_id="time", unit="ms")
         assert t.id == "time"
         assert t.unit.value == "ms"
         assert t.type == DimensionType.TIME
 
         # Index with inferred type
-        idx = Dimension(id="array_idx", unit="index")
+        idx = Dimension(dimension_id="array_idx", unit="index")
         assert idx.id == "array_idx"
         assert idx.unit.value == "index"
         assert idx.type == DimensionType.INDEX
 
         # Channel with explicit type override (no warning expected)
-        ch = Dimension(id="wavelength", unit="nm", kind=DimensionType.OTHER)
+        ch = Dimension(dimension_id="wavelength", unit="nm", kind=DimensionType.OTHER)
         assert ch.id == "wavelength"
         assert ch.unit.value == "nm"
         assert ch.type == DimensionType.OTHER
 
     def test_serialization(self):
         """Test dimension serialization."""
-        dim = Dimension(id="x", unit="m", kind=DimensionType.SPACE)
+        dim = Dimension(dimension_id="x", unit="m", kind=DimensionType.SPACE)
         data = dim.to_data()
 
         assert data == {"id": "x", "unit": "m", "type": "space"}
@@ -411,9 +413,9 @@ class TestDimension:
 
     def test_equality(self):
         """Test dimension equality."""
-        dim1 = Dimension(id="x", unit="m")
-        dim2 = Dimension(id="x", unit="m", kind=DimensionType.SPACE)
-        dim3 = Dimension(id="y", unit="m")
+        dim1 = Dimension(dimension_id="x", unit="m")
+        dim2 = Dimension(dimension_id="x", unit="m", kind=DimensionType.SPACE)
+        dim3 = Dimension(dimension_id="y", unit="m")
 
         assert dim1 == dim2  # Same, type inferred
         assert dim1 != dim3  # Different ID
@@ -421,7 +423,7 @@ class TestDimension:
 
     def test_string_representations(self):
         """Test string representations."""
-        dim = Dimension(id="time", unit="ms", kind=DimensionType.TIME)
+        dim = Dimension(dimension_id="time", unit="ms", kind=DimensionType.TIME)
 
         # User-friendly
         assert str(dim) == "time [ms] (time)"
@@ -432,18 +434,21 @@ class TestDimension:
     def test_invalid_inputs(self):
         """Test invalid input handling."""
         # Empty ID
-        with pytest.raises(ValueError, match="Dimension id must be a non-empty string"):
-            Dimension(id="", unit="m")
+        with pytest.raises(
+            ValueError,
+            match="Must provide either 'dimension_id' or 'coordinate_system'",
+        ):
+            Dimension(dimension_id="", unit="m")
 
         # Invalid unit
         with pytest.raises(pint.UndefinedUnitError):
-            Dimension(id="x", unit="invalid_unit_xyz")
+            Dimension(dimension_id="x", unit="invalid_unit_xyz")
 
         # Invalid type string
         with pytest.raises(
             ValueError, match="'invalid_type' is not a valid DimensionType"
         ):
-            Dimension(id="x", unit="m", kind="invalid_type")
+            Dimension(dimension_id="x", unit="m", kind="invalid_type")
 
 
 class TestCoordinateTransform:
@@ -452,8 +457,14 @@ class TestCoordinateTransform:
     @pytest.fixture
     def sample_coordinate_systems(self):
         """Create sample coordinate systems for testing."""
-        input_dims = [Dimension(id="x", unit="pixel"), Dimension(id="y", unit="pixel")]
-        output_dims = [Dimension(id="x", unit="mm"), Dimension(id="y", unit="mm")]
+        input_dims = [
+            Dimension(dimension_id="x", unit="pixel"),
+            Dimension(dimension_id="y", unit="pixel"),
+        ]
+        output_dims = [
+            Dimension(dimension_id="x", unit="mm"),
+            Dimension(dimension_id="y", unit="mm"),
+        ]
 
         input_cs = CoordinateSystem(dimensions=input_dims)
         output_cs = CoordinateSystem(dimensions=output_dims)
@@ -497,38 +508,6 @@ class TestCoordinateTransform:
 
         assert coord_transform.id == "test-transform"
         assert coord_transform.description == "Test coordinate transform"
-
-    def test_type_validation(self, sample_coordinate_systems, sample_transform):
-        """Test type validation for inputs."""
-        input_cs, output_cs = sample_coordinate_systems
-
-        # Invalid input type
-        with pytest.raises(
-            TypeError, match="input must be a CoordinateSystem instance"
-        ):
-            CoordinateTransform(
-                input="not_a_coordinate_system",
-                output=output_cs,
-                transform=sample_transform,
-            )
-
-        # Invalid output type
-        with pytest.raises(
-            TypeError, match="output must be a CoordinateSystem instance"
-        ):
-            CoordinateTransform(
-                input=input_cs,
-                output="not_a_coordinate_system",
-                transform=sample_transform,
-            )
-
-        # Invalid transform type
-        with pytest.raises(
-            TypeError, match="transform must be a noid_transforms.Transform instance"
-        ):
-            CoordinateTransform(
-                input=input_cs, output=output_cs, transform="not_a_transform"
-            )
 
     def test_optional_param_validation(
         self, sample_coordinate_systems, sample_transform

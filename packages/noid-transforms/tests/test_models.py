@@ -8,6 +8,7 @@ properties, and methods.
 from pathlib import Path
 import sys
 
+import numpy as np
 import pytest
 
 # Add src to path for imports
@@ -150,7 +151,8 @@ class TestHomogeneous:
         matrix = [[2.0, 0, 0, 10], [0, 1.5, 0, 20], [0, 0, 0.5, 5], [0, 0, 0, 1]]
         homogeneous = Homogeneous(matrix)
         retrieved = homogeneous.get_matrix()
-        assert retrieved == matrix
+        expected = np.array(matrix)
+        np.testing.assert_array_equal(retrieved, expected)
 
     def test_to_data(self):
         """Test homogeneous transform serialization."""
