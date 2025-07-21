@@ -231,7 +231,7 @@ class TestCoordinateSystemFactory:
         assert cs.id == "world-coords"
         assert cs.description == "World coordinate system"
         assert len(cs.dimensions) == 3
-        assert cs.dimensions[2].id == "t"
+        assert cs.dimensions[2].id == "world-coords#t"
         assert cs.dimensions[2].type == DimensionType.TIME
 
     def test_create_coordinate_system_type_inference(self):
@@ -283,14 +283,106 @@ class TestCoordinateSystemFactory:
         assert cs.dimensions[1].type == DimensionType.TIME  # Inferred
 
     def test_coordinate_system_empty_dimensions(self):
-        """Test that empty dimensions list raises validation error."""
-        with pytest.raises(ValueError):
-            coordinate_system(dimensions=[])
+        """Test that empty dimensions list is now allowed."""
+        # With the updated from_data method, empty dimensions are allowed
+        cs = coordinate_system(dimensions=[])
+        assert isinstance(cs, CoordinateSystem)
+        assert len(cs.dimensions) == 0
 
     def test_coordinate_system_invalid_dimension(self):
         """Test that invalid dimension data raises error."""
         with pytest.raises(pint.UndefinedUnitError):
             coordinate_system(dimensions=[{"id": "x", "unit": "invalid_unit_xyz"}])
+
+    def test_coordinate_system_auto_labeling(self):
+        """Test auto-labeling functionality when IDs not provided."""
+        cs = coordinate_system(
+            dimensions=[
+                {"unit": "pixel", "type": "space"},  # No ID - should get dim_0
+                {"unit": "pixel", "type": "space"},  # No ID - should get dim_1
+                {"id": "time", "unit": "ms", "type": "time"},  # Explicit ID
+            ],
+            id="image-coords",
+        )
+        assert len(cs.dimensions) == 3
+        # Auto-generated labels with proper namespacing
+        assert cs.dimensions[0].id == "image-coords#dim_0"
+        assert cs.dimensions[1].id == "image-coords#dim_1"
+        # Explicit ID with namespacing
+        assert cs.dimensions[2].id == "image-coords#time"
+
+    def test_coordinate_system_auto_labeling_without_cs_id(self):
+        """Test auto-labeling when coordinate system has no ID."""
+        cs = coordinate_system(
+            dimensions=[
+                {"unit": "mm"},  # No ID, type inferred - should get dim_0
+                {"unit": "ms"},  # No ID, type inferred - should get dim_1
+            ]
+        )
+        assert len(cs.dimensions) == 2
+        # Auto-generated simple IDs without namespacing (no CS ID)
+        assert cs.dimensions[0].id == "dim_0"
+        assert cs.dimensions[1].id == "dim_1"
+        # Type inference
+        assert cs.dimensions[0].type == DimensionType.SPACE
+        assert cs.dimensions[1].type == DimensionType.TIME
+
+    def test_coordinate_system_mixed_explicit_auto_ids(self):
+        """Test mixing explicit and auto-generated dimension IDs."""
+        cs = coordinate_system(
+            dimensions=[
+                {"id": "x", "unit": "mm"},  # Explicit ID, inferred type
+                {"unit": "mm"},  # Auto ID, inferred type
+                {"id": "time", "unit": "ms"},  # Explicit ID, inferred type
+            ],
+            id="mixed-system",
+        )
+        assert len(cs.dimensions) == 3
+        assert cs.dimensions[0].id == "mixed-system#x"  # Explicit
+        assert cs.dimensions[1].id == "mixed-system#dim_0"  # Auto-generated
+        assert cs.dimensions[2].id == "mixed-system#time"  # Explicit
+        # First two should infer to SPACE, third to TIME
+        assert cs.dimensions[0].type == DimensionType.SPACE
+        assert cs.dimensions[1].type == DimensionType.SPACE
+        assert cs.dimensions[2].type == DimensionType.TIME
+
+    def test_coordinate_system_serialization_roundtrip(self):
+        """Test that serialization/deserialization preserves schema-compliant structure."""
+        # Create coordinate system with enhanced factory
+        original_cs = coordinate_system(
+            dimensions=[
+                {"id": "x", "unit": "pixel", "type": "space"},
+                {"unit": "pixel", "type": "space"},  # Auto-labeled
+                {"id": "time", "unit": "ms"},  # Type inferred
+            ],
+            id="test-system",
+            description="Test coordinate system",
+        )
+
+        # Serialize to data
+        data = original_cs.to_data()
+
+        # Check data structure uses schema-compliant field names
+        assert "dimensions" in data
+        assert len(data["dimensions"]) == 3
+        assert data["dimensions"][0]["id"] == "test-system#x"
+        assert data["dimensions"][0]["unit"] == "pixel"
+        assert data["dimensions"][0]["type"] == "space"
+
+        # Deserialize via from_data
+        reconstructed_cs = CoordinateSystem.from_data(data)
+
+        # Verify reconstruction matches original
+        assert reconstructed_cs.id == original_cs.id
+        assert reconstructed_cs.description == original_cs.description
+        assert len(reconstructed_cs.dimensions) == len(original_cs.dimensions)
+
+        for orig_dim, reconst_dim in zip(
+            original_cs.dimensions, reconstructed_cs.dimensions, strict=False
+        ):
+            assert orig_dim.id == reconst_dim.id
+            assert orig_dim.unit.value == reconst_dim.unit.value
+            assert orig_dim.type == reconst_dim.type
 
 
 class TestCoordinateTransformFactory:

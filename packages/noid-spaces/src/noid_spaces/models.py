@@ -728,17 +728,36 @@ class CoordinateSystem:
         except KeyError as e:
             raise ValueError(f"Missing required field: {e}") from e
 
-        if not isinstance(dimensions_data, list) or not dimensions_data:
-            raise ValueError("Dimensions must be a non-empty list")
+        if not isinstance(dimensions_data, list):
+            raise ValueError("Dimensions must be a list")
 
-        # Convert dimension data to Dimension objects
-        dimensions = [Dimension.from_data(dim_data) for dim_data in dimensions_data]
-
-        return cls(
-            dimensions=dimensions,
+        # Create empty coordinate system first
+        cs = cls(
+            dimensions=[],
             id=data.get("id"),
             description=data.get("description"),
         )
+
+        # Add dimensions using add_dimension for proper namespacing and ownership
+        for dim_data in dimensions_data:
+            # Extract dimension parameters from data
+            try:
+                unit = dim_data["unit"]
+            except KeyError as e:
+                raise ValueError(f"Missing required dimension field: {e}") from e
+
+            # Extract label from dimension data
+            label = dim_data.get("id")
+            # Parse namespaced IDs to extract local label
+            if label and "#" in label:
+                _, label = label.split("#", 1)
+
+            kind = dim_data.get("type")
+
+            # Add dimension using coordinate system's method for proper namespacing
+            cs.add_dimension(unit=unit, kind=kind, label=label)
+
+        return cs
 
     def __repr__(self) -> str:
         """Developer representation."""

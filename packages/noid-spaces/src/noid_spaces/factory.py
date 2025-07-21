@@ -91,24 +91,44 @@ def coordinate_system(
     id: str | None = None,
     description: str | None = None,
 ) -> CoordinateSystem:
-    """Create a coordinate system.
+    """Create a coordinate system with automatic dimension creation and labeling.
+
+    This function creates coordinate systems using schema-compliant dimension
+    specifications. Dimensions use "id" and "type" fields matching the JSON-LD
+    schema. Auto-labeling is supported when "id" is not provided.
 
     Args:
-        dimensions: List of dimension specifications as dictionaries
+        dimensions: List of dimension specifications. Each dict can contain:
+            - "id": Dimension identifier (optional, auto-generated if not provided)
+            - "unit": Unit specification (required)
+            - "type": Dimension type (optional, inferred from unit if not provided)
         id: Optional identifier for the coordinate system
         description: Optional description of the coordinate system
 
     Returns:
-        CoordinateSystem object
+        CoordinateSystem object with properly namespaced dimensions
 
     Example:
-        >>> # Direct call
-        >>> cs = coordinate_system(
-        ...     dimensions=[
-        ...         {"id": "x", "unit": "m", "type": "space"},
-        ...         {"id": "y", "unit": "m", "type": "space"}
-        ...     ]
-        ... )
+        >>> # With explicit IDs
+        >>> cs = coordinate_system([
+        ...     {"id": "x", "unit": "pixel", "type": "space"},
+        ...     {"id": "y", "unit": "pixel", "type": "space"}
+        ... ], id="raw_data")
+        >>> print(cs.dimensions[0].id)  # "raw_data#x"
+        >>>
+        >>> # With auto-generated IDs
+        >>> cs = coordinate_system([
+        ...     {"unit": "pixel", "type": "space"},  # Auto-labeled as dim_0
+        ...     {"unit": "pixel", "type": "space"}   # Auto-labeled as dim_1
+        ... ], id="image")
+        >>> print(cs.dimensions[0].id)  # "image#dim_0"
+        >>>
+        >>> # Mixed explicit/auto IDs with type inference
+        >>> cs = coordinate_system([
+        ...     {"id": "x", "unit": "pixel"},        # Explicit ID, inferred type
+        ...     {"unit": "pixel"},                   # Auto-ID and inferred type
+        ...     {"id": "time", "unit": "ms"}         # Explicit ID, inferred type
+        ... ])
         >>>
         >>> # From registry (expands dict as kwargs)
         >>> cs = from_data({
