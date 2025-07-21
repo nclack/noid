@@ -24,12 +24,13 @@ Scientific coordinate transformations require unambiguous dimension identity to 
 
 ### 3.1 Local ID Assignment
 
-Dimensions within a coordinate system are assigned local identifiers based on their label parameter when provided, or sequential identifiers following the pattern `dim_{n}` where `n` is the zero-based index when no label is specified.
+Dimensions within a coordinate system are assigned local identifiers based on their label parameter when provided, or sequential identifiers following the pattern `dim_{n}` where `n` is the zero-based index when no label is specified. Auto-labeling occurs during coordinate system construction via the `add_dimension()` method.
 
 ```
-Dimension("mm", "space", label="AP") → "AP"
-Dimension("mm", "space", label="ML") → "ML"
-Dimension("mm", "space") → "dim_0" (fallback)
+Dimension(unit="mm", kind="space", label="AP") → "AP"
+Dimension(unit="mm", kind="space", label="ML") → "ML"
+# Auto-generated via CoordinateSystem.add_dimension():
+cs.add_dimension(unit="mm", kind="space") → "dim_0" (auto-labeled)
 ```
 
 ### 3.2 Global ID Construction
@@ -56,39 +57,61 @@ Global IDs are generated dynamically rather than stored to avoid data redundancy
 
 ```python
 class Dimension:
-    def __init__(self, unit: str, type: str = None, label: str = None,
-                 coordinate_system_id: str = None, id: str = None):
+    def __init__(self, unit: str | Unit, kind: str | DimensionType = None,
+                 label: str = None, coordinate_system: "CoordinateSystem" = None,
+                 dimension_id: str = None):
         """Initialize dimension with unit and coordinate system.
 
         Args:
-            unit: Physical unit specification
-            type: Dimension type (space, time, other, index)
-            label: Human-readable label for local ID
-            coordinate_system_id: Coordinate system this dimension belongs to
-            id: Fully qualified dimension ID (alternative to coordinate_system_id + label)
+            unit: Physical unit specification (string or Unit object)
+            kind: Dimension type (space, time, other, index) - inferred from unit if None
+            label: Human-readable label for local ID (auto-generated if None and coordinate_system provided)
+            coordinate_system: CoordinateSystem object this dimension belongs to (enables auto-labeling)
+            dimension_id: Fully qualified dimension ID (alternative to coordinate_system + label)
 
         Raises:
-            ValueError: If neither coordinate_system_id nor fully qualified id provided
+            ValueError: If parameters are invalid or inconsistent
         """
-        self.unit = unit
-        self.type = type
+        # Handle coordinate_system object with auto-labeling
+        if coordinate_system is not None:
+            coordinate_system_id = coordinate_system.id
+            # Auto-generate label if not provided
+            if not label and not dimension_id:
+                label = coordinate_system._generate_dimension_label()
+                coordinate_system._register_dimension_label(label)
+        else:
+            coordinate_system_id = None
 
-        if id:
+        unit = unit if isinstance(unit, Unit) else Unit(unit)
+
+        # Infer kind from unit if not provided
+        if kind is None:
+            kind = unit.to_dimension_type()
+        else:
+            kind = kind if isinstance(kind, DimensionType) else DimensionType(kind)
+
+        # Handle dimension identity according to coordinate system namespacing rules
+        if dimension_id is not None and dimension_id.strip():
             # Parse fully qualified ID
-            cs_id, local_id = self.parse_dimension_id(id)
+            cs_id, local_id = self.parse_dimension_id(dimension_id)
             if not cs_id:
-                raise ValueError("Fully qualified dimension ID must include coordinate system")
-            self._coordinate_system_id = cs_id
-            self._local_id = local_id
-            self.label = label or local_id
-        elif coordinate_system_id and label:
-            # Use provided coordinate system and label
+                # Standalone dimension with simple ID
+                self._coordinate_system_id = None
+                self._local_id = dimension_id
+                self.label = label or dimension_id
+            else:
+                # Namespaced dimension ID
+                self._coordinate_system_id = cs_id
+                self._local_id = local_id
+                self.label = label or local_id
+        elif label:
+            # Use provided coordinate system (can be None) and label
             self._coordinate_system_id = coordinate_system_id
             self._local_id = label
             self.label = label
         else:
             raise ValueError(
-                "Must provide either fully qualified 'id' or both 'coordinate_system_id' and 'label'"
+                "Must provide either 'dimension_id' or 'coordinate_system' (with optional 'label')"
             )
 
     @property
@@ -130,9 +153,10 @@ class CoordinateSystem:
         """
         # Validate dimension ownership consistency
         for dim in dimensions:
-            if dim._coordinate_system_id != id:
+            if (hasattr(dim, "_coordinate_system_id") and dim._coordinate_system_id
+                and dim._coordinate_system_id != id):
                 raise ValueError(
-                    f"Dimension belongs to coordinate system '{dim._coordinate_system_id}' "
+                    f"Dimension '{dim.local_id}' belongs to coordinate system '{dim._coordinate_system_id}' "
                     f"but this coordinate system is '{id}'. All dimensions must belong "
                     f"to the same coordinate system."
                 )
@@ -140,6 +164,55 @@ class CoordinateSystem:
         self.id = id
         self.dimensions = dimensions
         self.description = description
+
+        # Initialize auto-labeling counter
+        self._auto_label_counter = 0
+        self._used_labels = {dim.local_id for dim in dimensions if hasattr(dim, "local_id")}
+
+    def add_dimension(self, unit: str | Unit, kind: str | DimensionType = None,
+                     label: str = None) -> "Dimension":
+        """Add a new dimension to this coordinate system with optional auto-labeling.
+
+        Args:
+            unit: Unit specification
+            kind: Dimension type (inferred from unit if None)
+            label: Dimension label (auto-generated if None)
+
+        Returns:
+            The created Dimension object
+
+        Raises:
+            ValueError: If label already exists in this coordinate system
+        """
+        if label and label in self._used_labels:
+            raise ValueError(
+                f"Dimension label '{label}' already exists in coordinate system '{self.id}'"
+            )
+
+        # Create dimension with this coordinate system
+        dim = Dimension(unit=unit, kind=kind, label=label, coordinate_system=self)
+
+        # Register the label as used
+        if not label:  # Auto-generated label was already registered in constructor
+            pass
+        else:  # Explicit label needs to be registered
+            self._register_dimension_label(dim.label)
+
+        # Add to our dimensions list
+        self.dimensions.append(dim)
+        return dim
+
+    def _generate_dimension_label(self) -> str:
+        """Generate an automatic dimension label (dim_0, dim_1, etc.)."""
+        while True:
+            label = f"dim_{self._auto_label_counter}"
+            if label not in self._used_labels:
+                return label
+            self._auto_label_counter += 1
+
+    def _register_dimension_label(self, label: str) -> None:
+        """Register a dimension label as used."""
+        self._used_labels.add(label)
 ```
 
 ### 4.3 Dimension ID Parsing
@@ -200,22 +273,28 @@ def extract_coordinate_system_id(dimensions: list[Dimension]) -> str | None:
 
 ### 5.1 Coordinate System Serialization
 
+The actual JSON-LD output from the noid-spaces implementation:
+
 ```json
 {
-  "coordinate-system": {
-    "@id": "mouse_123_native",
+  "@context": {
+    "spac": "https://github.com/nclack/noid/schemas/space/"
+  },
+  "spac:coordinate-system": {
     "dimensions": [
       {
-        "@id": "mouse_123_native#AP",
+        "id": "mouse_123_native#AP",
         "unit": "mm",
         "type": "space"
       },
       {
-        "@id": "mouse_123_native#ML",
+        "id": "mouse_123_native#ML",
         "unit": "mm",
         "type": "space"
       }
-    ]
+    ],
+    "id": "mouse_123_native",
+    "description": "Mouse coordinate system"
   }
 }
 ```
@@ -349,8 +428,11 @@ When serializing dimensions outside of coordinate system context, the global ID 
 
 ```json
 {
-  "dimension": {
-    "@id": "mouse_123_native#AP",
+  "@context": {
+    "spac": "https://github.com/nclack/noid/schemas/space/"
+  },
+  "spac:dimension": {
+    "id": "mouse_123_native#AP",
     "unit": "mm",
     "type": "space"
   }
@@ -365,12 +447,40 @@ Each dimension instance can belong to at most one coordinate system. Attempting 
 
 ### 6.2 Transform Chain Validation
 
-Transform validation compares global dimension IDs to ensure proper axis mapping:
+Transform validation uses a sophisticated 4-tier compatibility system to validate dimension mappings in transform chains:
 
 ```python
-def validate_dimension_compatibility(output_dim: Dimension, input_dim: Dimension) -> bool:
-    """Validate dimension compatibility for transform chains."""
-    return output_dim.id == input_dim.id
+def validate_dimension_id_compatibility(output_dim: Dimension, input_dim: Dimension,
+                                      strict: bool = True) -> None:
+    """Validate dimension compatibility for transform chains with 4-tier logic."""
+    # 1. IDEAL: Same global dimension ID - perfect match
+    if output_dim.id == input_dim.id:
+        return  # Perfect match - no issues
+
+    # 2. COMPATIBLE: Same local ID with compatible coordinate systems
+    if output_dim.local_id == input_dim.local_id:
+        if (output_dim.coordinate_system_id is not None and
+            input_dim.coordinate_system_id is not None):
+            return  # Compatible - same local meaning, different coordinate systems
+
+    # 3. COMPATIBLE: Different local IDs but same semantic meaning
+    if (output_dim.type == input_dim.type and
+        output_dim.unit.value == input_dim.unit.value):
+        # Same semantic meaning - this is compatible, no warning needed
+        return
+
+    # 4. INCOMPATIBLE: Completely different dimensions
+    if (output_dim.type != input_dim.type or
+        output_dim.unit.value != input_dim.unit.value):
+        message = (
+            f"Incompatible dimensions at transform {transform_index}, dimension {dimension_index}: "
+            f"output dimension '{output_dim.id}' ({output_dim.type}, {output_dim.unit.value}) "
+            f"vs input dimension '{input_dim.id}' ({input_dim.type}, {input_dim.unit.value})"
+        )
+        if strict:
+            raise ValidationError(message)
+        else:
+            warnings.warn(message, ValidationWarning, stacklevel=3)
 ```
 
 ### 6.3 ID Consistency
@@ -382,23 +492,33 @@ Coordinate system ID changes require updating all associated dimension reference
 ### 7.1 Basic Usage
 
 ```python
-# Method 1: Create dimensions with coordinate system ID
-mouse_cs = CoordinateSystem(
-    id="mouse_123_native",
+from noid_spaces import coordinate_system
+from noid_spaces.models import CoordinateSystem, Dimension
+
+# Method 1: Using the factory function (recommended)
+mouse_cs = coordinate_system(
     dimensions=[
-        Dimension("mm", "space", label="AP", coordinate_system_id="mouse_123_native"),
-        Dimension("mm", "space", label="ML", coordinate_system_id="mouse_123_native"),
-        Dimension("mm", "space", label="DV", coordinate_system_id="mouse_123_native"),
-    ]
+        {"id": "AP", "unit": "mm", "type": "space"},
+        {"id": "ML", "unit": "mm", "type": "space"},
+        {"id": "DV", "unit": "mm", "type": "space"},
+    ],
+    id="mouse_123_native",
+    description="Mouse native coordinate system"
 )
 
-# Method 2: Create dimensions with fully qualified IDs
-atlas_cs = CoordinateSystem(
-    id="allen_ccf_v3",
+# Method 2: Using add_dimension with auto-labeling
+atlas_cs = CoordinateSystem(id="allen_ccf_v3", dimensions=[])
+ap_dim = atlas_cs.add_dimension(unit="mm", kind="space", label="AP")
+ml_dim = atlas_cs.add_dimension(unit="mm", kind="space", label="ML")
+dv_dim = atlas_cs.add_dimension(unit="mm", kind="space")  # Auto-labeled as "dim_2"
+
+# Method 3: Direct dimension creation with fully qualified IDs
+pixel_cs = CoordinateSystem(
+    id="raw_data",
     dimensions=[
-        Dimension("mm", "space", id="allen_ccf_v3#AP"),
-        Dimension("mm", "space", id="allen_ccf_v3#ML"),
-        Dimension("mm", "space", id="allen_ccf_v3#DV"),
+        Dimension(unit="pixel", dimension_id="raw_data#x"),
+        Dimension(unit="pixel", dimension_id="raw_data#y"),
+        Dimension(unit="ms", dimension_id="raw_data#time"),
     ]
 )
 
@@ -407,34 +527,114 @@ AP, ML, DV = mouse_cs.dimensions
 print(AP.id)        # "mouse_123_native#AP"
 print(AP.local_id)  # "AP"
 print(AP.label)     # "AP"
+print(DV.type)      # DimensionType.SPACE (inferred from unit)
 ```
 
 ### 7.2 Dimension Reuse Prevention
 
 ```python
-atlas_cs = CoordinateSystem(
-    id="allen_ccf_v3",
-    dimensions=[
-        Dimension("mm", "space"),
-        Dimension("mm", "space"),
-        Dimension("mm", "space"),
-    ]
-)
+from noid_spaces.models import CoordinateSystem, Dimension
 
-# This raises ValueError
+# Create coordinate systems with auto-labeling
+atlas_cs = CoordinateSystem(id="allen_ccf_v3", dimensions=[])
+atlas_cs.add_dimension(unit="mm", kind="space")  # Auto-labeled as "dim_0"
+atlas_cs.add_dimension(unit="mm", kind="space")  # Auto-labeled as "dim_1"
+atlas_cs.add_dimension(unit="mm", kind="space")  # Auto-labeled as "dim_2"
+
+# This raises ValueError - dimension objects cannot be shared between coordinate systems
 try:
     mixed_cs = CoordinateSystem(
         id="mixed",
-        dimensions=[mouse_cs.dimensions[0], atlas_cs.dimensions[1]]
+        dimensions=[mouse_cs.dimensions[0], atlas_cs.dimensions[1]]  # Reusing dimension objects
     )
 except ValueError as e:
-    # "Dimension already belongs to coordinate system 'mouse_123_native'"
+    # "Dimension 'AP' belongs to coordinate system 'mouse_123_native' but this coordinate system is 'mixed'"
     pass
+
+# Correct approach: Create new dimension objects with same properties
+mixed_cs = CoordinateSystem(
+    id="mixed",
+    dimensions=[
+        Dimension(unit="mm", kind="space", dimension_id="mixed#AP"),  # New dimension object
+        Dimension(unit="mm", kind="space", dimension_id="mixed#ML"),  # New dimension object
+    ]
+)
 ```
 
-### 7.3 Coordinate System Extraction
+### 7.3 Factory Function with Auto-labeling
 
 ```python
+from noid_spaces import coordinate_system
+
+# Auto-labeling when IDs not provided
+cs = coordinate_system(
+    dimensions=[
+        {"unit": "pixel", "type": "space"},    # Auto-labeled as "dim_0"
+        {"unit": "pixel", "type": "space"},    # Auto-labeled as "dim_1"
+        {"id": "time", "unit": "ms", "type": "time"},  # Explicit ID
+    ],
+    id="image-coords"
+)
+print(cs.dimensions[0].id)  # "image-coords#dim_0"
+print(cs.dimensions[1].id)  # "image-coords#dim_1"
+print(cs.dimensions[2].id)  # "image-coords#time"
+
+# Mixed explicit and auto-generated IDs with type inference
+cs2 = coordinate_system(
+    dimensions=[
+        {"id": "x", "unit": "mm"},        # Explicit ID, inferred type
+        {"unit": "mm"},                   # Auto ID, inferred type
+        {"id": "time", "unit": "ms"}      # Explicit ID, inferred type
+    ],
+    id="mixed-system"
+)
+print(cs2.dimensions[0].type)  # DimensionType.SPACE (inferred)
+print(cs2.dimensions[1].id)    # "mixed-system#dim_0"
+print(cs2.dimensions[2].type)  # DimensionType.TIME (inferred)
+```
+
+### 7.4 JSON-LD Serialization
+
+```python
+from noid_spaces import coordinate_system, to_jsonld, from_jsonld
+
+# Create coordinate system with namespaced dimensions
+cs = coordinate_system(
+    dimensions=[
+        {"id": "x", "unit": "mm", "type": "space"},
+        {"unit": "mm", "type": "space"},  # Auto-labeled
+    ],
+    id="test-system"
+)
+
+# Serialize to JSON-LD
+jsonld_data = to_jsonld(cs)
+print(jsonld_data)
+# Output:
+# {
+#   "@context": {"spac": "https://github.com/nclack/noid/schemas/space/"},
+#   "spac:coordinate-system": {
+#     "dimensions": [
+#       {"id": "test-system#x", "unit": "mm", "type": "space"},
+#       {"id": "test-system#dim_0", "unit": "mm", "type": "space"}
+#     ],
+#     "id": "test-system"
+#   }
+# }
+
+# Deserialize from JSON-LD
+jsonld_result = from_jsonld(jsonld_data)
+cs_key = [k for k in jsonld_result.keys() if "coordinate-system" in k][0]
+reconstructed_cs = jsonld_result[cs_key]
+print(reconstructed_cs.dimensions[0].id)  # "test-system#x"
+print(reconstructed_cs.dimensions[1].id)  # "test-system#dim_0"
+```
+
+### 7.5 Coordinate System Extraction
+
+```python
+from noid_spaces.models import extract_coordinate_system_id
+
 dimensions = [some_dimension_list]
 cs_id = extract_coordinate_system_id(dimensions)
 if cs_id:

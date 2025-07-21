@@ -664,8 +664,7 @@ class CoordinateSystem:
         # Store original Dimension objects for property access
         self._dimensions = dimensions
 
-        # Initialize auto-labeling counter
-        self._auto_label_counter = 0
+        # Initialize set of used labels for auto-labeling
         self._used_labels = {
             dim.local_id for dim in dimensions if hasattr(dim, "local_id")
         }
@@ -790,16 +789,23 @@ class CoordinateSystem:
 
     def _generate_dimension_label(self) -> str:
         """
-        Generate an automatic dimension label (dim_0, dim_1, etc.).
+        Generate an automatic dimension label based on array index (dim_0, dim_1, etc.).
 
         Returns:
-            Unique dimension label following the dim_N pattern
+            Unique dimension label following the dim_N pattern where N is the array index
         """
-        while True:
-            label = f"dim_{self._auto_label_counter}"
-            if label not in self._used_labels:
-                return label
-            self._auto_label_counter += 1
+        # Use the current array length as the index for the new dimension
+        # This ensures dim_i corresponds to array index i
+        index = len(self.dimensions)
+        label = f"dim_{index}"
+
+        # If this label is already taken (shouldn't normally happen with array indexing),
+        # find the next available label
+        while label in self._used_labels:
+            index += 1
+            label = f"dim_{index}"
+
+        return label
 
     def _register_dimension_label(self, label: str) -> None:
         """

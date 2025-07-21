@@ -18,13 +18,10 @@
 # ==========================================
 
 # Primary microscopy units
-micrometer = 1e-6 * meter = µm = micron = um
-nanometer = 1e-9 * meter = nm
-angstrom = 1e-10 * meter = Å = ångström = AA
-
-# Additional spatial units for multi-scale imaging
-picometer = 1e-12 * meter = pm
-femtometer = 1e-15 * meter = fm
+# Note: micrometer, nanometer, angstrom, picometer, femtometer are already in Pint's default registry
+# Only adding custom aliases not in Pint
+um = micrometer
+AA = angstrom
 attometer = 1e-18 * meter = am
 
 # ==========================================
@@ -32,29 +29,22 @@ attometer = 1e-18 * meter = am
 # ==========================================
 
 # Concentration units
-molarity = mole / liter = M = molar
-millimolar = 1e-3 * molarity = mM
-micromolar = 1e-6 * molarity = µM = uM = microM
-nanomolar = 1e-9 * molarity = nM = nanoM
-picomolar = 1e-12 * molarity = pM = picoM
+# Note: molar (M) is already in Pint's default registry
+# Adding custom biomedical concentration units
+millimolar = 1e-3 * molar = mM
+micromolar = 1e-6 * molar = µM = uM = microM
+nanomolar = 1e-9 * molar = nM = nanoM
+picomolar = 1e-12 * molar = pM = picoM
 
 # Mass concentration
 milligrams_per_liter = milligram / liter = mg_per_L = mg/L
 micrograms_per_liter = microgram / liter = µg_per_L = ug_per_L = µg/L = ug/L
 
 # Parts per notation
-parts_per_million = 1e-6 = ppm
+# Note: ppm is already in Pint's default registry
+# Adding additional parts-per notation
 parts_per_billion = 1e-9 = ppb
 parts_per_trillion = 1e-12 = ppt
-
-# ==========================================
-# ENZYME & CATALYTIC ACTIVITY
-# ==========================================
-
-# Enzyme units
-enzyme_unit = micromole / minute = U = unit_enzyme
-international_unit = enzyme_unit = IU
-katal = mole / second = kat
 
 # ==========================================
 # CELLULAR & MOLECULAR BIOLOGY
@@ -73,14 +63,13 @@ molecules_per_cell = 1 = molecules/cell
 # ==========================================
 
 # Digital imaging
-pixel = 1 = px = pixel_unit
+# Note: pixel and count are already in Pint's default registry
+# Adding custom imaging units
 voxel = 1 = voxel_unit
 gray_level = 1 = gray_value = grayscale
-counts = 1 = count = cts
+counts = 1 = cts
 
 # Pixel density/resolution
-pixels_per_inch = pixel / inch = ppi
-dots_per_inch = pixel / inch = dpi
 pixels_per_micrometer = pixel / micrometer = px_per_µm = px/µm
 
 # ==========================================
@@ -111,8 +100,8 @@ photons_per_square_centimeter = 1 / centimeter**2 = photons/cm² = ph/cm²
 
 # Osmolality and tonicity
 osmole = mole = osm
-osmolal = osmole / kilogram = osmolal = osm/kg
-milliosmolal = 1e-3 * osmolal = mOsm/kg
+osmolality = osmole / kilogram = osm/kg
+milliosmolality = 1e-3 * osmolality = mOsm/kg
 
 # pH and ion concentration (dimensionless but with special meaning)
 ph_unit = 1 = pH
@@ -122,8 +111,10 @@ pka_unit = 1 = pKa
 practical_salinity_unit = 1 = psu = PSU
 
 # Optical density and absorbance
+# Note: au (astronomical unit) is already in Pint's default registry
+# Using different symbol to avoid conflict
 optical_density_unit = 1 = OD = od
-absorbance_unit = 1 = AU = au = abs_unit
+absorbance_unit = 1 = abs_unit
 
 # ==========================================
 # FLOW CYTOMETRY & CELL ANALYSIS
@@ -147,9 +138,9 @@ arbitrary_fluorescence_unit = 1 = AFU = afu
 # - Sequential ordering (first, second, third item)
 # - Discrete counting positions without physical meaning
 # - Channel numbers, frame numbers, z-slice indices
-index = 1 = dimensionless
+index = 1
 
-arbitrary = 1 = dimensionless
+arbitrary = 1
 
 # Additional dimensionless ratios common in biology
 ratio = 1 = dimensionless_ratio

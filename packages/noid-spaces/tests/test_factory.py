@@ -339,7 +339,9 @@ class TestCoordinateSystemFactory:
         )
         assert len(cs.dimensions) == 3
         assert cs.dimensions[0].id == "mixed-system#x"  # Explicit
-        assert cs.dimensions[1].id == "mixed-system#dim_0"  # Auto-generated
+        assert (
+            cs.dimensions[1].id == "mixed-system#dim_1"
+        )  # Auto-generated (2nd dimension, index 1)
         assert cs.dimensions[2].id == "mixed-system#time"  # Explicit
         # First two should infer to SPACE, third to TIME
         assert cs.dimensions[0].type == DimensionType.SPACE

@@ -89,11 +89,11 @@ class TestAutomaticDimensionLabeling:
         # Mix auto and explicit labels
         auto_dim1 = cs.add_dimension(unit="mm", kind="space")  # Should be dim_0
         explicit_dim = cs.add_dimension(unit="mm", kind="space", label="custom")
-        auto_dim2 = cs.add_dimension(unit="ms", kind="time")  # Should be dim_1
+        auto_dim2 = cs.add_dimension(unit="ms", kind="time")  # Should be dim_2
 
         assert auto_dim1.id == "test_system#dim_0"
         assert explicit_dim.id == "test_system#custom"
-        assert auto_dim2.id == "test_system#dim_1"
+        assert auto_dim2.id == "test_system#dim_2"
 
     def test_auto_labeling_counter_continues(self):
         """Test that auto-labeling counter continues properly."""
@@ -102,14 +102,14 @@ class TestAutomaticDimensionLabeling:
         # Add some dimensions
         cs.add_dimension(unit="mm", kind="space")  # dim_0
         cs.add_dimension(unit="mm", kind="space", label="custom")
-        cs.add_dimension(unit="ms", kind="time")  # dim_1
+        cs.add_dimension(unit="ms", kind="time")  # dim_2
 
         # Add more - should continue counting
-        dim4 = cs.add_dimension(unit="arbitrary", kind="other")  # dim_2
-        dim5 = cs.add_dimension(unit="index", kind="index")  # dim_3
+        dim4 = cs.add_dimension(unit="arbitrary", kind="other")  # dim_3
+        dim5 = cs.add_dimension(unit="index", kind="index")  # dim_4
 
-        assert dim4.id == "test_system#dim_2"
-        assert dim5.id == "test_system#dim_3"
+        assert dim4.id == "test_system#dim_3"
+        assert dim5.id == "test_system#dim_4"
 
     def test_auto_labeling_duplicate_label_prevention(self):
         """Test that duplicate labels are prevented."""
@@ -118,14 +118,16 @@ class TestAutomaticDimensionLabeling:
         # Add explicit label
         cs.add_dimension(unit="mm", kind="space", label="dim_1")
 
-        # Auto-labeling should skip dim_1
-        auto_dim1 = cs.add_dimension(unit="mm", kind="space")  # Should be dim_0
+        # Auto-labeling should use array index but skip conflicts
+        auto_dim1 = cs.add_dimension(
+            unit="mm", kind="space"
+        )  # Should be dim_1, but that's taken, so dim_2
         auto_dim2 = cs.add_dimension(
             unit="ms", kind="time"
-        )  # Should be dim_2 (skipping dim_1)
+        )  # Should be dim_2, but that's taken, so dim_3
 
-        assert auto_dim1.id == "test_system#dim_0"
-        assert auto_dim2.id == "test_system#dim_2"
+        assert auto_dim1.id == "test_system#dim_2"  # Skipped dim_1 due to conflict
+        assert auto_dim2.id == "test_system#dim_3"
 
     def test_explicit_label_conflicts(self):
         """Test that explicit label conflicts are caught."""
@@ -278,7 +280,9 @@ class TestDimensionIdentityIntegration:
         assert y_dim.id == "microscopy_acquisition#y"
         assert z_dim.id == "microscopy_acquisition#z"
         assert time_dim.id == "microscopy_acquisition#time"
-        assert channel_dim.id == "microscopy_acquisition#dim_0"  # Auto-labeled
+        assert (
+            channel_dim.id == "microscopy_acquisition#dim_4"
+        )  # Auto-labeled (5th dimension, index 4)
 
         # Verify coordinate system
         assert len(microscopy_cs.dimensions) == 5
