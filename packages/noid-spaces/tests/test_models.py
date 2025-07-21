@@ -463,12 +463,9 @@ class TestCoordinateTransform:
     @pytest.fixture
     def sample_transform(self):
         """Create sample transform for testing."""
-        try:
-            import noid_transforms
+        import noid_transforms
 
-            return noid_transforms.translation([0.1, 0.1])
-        except ImportError:
-            pytest.skip("noid_transforms not available")
+        return noid_transforms.translation([0.1, 0.1])
 
     def test_basic_creation(self, sample_coordinate_systems, sample_transform):
         """Test creating coordinate transform with required parameters."""

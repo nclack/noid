@@ -37,9 +37,11 @@ classes:
       using "nm" for wavelength channels instead of spatial dimensions.
     attributes:
       id:
-        description: Unique identifier for the dimension
-        identifier: true
-        required: true
+        description: >-
+          Unique identifier for the dimension. If part of a CoordinateSystem, the id may
+          be optional and will be assigned a default value according to it's order in
+          the `dimensions` array: dim_0, dim_1, etc.
+        required: false
         pattern: "^.+$"  # Non-empty string
         annotations:
           jsonld.id: "@id"

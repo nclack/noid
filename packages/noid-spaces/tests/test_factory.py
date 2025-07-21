@@ -298,95 +298,83 @@ class TestCoordinateTransformFactory:
 
     def test_create_coordinate_transform_minimal(self):
         """Test creating coordinate transform with minimal parameters."""
-        try:
-            ct = coordinate_transform(
-                input={"dimensions": [{"id": "x", "unit": "pixel"}]},
-                output={"dimensions": [{"id": "x", "unit": "mm"}]},
-                transform={"translation": [0.1]},
-            )
-            assert isinstance(ct, CoordinateTransform)
-            assert ct.id is None
-            assert ct.description is None
-            assert len(ct.input.dimensions) == 1
-            assert len(ct.output.dimensions) == 1
-        except ImportError:
-            pytest.skip("noid_transforms not available")
+        ct = coordinate_transform(
+            input={"dimensions": [{"id": "x", "unit": "pixel"}]},
+            output={"dimensions": [{"id": "x", "unit": "mm"}]},
+            transform={"translation": [0.1]},
+        )
+        assert isinstance(ct, CoordinateTransform)
+        assert ct.id is None
+        assert ct.description is None
+        assert len(ct.input.dimensions) == 1
+        assert len(ct.output.dimensions) == 1
 
     def test_create_coordinate_transform_full(self):
         """Test creating coordinate transform with all parameters."""
-        try:
-            ct = coordinate_transform(
-                input={
-                    "dimensions": [
-                        {"id": "x", "unit": "pixel"},
-                        {"id": "y", "unit": "pixel"},
-                    ]
-                },
-                output={
-                    "dimensions": [{"id": "x", "unit": "µm"}, {"id": "y", "unit": "µm"}]
-                },
-                transform={"scale": [0.5, 0.5]},
-                id="pixel-to-micron",
-                description="Convert pixels to microns",
-            )
-            assert isinstance(ct, CoordinateTransform)
-            assert ct.id == "pixel-to-micron"
-            assert ct.description == "Convert pixels to microns"
-            assert len(ct.input.dimensions) == 2
-            assert len(ct.output.dimensions) == 2
-        except ImportError:
-            pytest.skip("noid_transforms not available")
+        ct = coordinate_transform(
+            input={
+                "dimensions": [
+                    {"id": "x", "unit": "pixel"},
+                    {"id": "y", "unit": "pixel"},
+                ]
+            },
+            output={
+                "dimensions": [{"id": "x", "unit": "µm"}, {"id": "y", "unit": "µm"}]
+            },
+            transform={"scale": [0.5, 0.5]},
+            id="pixel-to-micron",
+            description="Convert pixels to microns",
+        )
+        assert isinstance(ct, CoordinateTransform)
+        assert ct.id == "pixel-to-micron"
+        assert ct.description == "Convert pixels to microns"
+        assert len(ct.input.dimensions) == 2
+        assert len(ct.output.dimensions) == 2
 
     def test_coordinate_transform_from_data(self):
         """Test creating coordinate transform via from_data."""
-        try:
-            data = {
-                "coordinate-transform": {
-                    "input": {"dimensions": [{"id": "x", "unit": "pixel"}]},
-                    "output": {"dimensions": [{"id": "x", "unit": "mm"}]},
-                    "transform": {"translation": [0.1]},
-                    "id": "test-transform",
-                }
+        data = {
+            "coordinate-transform": {
+                "input": {"dimensions": [{"id": "x", "unit": "pixel"}]},
+                "output": {"dimensions": [{"id": "x", "unit": "mm"}]},
+                "transform": {"translation": [0.1]},
+                "id": "test-transform",
             }
-            ct = from_data(data)
-            assert isinstance(ct, CoordinateTransform)
-            assert ct.id == "test-transform"
-            assert len(ct.input.dimensions) == 1
-            assert len(ct.output.dimensions) == 1
-        except ImportError:
-            pytest.skip("noid_transforms not available")
+        }
+        ct = from_data(data)
+        assert isinstance(ct, CoordinateTransform)
+        assert ct.id == "test-transform"
+        assert len(ct.input.dimensions) == 1
+        assert len(ct.output.dimensions) == 1
 
     def test_coordinate_transform_from_json(self):
         """Test creating coordinate transform from JSON."""
-        try:
-            json_str = """{
-                "coordinate-transform": {
-                    "input": {
-                        "dimensions": [
-                            {"id": "x", "unit": "pixel"},
-                            {"id": "y", "unit": "pixel"}
-                        ]
-                    },
-                    "output": {
-                        "dimensions": [
-                            {"id": "x", "unit": "mm"},
-                            {"id": "y", "unit": "mm"}
-                        ]
-                    },
-                    "transform": "identity",
-                    "description": "Identity transform"
-                }
-            }"""
-            ct = from_json(json_str)
-            assert isinstance(ct, CoordinateTransform)
-            assert ct.description == "Identity transform"
-            assert len(ct.input.dimensions) == 2
-        except ImportError:
-            pytest.skip("noid_transforms not available")
+        json_str = """{
+            "coordinate-transform": {
+                "input": {
+                    "dimensions": [
+                        {"id": "x", "unit": "pixel"},
+                        {"id": "y", "unit": "pixel"}
+                    ]
+                },
+                "output": {
+                    "dimensions": [
+                        {"id": "x", "unit": "mm"},
+                        {"id": "y", "unit": "mm"}
+                    ]
+                },
+                "transform": "identity",
+                "description": "Identity transform"
+            }
+        }"""
+        ct = from_json(json_str)
+        assert isinstance(ct, CoordinateTransform)
+        assert ct.description == "Identity transform"
+        assert len(ct.input.dimensions) == 2
 
     def test_coordinate_transform_invalid_transform(self):
         """Test that invalid transform data raises error."""
-        with pytest.raises((ValueError, ImportError)):
+        with pytest.raises(ValueError):
             coordinate_transform(
                 input={"dimensions": [{"id": "x", "unit": "pixel"}]},
                 output={"dimensions": [{"id": "x", "unit": "mm"}]},

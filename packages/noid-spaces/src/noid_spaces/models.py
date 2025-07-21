@@ -109,6 +109,8 @@ class Unit:
         # Determine if unit is non-physical based on semantic meaning
         self._is_non_physical = unit in ["index", "arbitrary"]
 
+        # Unit validation happens via Pint in constructor, so no additional validation needed
+
     @staticmethod
     def _validate_unit(unit_str: str) -> pint.Unit:
         """
@@ -352,48 +354,123 @@ class Dimension:
     A single axis within a coordinate space with its measurement unit and classification.
 
     Example:
-        >>> # Create a spatial dimension with explicit type
+        >>> # Create dimensions with coordinate system namespacing
+        >>> ap_dim = Dimension(unit="mm", type=DimensionType.SPACE, label="AP", coordinate_system_id="mouse_123")
+        >>> ml_dim = Dimension(unit="mm", type=DimensionType.SPACE, label="ML", coordinate_system_id="mouse_123")
+        >>>
+        >>> # Create with fully qualified ID
+        >>> dv_dim = Dimension(unit="mm", id="mouse_123#DV")
+        >>>
+        >>> # Legacy support - create with explicit id (no coordinate system)
         >>> x_dim = Dimension(id="x", unit="m", type=DimensionType.SPACE)
-        >>>
-        >>> # Create with type inferred from unit
-        >>> y_dim = Dimension(id="y", unit="mm")  # Infers SPACE from "mm"
-        >>> time_dim = Dimension(id="time", unit="s")  # Infers TIME from "s"
-        >>> idx_dim = Dimension(id="idx", unit="index")  # Infers INDEX from "index"
-        >>>
-        >>> # Override inferred type (e.g., wavelength channel using nm)
-        >>> wavelength = Dimension(id="wavelength", unit="nm", kind=DimensionType.OTHER)
     """
 
     def __init__(
-        self, id: str, unit: str | Unit, kind: str | DimensionType | None = None
+        self,
+        unit: str | Unit = None,
+        type: str | DimensionType | None = None,
+        label: str | None = None,
+        coordinate_system_id: str | None = None,
+        id: str | None = None,
+        # Legacy support for old signature
+        kind: str | DimensionType | None = None,
     ) -> None:
         """
         Create a dimension with validation.
 
         Args:
-            id: Unique identifier for the dimension
             unit: Unit specification (string or UnitTerm)
-            kind: Dimension type (string or DimensionType enum). If None, inferred from unit.
+            type: Dimension type (string or DimensionType enum). If None, inferred from unit.
+            label: Human-readable label for local ID
+            coordinate_system_id: Coordinate system this dimension belongs to
+            id: Fully qualified dimension ID (alternative to coordinate_system_id + label)
+            kind: Legacy parameter name for type (deprecated)
 
         Raises:
             ValueError: If parameters are invalid or inconsistent
         """
-        # Validate inputs first
-        if not id or not isinstance(id, str):
-            raise ValueError("Dimension id must be a non-empty string")
+        # Handle legacy call signature where id was first parameter
+        if (
+            isinstance(unit, str)
+            and not any([label, coordinate_system_id])
+            and id is None
+        ):
+            # Check if this looks like legacy call: Dimension(id="x", unit="m", ...)
+            # In this case, unit is actually the old id parameter
+            if type is not None and isinstance(type, (str, Unit)):
+                # Legacy: Dimension(id="x", unit="m", kind=...)
+                old_id = unit
+                unit = type
+                type = kind
+                id = old_id
 
+        # Handle kind parameter (legacy)
+        if kind is not None and type is None:
+            type = kind
         unit = unit if isinstance(unit, Unit) else Unit(unit)
 
         # Infer type from unit if not provided
-        if kind is None:
-            kind = unit.to_dimension_type()
+        if type is None:
+            type = unit.to_dimension_type()
         else:
-            kind = kind if isinstance(kind, DimensionType) else DimensionType(kind)
+            type = type if isinstance(type, DimensionType) else DimensionType(type)
 
-        self._validate_unit_type_consistency(unit, kind)
+        self._validate_unit_type_consistency(unit, type)
 
-        # Create internal representation
-        self._inner = _Dimension(id=id, unit=unit.value, type=kind.value)
+        # Handle dimension identity according to RFC
+        if id:
+            # Parse fully qualified ID
+            cs_id, local_id = self.parse_dimension_id(id)
+            if not cs_id:
+                # Legacy support: if no coordinate system in ID, treat as local ID only
+                self._coordinate_system_id = None
+                self._local_id = id
+                self.label = label or id
+            else:
+                self._coordinate_system_id = cs_id
+                self._local_id = local_id
+                self.label = label or local_id
+        elif coordinate_system_id and label:
+            # Use provided coordinate system and label
+            self._coordinate_system_id = coordinate_system_id
+            self._local_id = label
+            self.label = label
+        else:
+            raise ValueError(
+                "Must provide either fully qualified 'id' or both 'coordinate_system_id' and 'label'"
+            )
+
+        # Create internal representation for LinkML compatibility
+        dimension_id = (
+            self.id if hasattr(self, "_coordinate_system_id") else (id or label)
+        )
+        self._inner = _Dimension(id=dimension_id, unit=unit.value, type=type.value)
+
+        # Validate the dimension (non-strict to avoid breaking existing functionality)
+        from .validation import validate_dimension
+
+        validate_dimension(self, strict=False)
+
+    @staticmethod
+    def parse_dimension_id(dim_id: str) -> tuple[str | None, str]:
+        """
+        Parse dimension ID into coordinate system and local components.
+
+        Args:
+            dim_id: Dimension identifier to parse
+
+        Returns:
+            Tuple of (coordinate_system_id, local_id)
+
+        Examples:
+            "mouse_123#AP" → ("mouse_123", "AP")
+            "AP" → (None, "AP")
+        """
+        if "#" in dim_id:
+            cs_id, local_id = dim_id.split("#", 1)
+            return cs_id, local_id
+        else:
+            return None, dim_id
 
     @staticmethod
     def _validate_unit_type_consistency(unit: Unit, type: DimensionType) -> None:
@@ -406,8 +483,23 @@ class Dimension:
 
     @property
     def id(self) -> str:
-        """Unique identifier for the dimension."""
-        return self._inner.id
+        """Return global dimension identifier."""
+        if self._coordinate_system_id and self._local_id:
+            return f"{self._coordinate_system_id}#{self._local_id}"
+        elif self._local_id:
+            return self._local_id
+        else:
+            raise ValueError("Dimension not properly initialized")
+
+    @property
+    def local_id(self) -> str:
+        """Return local dimension identifier."""
+        return self._local_id
+
+    @property
+    def coordinate_system_id(self) -> str | None:
+        """Return coordinate system identifier."""
+        return self._coordinate_system_id
 
     @property
     def unit(self) -> Unit:
@@ -454,9 +546,9 @@ class Dimension:
             raise ValueError(f"Missing required field: {e}") from e
 
         # Type is optional - will be inferred from unit if not provided
-        kind = data.get("type", None)
+        type_value = data.get("type", None)
 
-        return cls(id=id, unit=unit, kind=kind)
+        return cls(unit=unit, type=type_value, id=id)
 
     def __repr__(self) -> str:
         """Developer representation."""
@@ -514,7 +606,7 @@ class CoordinateSystem:
             description: Optional description of the coordinate system
 
         Raises:
-            ValueError: If parameters are invalid
+            ValueError: If parameters are invalid or dimensions belong to different coordinate systems
         """
         # Validate inputs
         if not dimensions:
@@ -535,6 +627,19 @@ class CoordinateSystem:
                 "CoordinateSystem description must be a non-empty string if provided"
             )
 
+        # Validate dimension ownership consistency according to RFC
+        for dim in dimensions:
+            if (
+                hasattr(dim, "_coordinate_system_id")
+                and dim._coordinate_system_id
+                and dim._coordinate_system_id != id
+            ):
+                raise ValueError(
+                    f"Dimension '{dim.local_id}' belongs to coordinate system '{dim._coordinate_system_id}' "
+                    f"but this coordinate system is '{id}'. All dimensions must belong "
+                    f"to the same coordinate system."
+                )
+
         # Convert Dimension objects to their internal representations for LinkML
         dimension_data = [dim._inner for dim in dimensions]
 
@@ -547,6 +652,11 @@ class CoordinateSystem:
 
         # Store original Dimension objects for property access
         self._dimensions = dimensions
+
+        # Validate the coordinate system (non-strict to avoid breaking existing functionality)
+        from .validation import validate_coordinate_system
+
+        validate_coordinate_system(self, strict=False)
 
     @property
     def id(self) -> str | None:
@@ -728,6 +838,11 @@ class CoordinateTransform:
         self._output = output
         self._transform = transform
 
+        # Validate the coordinate transform (non-strict to avoid breaking existing functionality)
+        from .validation import validate_coordinate_transform
+
+        validate_coordinate_transform(self, strict=False)
+
     @property
     def id(self) -> str | None:
         """Optional identifier for the coordinate transform."""
@@ -857,3 +972,29 @@ class CoordinateTransform:
             == other._transform.to_data()  # Compare transform data
             and self._inner.description == other._inner.description
         )
+
+
+def extract_coordinate_system_id(dimensions: list[Dimension]) -> str | None:
+    """
+    Extract coordinate system ID from a set of dimensions.
+
+    Args:
+        dimensions: List of dimensions to analyze
+
+    Returns:
+        Coordinate system ID if all dimensions belong to same system, None otherwise
+
+    Raises:
+        ValueError: If dimensions belong to multiple coordinate systems
+    """
+    cs_ids = set()
+    for dim in dimensions:
+        if hasattr(dim, "coordinate_system_id") and dim.coordinate_system_id:
+            cs_ids.add(dim.coordinate_system_id)
+
+    if len(cs_ids) == 0:
+        return None
+    elif len(cs_ids) == 1:
+        return cs_ids.pop()
+    else:
+        raise ValueError(f"Dimensions belong to multiple coordinate systems: {cs_ids}")
